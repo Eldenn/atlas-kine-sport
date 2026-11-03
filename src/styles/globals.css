@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import './coreloom/fonts.css';
+/* Not coreloom/fonts.css: the site serves its own fonts (atlas.css), so Geist & co. stay out. */
 @import './coreloom/tokens.css';
 @import './coreloom/theme.css';
 @import './coreloom/accents.css';
