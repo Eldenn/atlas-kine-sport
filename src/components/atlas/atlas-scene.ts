@@ -6,10 +6,10 @@
 // ~59k triangles, 1024px WebP textures, Meshopt geometry). Its bronze is metallic, so it reflects a
 // studio environment generated here (RoomEnvironment): no HDR file, nothing fetched from elsewhere.
 //
-// Scrolling turns it: from a three-quarter view at the top of the page to its profile as the hero
-// leaves the screen, the camera rising a little. Between scrolls nothing moves and nothing is drawn.
-// Under reduced motion it draws a single still frame, the same as the poster image shown before it
-// loads.
+// The home page holds it on a sticky stage for three beats (Bouger, Récupérer, Performer): the
+// scroll through that stage drives a camera path between three framings (KEYS). Between scrolls
+// nothing moves and nothing is drawn. Under reduced motion it draws the first framing only, the
+// same as the poster image shown before it loads.
 import {
   ACESFilmicToneMapping,
   Box3,
@@ -33,17 +33,24 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 
 /** The statue is scaled to this height (metres), feet on the floor, centred on the vertical axis. */
 const HEIGHT = 1.9
-/** Where the statue faces at the top of the page (and on the poster): a three-quarter view. */
-const START_TURN = (-22 * Math.PI) / 180
-/** How far scrolling turns it, by the time the figure has left the screen. */
-const SCROLL_TURN = (70 * Math.PI) / 180
-/** The camera rises from slightly below to slightly above over the same scroll. */
-const SCROLL_RISE = (12 * Math.PI) / 180
+const deg = (d: number) => (d * Math.PI) / 180
 
-const TARGET = new Vector3(0, HEIGHT / 2, 0)
+/**
+ * The camera path, one framing per beat of the stage (scroll progress 0, 0.5, 1).
+ * turn: the statue's rotation; elevation: the camera's, negative is from below; zoom: 1 frames
+ * the whole statue, more is closer; aim: the height looked at, in metres.
+ */
+const KEYS = [
+  // Bouger: the whole statue, three-quarter view, a touch from below. Also the poster.
+  { at: 0, turn: deg(-22), elevation: deg(-4), zoom: 1, aim: HEIGHT * 0.5 },
+  // Récupérer: in profile, close on the shoulders taking the load.
+  { at: 0.5, turn: deg(48), elevation: deg(6), zoom: 1.75, aim: HEIGHT * 0.66 },
+  // Performer: the other three-quarter, from low down, the whole figure again.
+  { at: 1, turn: deg(24), elevation: deg(-12), zoom: 1.08, aim: HEIGHT * 0.5 },
+] as const
+
 const FOV = 26
-const ELEVATION = (-4 * Math.PI) / 180 // a touch from below: the heroic angle
-/** What has to fit in the frame, around TARGET (half extents, with a margin). */
+/** What has to fit in the frame at zoom 1 (half extents, with a margin). */
 const HALF_HEIGHT = HEIGHT / 2 + 0.06
 const HALF_WIDTH = 0.6
 
@@ -52,7 +59,9 @@ export type AtlasScene = { dispose: () => void }
 export type AtlasSceneOptions = {
   canvas: HTMLCanvasElement
   modelUrl: string
-  /** Draw one still frame and stop: no scroll turn, no pointer parallax. */
+  /** Scroll progress through the stage, 0 to 1 (read on scroll). */
+  progress: () => number
+  /** Draw the first framing and stop: no scroll path, no pointer parallax. */
   still: boolean
   onReady: () => void
 }
@@ -111,7 +120,6 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
   model.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale)
   const turntable = new Group()
   turntable.add(model)
-  turntable.rotation.y = START_TURN
   scene.add(turntable)
 
   // A soft contact shadow on the floor; the floor itself stays the page.
@@ -131,18 +139,41 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
   /** 0 at the top of the page, 1 once the figure has scrolled out; eased towards. */
   const scroll = { p: 0, target: 0 }
 
+  const target = new Vector3()
+
+  /** The framing at progress p: smoothstep between the two keys around it. */
+  function framing(p: number) {
+    let i = 0
+    while (i < KEYS.length - 2 && p > KEYS[i + 1]!.at) i++
+    const a = KEYS[i]!
+    const b = KEYS[i + 1]!
+    let t = Math.min(1, Math.max(0, (p - a.at) / (b.at - a.at)))
+    t = t * t * (3 - 2 * t)
+    const mix = (x: number, y: number) => x + (y - x) * t
+    return {
+      turn: mix(a.turn, b.turn),
+      elevation: mix(a.elevation, b.elevation),
+      zoom: mix(a.zoom, b.zoom),
+      aim: mix(a.aim, b.aim),
+    }
+  }
+
   function placeCamera() {
+    const f = framing(scroll.p)
+    turntable.rotation.y = f.turn
     const aspect = width / height || 1
     const tanV = Math.tan(((FOV / 2) * Math.PI) / 180)
-    const distance = Math.max(HALF_HEIGHT / tanV, HALF_WIDTH / (tanV * aspect)) + 0.6
+    const fit = Math.max(HALF_HEIGHT / tanV, HALF_WIDTH / (tanV * aspect)) + 0.6
+    const distance = fit / f.zoom
     const az = pointer.x * 0.08
-    const el = ELEVATION + scroll.p * SCROLL_RISE + pointer.y * 0.04
+    const el = f.elevation + pointer.y * 0.04
+    target.set(0, f.aim, 0)
     camera.position.set(
-      TARGET.x + distance * Math.cos(el) * Math.sin(az),
-      TARGET.y + distance * Math.sin(el),
-      TARGET.z + distance * Math.cos(el) * Math.cos(az),
+      distance * Math.cos(el) * Math.sin(az),
+      f.aim + distance * Math.sin(el),
+      distance * Math.cos(el) * Math.cos(az),
     )
-    camera.lookAt(TARGET)
+    camera.lookAt(target)
   }
 
   function resize() {
@@ -162,9 +193,7 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
   let onScreen = true
 
   function readScroll() {
-    const rect = canvas.getBoundingClientRect()
-    const bottom = rect.bottom + window.scrollY
-    scroll.target = Math.min(1, Math.max(0, window.scrollY / Math.max(1, bottom)))
+    scroll.target = Math.min(1, Math.max(0, opts.progress()))
   }
 
   /** Eases a value towards its target; returns whether it is still moving. */
@@ -180,7 +209,6 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
     last = now
     const k = Math.min(1, dt * 6)
     let moving = ease(scroll, k)
-    turntable.rotation.y = START_TURN + scroll.p * SCROLL_TURN
     const px = { p: pointer.x, target: pointer.tx }
     const py = { p: pointer.y, target: pointer.ty }
     moving = ease(px, k / 2) || moving
@@ -244,9 +272,8 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
   if (!opts.still) {
     readScroll()
     scroll.p = scroll.target
-    turntable.rotation.y = START_TURN + scroll.p * SCROLL_TURN
-    placeCamera()
   }
+  placeCamera()
   renderer.compile(scene, camera)
   renderer.render(scene, camera)
   opts.onReady()

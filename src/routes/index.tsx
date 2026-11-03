@@ -1,16 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { Atlas3D } from '@/components/atlas/atlas-3d'
-import { AtlasLockup } from '@/components/atlas/atlas-logo'
 import { DoctolibButtons } from '@/components/atlas/doctolib-buttons'
+import { HomeStage } from '@/components/atlas/home-stage'
 import { PhotoPlaceholder } from '@/components/atlas/photo-placeholder'
 import { ContactDetails, ContactSection, OpeningHours } from '@/components/contact-section'
-import { Hero } from '@/components/hero'
 import { MediaSection } from '@/components/media-section'
 import { PractitionerCard, PractitionerGrid } from '@/components/practitioner-card'
 import { Quote } from '@/components/quote'
 import { Button } from '@/components/ui/button'
-import { Logo } from '@/components/ui/logo'
 import { cabinet, practitioners } from '@/content/cabinet'
 import { AppLink } from '@/lib/link'
 import { seo } from '@/lib/seo'
@@ -46,34 +43,7 @@ const axes = [
 function Home() {
   return (
     <>
-      <Hero
-        layout="split"
-        eyebrow={<span className="atlas-eyebrow">Chasseneuil-du-Poitou · Vienne</span>}
-        title={
-          <>
-            <span className="sr-only">Atlas Kiné Sport.</span>
-            {/* The logo traces itself once on arrival: symbol, then ATLAS, then KINÉ SPORT. */}
-            <Logo animation="draw" className="mb-6 block h-[clamp(150px,20vw,240px)] w-fit">
-              <AtlasLockup />
-            </Logo>
-          </>
-        }
-        highlight="Bouger. Récupérer. Performer."
-        highlightStyle="solid"
-        description="Un cabinet de kinésithérapie du sport pour les athlètes de tous niveaux, et pour toute personne qui veut retrouver un corps fiable. On évalue, on soigne, puis on recharge progressivement, avec des mesures à chaque étape."
-        actions={
-          <>
-            <Button asChild size="lg">
-              <AppLink href="/contact">Prendre rendez-vous</AppLink>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <AppLink href="/cabinet">Découvrir le cabinet</AppLink>
-            </Button>
-          </>
-        }
-        mediaFrame="none"
-        media={<Atlas3D />}
-      />
+      <HomeStage />
 
       {/* The three axes as a numbered sequence, not a grid of icon cards. */}
       <section aria-labelledby="axes" className="border-t border-border-subtle px-5 py-20 md:px-7">
