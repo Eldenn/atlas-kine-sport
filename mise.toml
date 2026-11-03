@@ -1,0 +1,42 @@
+# Outils et tâches du projet : `mise install` installe Node et pnpm aux versions ci-dessous,
+# `mise run <tâche>` (ou `mise <tâche>`) lance les commandes. https://mise.jdx.dev
+# Node 22 est aussi la version choisie dans hPanel (Hostinger) ; pnpm suit "packageManager".
+
+[tools]
+node = "22"
+pnpm = "12.13.0"
+
+[tasks.install]
+description = "Installer les dépendances (lockfile figé)"
+run = "pnpm install --frozen-lockfile"
+
+[tasks.dev]
+description = "Serveur de développement sur http://localhost:3000"
+depends = ["install"]
+run = "pnpm dev"
+
+[tasks.build]
+description = "Build de production : pré-rendu des pages + serveur Nitro dans .output/"
+depends = ["install"]
+run = "pnpm build"
+
+[tasks.start]
+description = "Lancer le build de production (comme Hostinger)"
+depends = ["build"]
+run = "node .output/server/index.mjs"
+
+[tasks.typecheck]
+description = "Vérifier les types"
+run = "pnpm typecheck"
+
+[tasks.format]
+description = "Formater le code"
+run = "pnpm format"
+
+[tasks.check]
+description = "Tout vérifier avant de pousser : format, types, build"
+run = ["pnpm format:check", "pnpm typecheck", "pnpm build"]
+
+[tasks."coreloom:sync"]
+description = "Mettre à jour les composants Coreloom depuis un clone local : mise run coreloom:sync ../coreloom-ui"
+run = "node scripts/sync-coreloom.mjs"
