@@ -1,8 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { ContactForm } from '@/components/atlas/contact-form'
 import { DoctolibButtons } from '@/components/atlas/doctolib-buttons'
 import { PageIntro } from '@/components/atlas/page-intro'
-import { ContactDetails, ContactSection, OpeningHours } from '@/components/contact-section'
+import { ContactDetails, OpeningHours } from '@/components/contact-section'
 import { cabinet } from '@/content/cabinet'
 import { seo } from '@/lib/seo'
 
@@ -23,27 +24,43 @@ function Contact() {
       <PageIntro eyebrow="Contact" title="Prenez rendez-vous">
         <p>
           Les rendez-vous se prennent directement sur l’agenda Doctolib de chaque praticien. Pour
-          une autre question, appelez le cabinet.
+          une autre question, écrivez-nous ou appelez le cabinet.
         </p>
         <div className="mt-8">
           <DoctolibButtons />
         </div>
       </PageIntro>
-      {/* The contact form (Hostinger Mail API, server function) arrives with the pages step. */}
-      <ContactSection className="border-t border-border-subtle">
-        <ContactDetails
-          address={
-            <>
-              {cabinet.address.street}
-              <br />
-              {cabinet.address.postalCode} {cabinet.address.city}
-            </>
-          }
-          directionsHref={cabinet.directionsHref}
-          phone={cabinet.phone}
-        />
-        <OpeningHours hours={cabinet.hours} />
-      </ContactSection>
+      <section className="border-t border-border-subtle px-5 py-20 md:px-7">
+        <div className="mx-auto grid max-w-[1120px] gap-14 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+          <div>
+            <h2
+              id="contact-form-title"
+              className="m-0 font-display text-[clamp(28px,3.5vw,36px)] leading-[1.15]"
+            >
+              Écrire au cabinet
+            </h2>
+            <p className="mt-3 mb-10 max-w-[52ch] leading-relaxed text-fg-secondary">
+              Une question avant de venir, un club qui cherche un suivi : laissez un message, le
+              cabinet vous répond par e-mail.
+            </p>
+            <ContactForm />
+          </div>
+          <aside aria-label="Coordonnées et horaires" className="flex flex-col gap-10">
+            <ContactDetails
+              address={
+                <>
+                  {cabinet.address.street}
+                  <br />
+                  {cabinet.address.postalCode} {cabinet.address.city}
+                </>
+              }
+              directionsHref={cabinet.directionsHref}
+              phone={cabinet.phone}
+            />
+            <OpeningHours hours={cabinet.hours} />
+          </aside>
+        </div>
+      </section>
     </>
   )
 }
