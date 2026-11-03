@@ -1,0 +1,5 @@
+allowBuilds:
+  esbuild: true
+
+# Only install versions published at least 14 days ago (supply-chain safety), as in coreloom-ui.
+minimumReleaseAge: 20160

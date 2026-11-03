@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import './coreloom/fonts.css';
+@import './coreloom/tokens.css';
+@import './coreloom/theme.css';
+@import './coreloom/accents.css';
+@import './coreloom/surfaces.css';
+/* Atlas: the gold accent, the moodboard's exact colours and fonts. After the Coreloom files. */
+@import './atlas-accent.css';
+@import './atlas.css';
