@@ -1,66 +1,58 @@
-// The 3D Atlas of the home page: a carved figure on one knee, the Earth on his shoulders. Plain
+// The 3D Atlas of the home page: a bronze Atlas on one knee, the Earth on his shoulders. Plain
 // Three.js in a canvas the React component hands over ("layered" pattern: the scene owns its render
 // loop, React only mounts and disposes it). Loaded on demand, after the page is interactive.
 //
-// The figure is baked by scripts/atlas-3d/sculpt.py (a signed distance field, meshed, ambient
-// occlusion per vertex); the land of the globe by scripts/atlas-3d/earth.py (Natural Earth). The
-// globe is coloured here in the site's tones: mineral sea, antique gold land, a fine gold graticule.
+// The statue is public/3d/atlas.glb (made with Meshy, optimised by scripts/atlas-3d/optimize.sh:
+// ~59k triangles, 1024px WebP textures, Meshopt geometry). Its bronze is metallic, so it reflects a
+// studio environment generated here (RoomEnvironment): no HDR file, nothing fetched from elsewhere.
 //
-// It draws only while it is on screen and the tab is visible. Under reduced motion it draws a single
-// still frame, the same as the poster image shown before it loads.
+// Scrolling turns it: from a three-quarter view at the top of the page to its profile as the hero
+// leaves the screen, the camera rising a little. Between scrolls nothing moves and nothing is drawn.
+// Under reduced motion it draws a single still frame, the same as the poster image shown before it
+// loads.
 import {
   ACESFilmicToneMapping,
-  BufferAttribute,
-  BufferGeometry,
+  Box3,
   CanvasTexture,
-  Color,
   DirectionalLight,
   Group,
-  HemisphereLight,
-  LinearMipmapLinearFilter,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
   PerspectiveCamera,
   PlaneGeometry,
+  PMREMGenerator,
   Scene,
-  ShaderMaterial,
-  SphereGeometry,
   SRGBColorSpace,
-  TextureLoader,
   Vector3,
   WebGLRenderer,
 } from 'three'
-import type { Texture } from 'three'
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 
-/** Keep in sync with scripts/atlas-3d/sculpt.py. */
-const GLOBE_CENTER = new Vector3(0, 1.56, -0.24)
-const GLOBE_RADIUS = 0.47
-const AXIAL_TILT = (23.44 * Math.PI) / 180
-/** One turn of the Earth, in seconds. Slow enough to read as weight, not as a spinner. */
-const TURN_SECONDS = 70
-/** France faces the viewer on the first frame (and on the poster). */
-const START_LONGITUDE = 2
+/** The statue is scaled to this height (metres), feet on the floor, centred on the vertical axis. */
+const HEIGHT = 1.9
+/** Where the statue faces at the top of the page (and on the poster): a three-quarter view. */
+const START_TURN = (-22 * Math.PI) / 180
+/** How far scrolling turns it, by the time the figure has left the screen. */
+const SCROLL_TURN = (70 * Math.PI) / 180
+/** The camera rises from slightly below to slightly above over the same scroll. */
+const SCROLL_RISE = (12 * Math.PI) / 180
 
-const TARGET = new Vector3(0, 1.02, 0.05)
+const TARGET = new Vector3(0, HEIGHT / 2, 0)
 const FOV = 26
-const AZIMUTH = (38 * Math.PI) / 180
-const ELEVATION = (7 * Math.PI) / 180
+const ELEVATION = (-4 * Math.PI) / 180 // a touch from below: the heroic angle
 /** What has to fit in the frame, around TARGET (half extents, with a margin). */
-const HALF_HEIGHT = 1.13
-const HALF_WIDTH = 0.62
-
-const BONE = '#e9e3da'
-const GOLD = '#b0903d'
-const SEA = '#1a2738'
+const HALF_HEIGHT = HEIGHT / 2 + 0.06
+const HALF_WIDTH = 0.6
 
 export type AtlasScene = { dispose: () => void }
 
 export type AtlasSceneOptions = {
   canvas: HTMLCanvasElement
-  figureUrl: string
-  landUrl: string
-  /** Draw one still frame and stop: no turning globe, no pointer parallax. */
+  modelUrl: string
+  /** Draw one still frame and stop: no scroll turn, no pointer parallax. */
   still: boolean
   onReady: () => void
 }
@@ -75,71 +67,76 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
   })
   renderer.setClearColor(0x000000, 0)
   renderer.toneMapping = ACESFilmicToneMapping
-  renderer.toneMappingExposure = 1.05
+  renderer.toneMappingExposure = 1.0
   renderer.outputColorSpace = SRGBColorSpace
 
   const scene = new Scene()
   const camera = new PerspectiveCamera(FOV, 1, 0.1, 50)
 
-  // Light: a warm key from the upper front left, a cool sky fill, and a gold rim from behind on the
-  // right that draws the silhouette against the mineral page.
-  scene.add(new HemisphereLight('#cfd8e6', '#2b2418', 0.55))
-  const key = new DirectionalLight('#fff3e2', 3.1)
-  key.position.set(-2.2, 3.2, 3.0)
+  // Reflections for the bronze: a neutral studio, dimmed so the lights below do the modelling.
+  const pmrem = new PMREMGenerator(renderer)
+  const room = new RoomEnvironment()
+  const environment = pmrem.fromScene(room, 0.04).texture
+  room.dispose()
+  pmrem.dispose()
+  scene.environment = environment
+  scene.environmentIntensity = 0.55
+
+  // A warm key from the upper front left, and a gold rim from behind on the right that draws the
+  // silhouette against the mineral page.
+  const key = new DirectionalLight('#fff1dc', 2.4)
+  key.position.set(-2.2, 3.4, 3.0)
   scene.add(key)
-  const rim = new DirectionalLight('#e2bd62', 4.5)
-  rim.position.set(2.6, 2.2, -3.2)
+  const rim = new DirectionalLight('#e2bd62', 3.6)
+  rim.position.set(2.8, 2.4, -3.0)
   scene.add(rim)
-  const fill = new DirectionalLight('#9fb2cc', 0.5)
-  fill.position.set(2.5, 0.4, 2.5)
+  const fill = new DirectionalLight('#9fb2cc', 0.35)
+  fill.position.set(2.5, 0.3, 2.5)
   scene.add(fill)
 
-  const [figureGeometry, landTexture] = await Promise.all([
-    loadFigure(opts.figureUrl),
-    new TextureLoader().loadAsync(opts.landUrl),
-  ])
-  landTexture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy())
-  landTexture.minFilter = LinearMipmapLinearFilter
-
-  const figure = new Mesh(
-    figureGeometry,
-    new MeshStandardMaterial({ color: BONE, roughness: 0.58, metalness: 0, vertexColors: true }),
-  )
-  scene.add(figure)
-
-  // The globe: tilted on its axis, turning about it.
-  const tilt = new Group()
-  tilt.position.copy(GLOBE_CENTER)
-  tilt.rotation.z = -AXIAL_TILT
-  const globeMaterial = createGlobeMaterial(landTexture)
-  const globe = new Mesh(new SphereGeometry(GLOBE_RADIUS, 96, 64), globeMaterial)
-  // SphereGeometry puts longitude 0 on +X; turn it to +Z, then to the starting meridian.
-  const startTurn = -Math.PI / 2 - (START_LONGITUDE * Math.PI) / 180 + AZIMUTH
-  globe.rotation.y = startTurn
-  tilt.add(globe)
-  scene.add(tilt)
+  const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(opts.modelUrl)
+  const model = gltf.scene
+  model.traverse((object) => {
+    if (object instanceof Mesh) {
+      const material = object.material as MeshStandardMaterial
+      material.side = 0 // FrontSide: the mesh is closed, the back faces only cost fill rate
+    }
+  })
+  // Normalise: feet on the floor, centred, HEIGHT tall.
+  const box = new Box3().setFromObject(model)
+  const size = box.getSize(new Vector3())
+  const scale = HEIGHT / size.y
+  const center = box.getCenter(new Vector3())
+  model.scale.setScalar(scale)
+  model.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale)
+  const turntable = new Group()
+  turntable.add(model)
+  turntable.rotation.y = START_TURN
+  scene.add(turntable)
 
   // A soft contact shadow on the floor; the floor itself stays the page.
   const shadow = new Mesh(
-    new PlaneGeometry(1.5, 1.5),
+    new PlaneGeometry(1.6, 1.6),
     new MeshBasicMaterial({ map: shadowTexture(), transparent: true, depthWrite: false }),
   )
   shadow.rotation.x = -Math.PI / 2
-  shadow.position.set(0, 0.002, 0.04)
-  shadow.scale.set(1, 0.85, 1)
+  shadow.position.set(0, 0.002, 0)
+  shadow.scale.set(1, 0.8, 1)
   scene.add(shadow)
 
   // --- framing ---------------------------------------------------------------------------------
   let width = 0
   let height = 0
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 }
+  /** 0 at the top of the page, 1 once the figure has scrolled out; eased towards. */
+  const scroll = { p: 0, target: 0 }
 
   function placeCamera() {
     const aspect = width / height || 1
     const tanV = Math.tan(((FOV / 2) * Math.PI) / 180)
-    const distance = Math.max(HALF_HEIGHT / tanV, HALF_WIDTH / (tanV * aspect)) + 0.9
-    const az = AZIMUTH + pointer.x * 0.09
-    const el = ELEVATION + pointer.y * 0.05
+    const distance = Math.max(HALF_HEIGHT / tanV, HALF_WIDTH / (tanV * aspect)) + 0.6
+    const az = pointer.x * 0.08
+    const el = ELEVATION + scroll.p * SCROLL_RISE + pointer.y * 0.04
     camera.position.set(
       TARGET.x + distance * Math.cos(el) * Math.sin(az),
       TARGET.y + distance * Math.sin(el),
@@ -163,25 +160,50 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
   let raf = 0
   let last = 0
   let onScreen = true
-  let elapsed = 0
+
+  function readScroll() {
+    const rect = canvas.getBoundingClientRect()
+    const bottom = rect.bottom + window.scrollY
+    scroll.target = Math.min(1, Math.max(0, window.scrollY / Math.max(1, bottom)))
+  }
+
+  /** Eases a value towards its target; returns whether it is still moving. */
+  function ease(value: { p: number; target: number }, k: number) {
+    value.p += (value.target - value.p) * k
+    if (Math.abs(value.target - value.p) < 1e-4) value.p = value.target
+    return value.p !== value.target
+  }
 
   function frame(now: number) {
     raf = 0
-    const dt = last ? Math.min(0.05, (now - last) / 1000) : 0
+    const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60
     last = now
-    elapsed += dt
-    globe.rotation.y = startTurn + (elapsed / TURN_SECONDS) * Math.PI * 2
-    pointer.x += (pointer.tx - pointer.x) * Math.min(1, dt * 3)
-    pointer.y += (pointer.ty - pointer.y) * Math.min(1, dt * 3)
+    const k = Math.min(1, dt * 6)
+    let moving = ease(scroll, k)
+    turntable.rotation.y = START_TURN + scroll.p * SCROLL_TURN
+    const px = { p: pointer.x, target: pointer.tx }
+    const py = { p: pointer.y, target: pointer.ty }
+    moving = ease(px, k / 2) || moving
+    moving = ease(py, k / 2) || moving
+    pointer.x = px.p
+    pointer.y = py.p
     placeCamera()
     renderer.render(scene, camera)
-    schedule()
+    // Draw again only while something is still settling; scroll and mouse wake the loop.
+    if (moving) schedule()
+    else last = 0
   }
 
   function schedule() {
     if (opts.still || raf || !onScreen || document.hidden) return
     raf = requestAnimationFrame(frame)
   }
+
+  const onScroll = () => {
+    readScroll()
+    schedule()
+  }
+  if (!opts.still) window.addEventListener('scroll', onScroll, { passive: true })
 
   function stop() {
     if (raf) cancelAnimationFrame(raf)
@@ -213,10 +235,18 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
   const onPointerMove = (event: PointerEvent) => {
     pointer.tx = (event.clientX / window.innerWidth) * 2 - 1
     pointer.ty = (event.clientY / window.innerHeight) * 2 - 1
+    schedule()
   }
   if (!opts.still && finePointer) window.addEventListener('pointermove', onPointerMove)
 
   resize()
+  // Arriving mid-page (reload, back button): start where the scroll already is, no catch-up turn.
+  if (!opts.still) {
+    readScroll()
+    scroll.p = scroll.target
+    turntable.rotation.y = START_TURN + scroll.p * SCROLL_TURN
+    placeCamera()
+  }
   renderer.compile(scene, camera)
   renderer.render(scene, camera)
   opts.onReady()
@@ -229,128 +259,26 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
       visibility.disconnect()
       document.removeEventListener('visibilitychange', onVisibilityChange)
       window.removeEventListener('pointermove', onPointerMove)
+      window.removeEventListener('scroll', onScroll)
       scene.traverse((object) => {
         if (object instanceof Mesh) {
           object.geometry.dispose()
-          const material = object.material as MeshStandardMaterial | ShaderMaterial
+          const material = object.material as MeshStandardMaterial
+          for (const map of [
+            material.map,
+            material.normalMap,
+            material.roughnessMap,
+            material.metalnessMap,
+          ]) {
+            map?.dispose()
+          }
           material.dispose()
         }
       })
-      landTexture.dispose()
+      environment.dispose()
       renderer.dispose()
     },
   }
-}
-
-/** Reads the binary written by sculpt.py: quantised positions, normals and baked occlusion. */
-async function loadFigure(url: string): Promise<BufferGeometry> {
-  const response = await fetch(url)
-  if (!response.ok) throw new Error(`${url}: ${response.status}`)
-  const buffer = await response.arrayBuffer()
-  const view = new DataView(buffer)
-  const vertexCount = view.getUint32(0, true)
-  const indexCount = view.getUint32(4, true)
-  const min = [0, 1, 2].map((i) => view.getFloat32(8 + i * 4, true))
-  const max = [0, 1, 2].map((i) => view.getFloat32(20 + i * 4, true))
-  const pad4 = (n: number) => (n + 3) & ~3
-
-  let offset = 32
-  const q = new Int16Array(buffer, offset, vertexCount * 3)
-  offset += pad4(q.byteLength)
-  const normals = new Int8Array(buffer, offset, vertexCount * 3)
-  offset += pad4(normals.byteLength)
-  const occlusion = new Uint8Array(buffer, offset, vertexCount)
-  offset += pad4(occlusion.byteLength)
-  const indices = new Uint16Array(buffer, offset, indexCount)
-
-  const positions = new Float32Array(vertexCount * 3)
-  for (let i = 0; i < positions.length; i++) {
-    const axis = i % 3
-    positions[i] = min[axis]! + ((q[i]! + 32768) / 65535) * (max[axis]! - min[axis]!)
-  }
-  const colors = new Uint8Array(vertexCount * 3)
-  for (let i = 0; i < vertexCount; i++) {
-    colors[i * 3] = colors[i * 3 + 1] = colors[i * 3 + 2] = occlusion[i]!
-  }
-
-  const geometry = new BufferGeometry()
-  geometry.setAttribute('position', new BufferAttribute(positions, 3))
-  geometry.setAttribute('normal', new BufferAttribute(normals, 3, true))
-  geometry.setAttribute('color', new BufferAttribute(colors, 3, true))
-  geometry.setIndex(new BufferAttribute(indices, 1))
-  return geometry
-}
-
-function createGlobeMaterial(land: Texture) {
-  const lin = (hex: string) => new Color(hex) // Color converts sRGB hex to the linear working space
-  return new ShaderMaterial({
-    uniforms: {
-      land: { value: land },
-      sea: { value: lin(SEA) },
-      gold: { value: lin(GOLD) },
-      keyDir: { value: new Vector3(-2.2, 3.2, 3.0).normalize() },
-      rimDir: { value: new Vector3(2.6, 2.2, -3.2).normalize() },
-      rimColor: { value: lin('#e2bd62') },
-    },
-    vertexShader: /* glsl */ `
-      varying vec2 vUv;
-      varying vec3 vNormal;
-      varying vec3 vView;
-      void main() {
-        vUv = uv;
-        vec4 world = modelMatrix * vec4(position, 1.0);
-        vNormal = normalize(mat3(modelMatrix) * normal);
-        vView = normalize(cameraPosition - world.xyz);
-        gl_Position = projectionMatrix * viewMatrix * world;
-      }
-    `,
-    fragmentShader: /* glsl */ `
-      uniform sampler2D land;
-      uniform vec3 sea;
-      uniform vec3 gold;
-      uniform vec3 keyDir;
-      uniform vec3 rimDir;
-      uniform vec3 rimColor;
-      varying vec2 vUv;
-      varying vec3 vNormal;
-      varying vec3 vView;
-
-      float gridLine(float coord, float step) {
-        float c = coord / step;
-        float d = abs(fract(c - 0.5) - 0.5) / max(fwidth(c), 1e-4);
-        return 1.0 - clamp(d - 0.25, 0.0, 1.0);
-      }
-
-      void main() {
-        vec3 n = normalize(vNormal);
-        vec3 v = normalize(vView);
-        float isLand = texture2D(land, vUv).r;
-
-        // Graticule every 15 degrees, on the sea only.
-        float lon = vUv.x * 360.0;
-        float lat = vUv.y * 180.0;
-        float grid = max(gridLine(lon, 15.0), gridLine(lat, 15.0)) * (1.0 - isLand);
-
-        vec3 base = mix(sea, gold, isLand);
-        base = mix(base, gold * 0.75, grid * 0.32);
-
-        float diffuse = max(dot(n, keyDir), 0.0);
-        vec3 color = base * (0.22 + 0.78 * diffuse);
-
-        // A little gloss on the sea, none on the land.
-        vec3 h = normalize(keyDir + v);
-        color += vec3(1.0, 0.95, 0.85) * pow(max(dot(n, h), 0.0), 90.0) * 0.08 * (1.0 - isLand);
-
-        // Rim from behind, and a faint edge so the sphere reads against the page.
-        float fresnel = pow(1.0 - max(dot(n, v), 0.0), 3.0);
-        color += rimColor * fresnel * (0.06 + 0.45 * max(dot(n, rimDir), 0.0));
-
-        gl_FragColor = vec4(color, 1.0);
-        #include <tonemapping_fragment>
-        #include <colorspace_fragment>
-      }
-    `,
-  })
 }
 
 function shadowTexture() {
@@ -359,8 +287,8 @@ function shadowTexture() {
   canvas.width = canvas.height = size
   const ctx = canvas.getContext('2d')!
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  gradient.addColorStop(0, 'rgba(0,0,0,0.55)')
-  gradient.addColorStop(0.45, 'rgba(0,0,0,0.28)')
+  gradient.addColorStop(0, 'rgba(0,0,0,0.6)')
+  gradient.addColorStop(0.45, 'rgba(0,0,0,0.3)')
   gradient.addColorStop(1, 'rgba(0,0,0,0)')
   ctx.fillStyle = gradient
   ctx.fillRect(0, 0, size, size)

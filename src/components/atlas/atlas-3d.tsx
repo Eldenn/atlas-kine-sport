@@ -4,13 +4,12 @@
 // first paint, without JavaScript, without WebGL and with Save-Data. Three.js (atlas-scene.ts) is
 // fetched only once the page is idle and the figure near the screen; when its first frame is drawn
 // the canvas takes over from the poster, which shows the same frame. Under reduced motion the canvas
-// draws that one frame and the globe stays still.
+// draws that one frame and scrolling does not turn the statue.
 import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-const FIGURE_URL = '/3d/atlas-figure.bin'
-const LAND_URL = '/3d/earth-land.png'
+const MODEL_URL = '/3d/atlas.glb'
 const LABEL = 'Atlas, un genou à terre, porte la Terre sur ses épaules.'
 
 type Connection = { saveData?: boolean }
@@ -46,8 +45,7 @@ export function Atlas3D({ className }: { className?: string }) {
         .then(({ createAtlasScene }) =>
           createAtlasScene({
             canvas,
-            figureUrl: FIGURE_URL,
-            landUrl: LAND_URL,
+            modelUrl: MODEL_URL,
             still: reduce.matches,
             onReady: () => {
               if (!disposed) setReady(true)
