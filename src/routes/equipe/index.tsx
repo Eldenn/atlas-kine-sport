@@ -48,7 +48,9 @@ function Equipe() {
                   </a>
                 </Button>
                 <Button asChild variant="ghost">
-                  <AppLink href={`/equipe/${p.slug}`}>Fiche complète</AppLink>
+                  <AppLink href={`/equipe/${p.slug}`}>
+                    Fiche complète<span className="sr-only"> de {p.name}</span>
+                  </AppLink>
                 </Button>
               </>
             }

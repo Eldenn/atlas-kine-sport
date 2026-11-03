@@ -26,7 +26,8 @@ export const Route = createFileRoute('/equipe/$slug')({
       ? seo({
           path: `/equipe/${loaderData.slug}`,
           title: `${loaderData.name}, masseur-kinésithérapeute`,
-          description: `${loaderData.name}, kinésithérapeute du sport chez Atlas Kiné Sport : ${loaderData.areas.join(', ').toLowerCase()}.`,
+          // Kept under ~160 characters: the first areas only, the page lists them all.
+          description: `${loaderData.name}, kinésithérapeute du sport à Chasseneuil-du-Poitou : ${loaderData.areas.slice(1, 4).join(', ').toLowerCase()}. Rendez-vous sur Doctolib.`,
         })
       : {},
   component: Fiche,

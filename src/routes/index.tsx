@@ -147,7 +147,9 @@ function Home() {
                   </a>
                 </Button>
                 <Button asChild variant="ghost">
-                  <AppLink href={`/equipe/${p.slug}`}>Son parcours</AppLink>
+                  <AppLink href={`/equipe/${p.slug}`}>
+                    Son parcours<span className="sr-only"> : {p.name}</span>
+                  </AppLink>
                 </Button>
               </>
             }
