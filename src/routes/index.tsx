@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { Atlas3D } from '@/components/atlas/atlas-3d'
 import { AtlasLockup } from '@/components/atlas/atlas-logo'
 import { DoctolibButtons } from '@/components/atlas/doctolib-buttons'
 import { PhotoPlaceholder } from '@/components/atlas/photo-placeholder'
@@ -70,7 +71,8 @@ function Home() {
             </Button>
           </>
         }
-        media={<PhotoPlaceholder label="le plateau technique" />}
+        mediaFrame="none"
+        media={<Atlas3D />}
       />
 
       {/* The three axes as a numbered sequence, not a grid of icon cards. */}
