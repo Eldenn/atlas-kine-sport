@@ -24,8 +24,22 @@ function canRun() {
   }
 }
 
-export function Atlas3D({ className }: { className?: string }) {
+const atRest = () => 0
+
+export function Atlas3D({
+  className,
+  progress = atRest,
+  sizes = '(min-width: 1024px) 560px, 100vw',
+}: {
+  className?: string
+  /** Scroll progress through the stage that holds the statue, 0 to 1. */
+  progress?: () => number
+  /** The poster's `sizes`, for the width the frame takes in its layout. */
+  sizes?: string
+}) {
   const frameRef = React.useRef<HTMLDivElement>(null)
+  const progressRef = React.useRef(progress)
+  progressRef.current = progress
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   const [ready, setReady] = React.useState(false)
 
@@ -46,6 +60,7 @@ export function Atlas3D({ className }: { className?: string }) {
           createAtlasScene({
             canvas,
             modelUrl: MODEL_URL,
+            progress: () => progressRef.current(),
             still: reduce.matches,
             onReady: () => {
               if (!disposed) setReady(true)
@@ -102,10 +117,10 @@ export function Atlas3D({ className }: { className?: string }) {
       <img
         src="/images/atlas-3d-1120.webp"
         srcSet="/images/atlas-3d-560.webp 560w, /images/atlas-3d-1120.webp 1120w"
-        sizes="(min-width: 1024px) 520px, (min-width: 600px) 560px, 100vw"
+        sizes={sizes}
         alt=""
         width={560}
-        height={672}
+        height={755}
         className={cn(
           'absolute inset-0 size-full object-contain transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]',
           ready && 'opacity-0',

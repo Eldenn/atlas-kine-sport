@@ -15,10 +15,10 @@ const url = process.argv[2] ?? 'http://localhost:3000/'
 const browser = await chromium.launch({
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 })
-// 640px wide: the figure's frame is at its full 560px; device scale 2 gives the 1120px image.
+// Desktop: the figure's 5:6 frame is about 660px wide; scale 1.7 gives the 1120px image.
 const page = await browser.newPage({
-  viewport: { width: 640, height: 1000 },
-  deviceScaleFactor: 2,
+  viewport: { width: 1440, height: 1000 },
+  deviceScaleFactor: 1.7,
   reducedMotion: 'reduce',
 })
 await page.addInitScript(() => sessionStorage.setItem('atlas-intro', '1'))
