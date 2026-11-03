@@ -44,7 +44,8 @@ function Confidentialite() {
           content: (
             <>
               <p>
-                <strong>Données</strong> : nom, adresse e-mail et contenu de votre message.
+                <strong>Données</strong> : nom, adresse e-mail, téléphone si vous le donnez, sujet
+                et contenu de votre message.
                 <br />
                 <strong>Finalité</strong> : répondre à votre demande.
                 <br />
@@ -55,6 +56,11 @@ function Confidentialite() {
                 <br />
                 <strong>Destinataires</strong> : les praticiens du cabinet, et {hebergeur.name} qui
                 héberge le site et la messagerie.
+              </p>
+              <p>
+                Pour limiter les envois automatiques, le serveur garde en mémoire l’adresse IP de
+                l’expéditeur et l’heure d’envoi pendant 15 minutes au plus. Elles ne sont ni
+                enregistrées ni transmises.
               </p>
               <p>
                 N’envoyez pas d’informations médicales par ce formulaire : elles seront échangées en
