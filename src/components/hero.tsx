@@ -22,6 +22,7 @@ function Hero({
   media,
   layout = 'centered',
   mediaPosition = 'end',
+  mediaFrame = 'card',
   glow,
   children,
   className,
@@ -53,6 +54,11 @@ function Hero({
   layout?: HeroLayout
   /** Split layout: the media's side. Default "end" (right in left-to-right languages). */
   mediaPosition?: 'start' | 'end'
+  /**
+   * Split layout: "card" (the default) sets the media in a 4:3 bordered frame; "none" leaves it
+   * unframed at its own size, for a cut-out figure or a 3D scene. (Atlas adaptation.)
+   */
+  mediaFrame?: 'card' | 'none'
   /** The faint accent top-light. Default: on for "centered", off for the others. */
   glow?: boolean
   /** Anything below: a product shot, a live demo, logos. */
@@ -173,9 +179,13 @@ function Hero({
         {split ? (
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
             <div className={cn(mediaPosition === 'start' && 'lg:order-2')}>{text}</div>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border-subtle bg-inset shadow-lg [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover">
-              {media}
-            </div>
+            {mediaFrame === 'none' ? (
+              <div className="relative">{media}</div>
+            ) : (
+              <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border-subtle bg-inset shadow-lg [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover">
+                {media}
+              </div>
+            )}
           </div>
         ) : (
           text
