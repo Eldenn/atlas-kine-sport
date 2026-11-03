@@ -23,6 +23,8 @@ export const cabinet = {
   phone: '07 72 50 80 17',
   // TODO(Matthieu): the address the contact form sends to (masked on the current site).
   email: null as string | null,
+  // TODO(Matthieu): step-free access, parking, bus line. Until then the page asks visitors to call.
+  access: null as string | null,
   directionsHref:
     'https://www.openstreetmap.org/search?query=2%20avenue%20de%20l%27Europe%2C%2086360%20Chasseneuil-du-Poitou',
   hours: {
@@ -60,6 +62,11 @@ export interface Practitioner {
   /** TODO(Matthieu): Ordre registration numbers, to add when received. */
   ordre: string | null
   convention: string
+  /** As shown in the tags of the practical info page. */
+  paymentMethods: string[]
+  /** Said out loud when false: people expect to pay by card. */
+  acceptsCard: boolean
+  /** The same, as a sentence. */
   payment: string
   areas: string[]
   bio: string
@@ -77,6 +84,8 @@ export const practitioners: Practitioner[] = [
     rpps: '10111339171',
     ordre: null,
     convention: 'Conventionné, tiers payant',
+    paymentMethods: ['Espèces', 'Carte bancaire', 'Virement'],
+    acceptsCard: true,
     payment: 'Espèces, carte bancaire, virement',
     areas: [
       'Kinésithérapie du sport',
@@ -98,6 +107,8 @@ export const practitioners: Practitioner[] = [
     rpps: '10108844001',
     ordre: null,
     convention: 'Conventionné, tiers payant',
+    paymentMethods: ['Chèque', 'Espèces', 'Virement'],
+    acceptsCard: false,
     payment: 'Chèque, espèces, virement (carte bancaire non acceptée)',
     areas: [
       'Kinésithérapie du sport',

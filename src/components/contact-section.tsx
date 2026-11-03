@@ -112,6 +112,13 @@ function openingStatus(
 function formatClockTime(locale: string, value: string) {
   const minutes = minutesOf(value)
   if (minutes === null) return value
+  // French typography writes "8 h 30" and "13 h", which Intl doesn't produce. Atlas adaptation, to
+  // upstream to Coreloom.
+  if (locale.toLowerCase().startsWith('fr')) {
+    const h = Math.floor(minutes / 60)
+    const m = minutes % 60
+    return m === 0 ? `${h} h` : `${h} h ${String(m).padStart(2, '0')}`
+  }
   return new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(
     new Date(2024, 0, 1, Math.floor(minutes / 60), minutes % 60),
   )
