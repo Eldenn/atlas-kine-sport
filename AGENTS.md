@@ -8,4 +8,5 @@ Règles pour travailler sur ce dépôt (humains et agents de code). Le README d�
 - **Composants** : utiliser ceux de Coreloom (`coreloom.json`) avant d'en écrire. Ne pas modifier `src/styles/coreloom/` ; adapter un composant Coreloom est permis, en le signalant dans la PR pour le remonter au design system.
 - **Style** : tokens sémantiques (`bg-background`, `text-fg-secondary`, `text-primary-text`), jamais de couleur en dur hors `src/styles/`. Titres en `font-display` (Marcellus, une seule graisse), sur-titres avec `.atlas-eyebrow`. Une bande claire : `data-theme="light" data-surface="bone" data-accent="atlas"` + `bg-background`.
 - **Accessibilité** : WCAG 2.1 AA. Liens externes avec `target="_blank"` annoncés « (nouvel onglet) » ; une image qui dit quelque chose a un `alt`.
-- **Avant de pousser** : `pnpm typecheck`, `pnpm format:check`, `pnpm build` (le pré-rendu échoue si une page plante).
+- **Outils** : Node et pnpm viennent de `mise.toml` (`mise install`) ; changer une version, c'est changer `mise.toml`, `packageManager` et le réglage Node de Hostinger ensemble.
+- **Avant de pousser** : `mise run check` (format, types, build ; le pré-rendu échoue si une page plante).

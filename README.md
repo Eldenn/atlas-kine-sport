@@ -8,14 +8,17 @@ Site du cabinet de kinésithérapie du sport Atlas, à Chasseneuil-du-Poitou : [
 
 ## Développer
 
+Les outils sont fixés par [mise](https://mise.jdx.dev) dans `mise.toml` : Node 22 (la version choisie sur Hostinger) et pnpm 12.13.
+
 ```bash
-corepack enable          # pnpm 12, version fixée dans package.json
-pnpm install             # n'installe que des versions publiées depuis 14 jours (pnpm-workspace.yaml)
-pnpm dev                 # http://localhost:3000
-pnpm typecheck
-pnpm format
-pnpm build && pnpm start # build de production, servi sur http://localhost:3000
+mise install             # Node et pnpm aux bonnes versions
+mise run dev             # http://localhost:3000 (installe les dépendances d'abord)
+mise run check           # avant de pousser : format, types, build
+mise run start           # build de production servi comme sur Hostinger
+mise tasks               # toutes les tâches
 ```
+
+`pnpm install` n'installe que des versions publiées depuis au moins 14 jours (`pnpm-workspace.yaml`). Hostinger n'utilise pas mise : il lit `package.json` et `pnpm-lock.yaml`.
 
 ## Où est quoi
 
@@ -32,7 +35,7 @@ pnpm build && pnpm start # build de production, servi sur http://localhost:3000
 
 ```bash
 pnpm dlx shadcn@latest add @coreloom/showcase --overwrite   # depuis le registre
-pnpm coreloom:sync ../coreloom-ui                          # ou depuis un clone local, pour tous les items de coreloom.json
+mise run coreloom:sync ../coreloom-ui                      # ou depuis un clone local, pour tous les items de coreloom.json
 ```
 
 Les fichiers installés nous appartiennent : relire le diff avant de valider.
