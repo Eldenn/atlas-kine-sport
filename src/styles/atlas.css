@@ -77,3 +77,33 @@ header nav a {
 [data-slot='field-description'] {
   font-size: 13px;
 }
+
+/* The intro screen (components/atlas/intro.tsx): the logo traces itself in about 1.9 s, holds,
+   then the screen fades out and lets clicks through. Hidden for the rest of the visit
+   (data-intro="seen", set in <head>), when skipped, and for reduced motion. */
+.atlas-intro {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-toast);
+  display: grid;
+  place-items: center;
+  animation: atlas-intro-out 500ms var(--ease-out) 2100ms forwards;
+}
+.atlas-intro[data-skipped] {
+  animation: atlas-intro-out 250ms var(--ease-out) forwards;
+}
+:root[data-intro='seen'] .atlas-intro {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-intro {
+    display: none;
+  }
+}
+@keyframes atlas-intro-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}

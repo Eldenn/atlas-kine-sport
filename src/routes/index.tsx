@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { AtlasLockup } from '@/components/atlas/atlas-logo'
 import { DoctolibButtons } from '@/components/atlas/doctolib-buttons'
 import { PhotoPlaceholder } from '@/components/atlas/photo-placeholder'
 import { ContactDetails, ContactSection, OpeningHours } from '@/components/contact-section'
@@ -8,6 +9,7 @@ import { MediaSection } from '@/components/media-section'
 import { PractitionerCard, PractitionerGrid } from '@/components/practitioner-card'
 import { Quote } from '@/components/quote'
 import { Button } from '@/components/ui/button'
+import { Logo } from '@/components/ui/logo'
 import { cabinet, practitioners } from '@/content/cabinet'
 import { AppLink } from '@/lib/link'
 import { seo } from '@/lib/seo'
@@ -45,8 +47,16 @@ function Home() {
     <>
       <Hero
         layout="split"
-        eyebrow={<span className="atlas-eyebrow">Kiné sport · Chasseneuil-du-Poitou</span>}
-        title={<span className="block tracking-[0.06em]">ATLAS</span>}
+        eyebrow={<span className="atlas-eyebrow">Chasseneuil-du-Poitou · Vienne</span>}
+        title={
+          <>
+            <span className="sr-only">Atlas Kiné Sport.</span>
+            {/* The logo traces itself once on arrival: symbol, then ATLAS, then KINÉ SPORT. */}
+            <Logo animation="draw" className="mb-6 block h-[clamp(150px,20vw,240px)] w-fit">
+              <AtlasLockup />
+            </Logo>
+          </>
+        }
         highlight="Bouger. Récupérer. Performer."
         highlightStyle="solid"
         description="Un cabinet de kinésithérapie du sport pour les athlètes de tous niveaux, et pour toute personne qui veut retrouver un corps fiable. On évalue, on soigne, puis on recharge progressivement, avec des mesures à chaque étape."

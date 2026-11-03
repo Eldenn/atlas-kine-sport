@@ -3,6 +3,7 @@ import { createRootRoute, HeadContent, Outlet, Scripts, useLocation } from '@tan
 import type * as React from 'react'
 
 import { Brand } from '@/components/atlas/brand'
+import { Intro, introScript } from '@/components/atlas/intro'
 import { RouterLink } from '@/components/atlas/router-link'
 import { NotFound } from '@/components/atlas/not-found'
 import { SiteFooter } from '@/components/site-footer'
@@ -45,7 +46,10 @@ export const Route = createRootRoute({
       { rel: 'icon', href: '/favicon-64.png', type: 'image/png' },
       { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
     ],
-    scripts: [{ type: 'application/ld+json', children: JSON.stringify(structuredData) }],
+    scripts: [
+      { children: introScript },
+      { type: 'application/ld+json', children: JSON.stringify(structuredData) },
+    ],
   }),
   shellComponent: RootDocument,
   component: Layout,
@@ -89,7 +93,14 @@ const structuredData = {
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     // The moodboard's dark mineral page with the gold accent; light bands set their own theme.
-    <html lang="fr" data-theme="dark" data-surface="mineral" data-accent="atlas">
+    // The intro script adds data-intro to <html> before React hydrates it.
+    <html
+      lang="fr"
+      suppressHydrationWarning
+      data-theme="dark"
+      data-surface="mineral"
+      data-accent="atlas"
+    >
       <head>
         <HeadContent />
       </head>
@@ -114,7 +125,7 @@ function Layout() {
             Aller au contenu
           </a>
           <SiteHeader
-            brand={<Brand />}
+            brand={<Brand compact />}
             links={nav.map((link) => ({ ...link, active: pathname.startsWith(link.href) }))}
             actions={
               <Button asChild size="sm" className="hidden lg:inline-flex">
@@ -132,6 +143,7 @@ function Layout() {
           </main>
           <Footer />
           <Toaster />
+          <Intro />
         </TooltipProvider>
       </CoreloomLinkProvider>
     </CoreloomI18nProvider>
