@@ -24,7 +24,7 @@ function Equipe() {
         <p>Chacun a son agenda Doctolib : choisissez selon vos besoins ou vos disponibilités.</p>
       </PageIntro>
       {/* One card per row, portrait beside the text: the portraits stay near their native size. */}
-      <section className="mx-auto flex max-w-[1120px] flex-col gap-6 px-5 pb-20 md:px-7">
+      <section className="mx-auto box-content flex max-w-[1120px] flex-col gap-6 px-5 pb-20 md:px-7">
         {practitioners.map((p) => (
           <PractitionerCard
             key={p.slug}

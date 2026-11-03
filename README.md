@@ -53,7 +53,15 @@ Hébergement « Unlimited Web Hosting », application Node.js connectée à ce d
 | Dossier de sortie       | `.output`          |
 | Fichier d'entrée        | `server/index.mjs` |
 
-Variables d'environnement : aucune pour l'instant. Le formulaire de contact demandera le jeton de la Mail API Hostinger (créé dans _Agentic Mail → API access_), uniquement côté serveur.
+Variables d'environnement, à définir dans hPanel (jamais dans le code, jamais préfixées `VITE_`) :
+
+| Variable                   | Valeur                                                                                          |
+| -------------------------- | ----------------------------------------------------------------------------------------------- |
+| `HOSTINGER_MAIL_API_TOKEN` | Jeton de la Mail API (_Emails → Agentic Mail → API access_)                                     |
+| `HOSTINGER_MAILBOX_ID`     | Identifiant de la boîte qui envoie (renvoyé par `GET https://api.mail.hostinger.com/api/v1/me`) |
+| `CONTACT_TO`               | Adresse(s) qui reçoivent les messages du formulaire, séparées par des virgules                  |
+
+Sans ces variables, `pnpm dev` affiche le message dans le terminal au lieu de l'envoyer ; en production, le formulaire indique que l'envoi est indisponible et renvoie vers le téléphone.
 
 ## Règles de contenu
 
