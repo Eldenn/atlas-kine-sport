@@ -4,7 +4,7 @@ import type * as React from 'react'
 
 import { Brand } from '@/components/atlas/brand'
 import { RouterLink } from '@/components/atlas/router-link'
-import { NotFoundPage } from '@/components/error-page'
+import { NotFound } from '@/components/atlas/not-found'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,8 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { cabinet, legalLinks, nav, practitioners, SITE_URL } from '@/content/cabinet'
 import { CoreloomI18nProvider } from '@/lib/i18n'
 import { AppLink, CoreloomLinkProvider } from '@/lib/link'
+import montserratWoff2 from '@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2?url'
+import marcellusWoff2 from '@fontsource/marcellus/files/marcellus-latin-400-normal.woff2?url'
 import appCss from '@/styles/globals.css?url'
 
 export const Route = createRootRoute({
@@ -25,6 +27,21 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: 'stylesheet', href: appCss },
+      // The two fonts of the first screen, latin subset: fetched with the CSS, not after it.
+      {
+        rel: 'preload',
+        href: marcellusWoff2,
+        as: 'font',
+        type: 'font/woff2',
+        crossOrigin: 'anonymous',
+      },
+      {
+        rel: 'preload',
+        href: montserratWoff2,
+        as: 'font',
+        type: 'font/woff2',
+        crossOrigin: 'anonymous',
+      },
       { rel: 'icon', href: '/favicon-64.png', type: 'image/png' },
       { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
     ],
@@ -32,14 +49,7 @@ export const Route = createRootRoute({
   }),
   shellComponent: RootDocument,
   component: Layout,
-  notFoundComponent: () => (
-    <NotFoundPage
-      brand={<Brand />}
-      homeHref="/"
-      title="Cette page n’existe pas"
-      description="Elle a peut-être changé d’adresse avec le nouveau site."
-    />
-  ),
+  notFoundComponent: NotFound,
 })
 
 // schema.org description of the practice, read by search engines for the local results.
@@ -49,6 +59,10 @@ const structuredData = {
   name: cabinet.name,
   description: cabinet.description,
   url: SITE_URL,
+  image: `${SITE_URL}/og-image.jpg`,
+  logo: `${SITE_URL}/images/emblem-bone.png`,
+  hasMap: cabinet.directionsHref,
+  medicalSpecialty: 'PhysicalTherapy',
   telephone: '+33772508017',
   address: {
     '@type': 'PostalAddress',
