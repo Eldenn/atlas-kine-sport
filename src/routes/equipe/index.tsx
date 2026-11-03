@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { PageIntro } from '@/components/atlas/page-intro'
-import { PractitionerCard, PractitionerGrid } from '@/components/practitioner-card'
+import { PractitionerCard } from '@/components/practitioner-card'
 import { Button } from '@/components/ui/button'
 import { practitioners } from '@/content/cabinet'
 import { AppLink } from '@/lib/link'
@@ -23,13 +23,14 @@ function Equipe() {
       <PageIntro eyebrow="L’équipe" title="Deux kinésithérapeutes du sport">
         <p>Chacun a son agenda Doctolib : choisissez selon vos besoins ou vos disponibilités.</p>
       </PageIntro>
-      <PractitionerGrid columns={2} className="pt-0">
+      {/* One card per row, portrait beside the text: the portraits stay near their native size. */}
+      <section className="mx-auto flex max-w-[1120px] flex-col gap-6 px-5 pb-20 md:px-7">
         {practitioners.map((p) => (
           <PractitionerCard
             key={p.slug}
             name={p.name}
             profession={p.profession}
-            photo={<img src={p.photo} alt="" width={460} height={575} loading="lazy" />}
+            photo={<img src={p.photo} alt="" width={480} height={600} loading="lazy" />}
             specialties={p.areas}
             bio={p.bio}
             facts={[
@@ -37,6 +38,7 @@ function Equipe() {
               { label: 'Conventionnement', value: p.convention },
             ]}
             headingLevel={2}
+            orientation="horizontal"
             actions={
               <>
                 <Button asChild>
@@ -52,7 +54,7 @@ function Equipe() {
             }
           />
         ))}
-      </PractitionerGrid>
+      </section>
     </>
   )
 }
