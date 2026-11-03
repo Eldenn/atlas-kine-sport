@@ -117,7 +117,7 @@ function Layout() {
             brand={<Brand />}
             links={nav.map((link) => ({ ...link, active: pathname.startsWith(link.href) }))}
             actions={
-              <Button asChild size="sm" className="hidden md:inline-flex">
+              <Button asChild size="sm" className="hidden lg:inline-flex">
                 <AppLink href="/contact">Prendre rendez-vous</AppLink>
               </Button>
             }

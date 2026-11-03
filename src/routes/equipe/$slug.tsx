@@ -55,13 +55,13 @@ function Fiche() {
       <PageIntro eyebrow={p.profession} title={p.name}>
         <p>{p.bio}</p>
       </PageIntro>
-      <section className="mx-auto box-content grid max-w-[1120px] gap-12 border-t border-border-subtle px-5 py-12 md:grid-cols-[280px_1fr_1fr] md:px-7">
+      <section className="mx-auto box-content grid max-w-[1120px] grid-cols-[minmax(0,1fr)] gap-12 border-t border-border-subtle px-5 py-12 md:grid-cols-[240px_minmax(0,1fr)] md:px-7 lg:grid-cols-[280px_minmax(0,1fr)_minmax(0,1fr)]">
         <img
           src={p.photo}
           alt={`Portrait de ${p.name}`}
           width={480}
           height={600}
-          className="aspect-[4/5] w-full max-w-[280px] rounded-lg object-cover"
+          className="aspect-[4/5] w-full max-w-[280px] rounded-lg object-cover md:row-span-2 lg:row-span-1"
         />
         <div>
           <h2 className="m-0 font-display text-[26px]">Domaines d’intervention</h2>
@@ -75,21 +75,25 @@ function Fiche() {
         </div>
         <div>
           <h2 className="m-0 font-display text-[26px]">Informations</h2>
-          <dl className="mt-5 mb-0 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-[15px]">
+          <dl className="mt-5 mb-0 grid gap-x-6 gap-y-1 text-[15px] sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-y-3">
             <dt className="text-fg-muted">N° RPPS</dt>
-            <dd className="m-0">{p.rpps}</dd>
+            <dd className="m-0 mb-2 sm:mb-0">{p.rpps}</dd>
             {!!p.ordre && (
               <>
                 <dt className="text-fg-muted">N° Ordre</dt>
-                <dd className="m-0">{p.ordre}</dd>
+                <dd className="m-0 mb-2 sm:mb-0">{p.ordre}</dd>
               </>
             )}
             <dt className="text-fg-muted">Conventionnement</dt>
-            <dd className="m-0">{p.convention}</dd>
+            <dd className="m-0 mb-2 sm:mb-0">{p.convention}</dd>
             <dt className="text-fg-muted">Paiement</dt>
             <dd className="m-0">{p.payment}</dd>
           </dl>
-          <Button asChild size="lg" className="mt-8">
+          <Button
+            asChild
+            size="lg"
+            className="mt-8 h-auto min-h-11 w-full py-2.5 whitespace-normal sm:w-auto"
+          >
             <a href={p.doctolib} target="_blank" rel="noopener noreferrer">
               Prendre rendez-vous sur Doctolib<span className="sr-only"> (nouvel onglet)</span>
             </a>
