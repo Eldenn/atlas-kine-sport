@@ -58,8 +58,8 @@ function Fiche() {
         <img
           src={p.photo}
           alt={`Portrait de ${p.name}`}
-          width={460}
-          height={575}
+          width={480}
+          height={600}
           className="aspect-[4/5] w-full max-w-[280px] rounded-lg object-cover"
         />
         <div>
