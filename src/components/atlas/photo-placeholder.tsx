@@ -8,11 +8,13 @@ export function PhotoPlaceholder({ label, className }: { label: string; classNam
       role="img"
       aria-label={`Photo à venir : ${label}`}
       className={cn(
-        'flex size-full min-h-[240px] items-end bg-[repeating-linear-gradient(135deg,var(--surface-1)_0_14px,var(--surface-2)_14px_28px)] p-5',
+        'flex size-full min-h-[160px] items-end bg-[repeating-linear-gradient(135deg,var(--surface-1)_0_14px,var(--surface-2)_14px_28px)] p-5',
         className,
       )}
     >
-      <span className="atlas-eyebrow text-fg-muted text-[10px]">Photo à venir · {label}</span>
+      <span className="atlas-eyebrow text-fg-muted text-[11px] leading-relaxed">
+        Photo à venir · {label}
+      </span>
     </div>
   )
 }

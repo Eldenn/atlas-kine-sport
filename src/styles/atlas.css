@@ -64,3 +64,16 @@
   letter-spacing: 0.32em;
   text-transform: uppercase;
 }
+
+/* Responsive and legibility adjustments to Coreloom blocks, kept here so a Coreloom sync keeps them.
+   Header links stay on one line between 768 and 1024px. */
+header nav a {
+  white-space: nowrap;
+}
+/* Coreloom's 11px mono labels (badges, table heads, footer and legal headings) read at 12px. */
+.font-mono.text-\[11px\] {
+  font-size: 12px;
+}
+[data-slot='field-description'] {
+  font-size: 13px;
+}

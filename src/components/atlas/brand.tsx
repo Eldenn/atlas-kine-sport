@@ -9,7 +9,10 @@ export function Brand({ className }: { className?: string }) {
     <Link
       to="/"
       aria-label="Atlas Kiné Sport, accueil"
-      className={cn('flex items-center gap-2.5 leading-none text-foreground', className)}
+      className={cn(
+        'flex shrink-0 items-center gap-2.5 leading-none whitespace-nowrap text-foreground',
+        className,
+      )}
     >
       {/* The PNG has a wide transparent margin: the visible emblem is about 62% of it. */}
       <img src="/images/emblem-bone.png" alt="" width={56} height={56} className="-m-2 size-14" />
