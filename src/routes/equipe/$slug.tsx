@@ -54,7 +54,14 @@ function Fiche() {
       <PageIntro eyebrow={p.profession} title={p.name}>
         <p>{p.bio}</p>
       </PageIntro>
-      <section className="mx-auto grid max-w-[1120px] gap-12 border-t border-border-subtle px-5 py-12 md:grid-cols-2 md:px-7">
+      <section className="mx-auto grid max-w-[1120px] gap-12 border-t border-border-subtle px-5 py-12 md:grid-cols-[280px_1fr_1fr] md:px-7">
+        <img
+          src={p.photo}
+          alt={`Portrait de ${p.name}`}
+          width={460}
+          height={575}
+          className="aspect-[4/5] w-full max-w-[280px] rounded-lg object-cover"
+        />
         <div>
           <h2 className="m-0 font-display text-[26px]">Domaines d’intervention</h2>
           <ul className="mt-5 mb-0 flex list-none flex-wrap gap-2 p-0">

@@ -29,6 +29,7 @@ function Equipe() {
             key={p.slug}
             name={p.name}
             profession={p.profession}
+            photo={<img src={p.photo} alt="" width={460} height={575} loading="lazy" />}
             specialties={p.areas}
             bio={p.bio}
             facts={[
