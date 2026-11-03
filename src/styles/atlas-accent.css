@@ -1,0 +1,31 @@
+/* Atlas — "atlas" accent (or antique #B0903D), built with coreloom-ui's theme generator
+ * (node build/gen-brand.mjs) and checked there: text 4.5:1, fills and focus rings 3:1 on all
+ * surfaces. Dark theme: generated from #B0903D. Light theme: generated from #7d6424, a darker gold
+ * of the same hue, because the generator turns #B0903D orange (#a85e19) when it darkens it for
+ * light surfaces. */
+
+[data-accent='atlas'],
+[data-theme='dark'][data-accent='atlas'] {
+  --accent: #b59542;
+  --accent-hover: #d0c098;
+  --accent-press: #a07c00;
+  --accent-fg: #c1a359;
+  --accent-subtle: rgba(181, 149, 66, 0.1);
+  --accent-ring: rgba(181, 149, 66, 0.7);
+  --border-accent: #b59542;
+  --fg-on-accent: #1d1501;
+  --glow-accent: 0 0 0 1px rgba(181, 149, 66, 0.4), 0 6px 24px rgba(181, 149, 66, 0.22);
+}
+
+[data-theme='light'][data-accent='atlas'],
+:where([data-theme='light']) [data-accent='atlas'] {
+  --accent: #7d6424;
+  --accent-hover: #6b530e;
+  --accent-press: #584307;
+  --accent-fg: #6b530e;
+  --accent-subtle: rgba(125, 100, 36, 0.1);
+  --accent-ring: rgba(107, 83, 14, 0.85);
+  --border-accent: #7d6424;
+  --fg-on-accent: #ffffff;
+  --glow-accent: 0 0 0 1px rgba(125, 100, 36, 0.35), 0 6px 20px rgba(125, 100, 36, 0.2);
+}
