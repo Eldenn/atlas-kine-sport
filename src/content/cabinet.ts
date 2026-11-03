@@ -64,11 +64,14 @@ export interface Practitioner {
   areas: string[]
   bio: string
   doctolib: string
+  /** Portrait in public/images, 4:5. */
+  photo: string
 }
 
 export const practitioners: Practitioner[] = [
   {
     slug: 'delman-ahmed-mustafa',
+    photo: '/images/delman-ahmed-mustafa.webp',
     name: 'Delman Ahmed Mustafa',
     profession: 'Masseur-kinésithérapeute',
     rpps: '10111339171',
@@ -89,6 +92,7 @@ export const practitioners: Practitioner[] = [
   },
   {
     slug: 'moeine-khalifeh',
+    photo: '/images/moeine-khalifeh.webp',
     name: 'Moeine Khalifeh',
     profession: 'Masseur-kinésithérapeute',
     rpps: '10108844001',
