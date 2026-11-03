@@ -1,0 +1,23 @@
+{
+  "$comment": "Coreloom UI registry items this site uses. Update them with `pnpm dlx shadcn@latest add @coreloom/<name> --overwrite`, or from a local coreloom-ui checkout with `node scripts/sync-coreloom.mjs <path-to-coreloom-ui>`. Installed files are ours: review the diff after an update, Atlas adaptations live in src/components/atlas/.",
+  "items": [
+    "theme",
+    "link",
+    "showcase",
+    "marketing",
+    "error-pages",
+    "breadcrumb",
+    "button",
+    "field",
+    "input",
+    "textarea",
+    "label",
+    "alert",
+    "spinner",
+    "sonner",
+    "table",
+    "description-list",
+    "accordion",
+    "separator"
+  ]
+}

@@ -1,0 +1,66 @@
+/* Atlas Kiné Sport — the moodboard (PLANCHE MOODBOARD, p. 6-7) on top of Coreloom UI.
+ *
+ * Palette   Bleu minéral #121A26 (page), Bone #EBE7E3 (light bands), Or antique #B0903D (accent,
+ *           see atlas-accent.css). Coreloom's "mineral" and "bone" surface presets are close; the
+ *           page backgrounds are pinned to the moodboard's values below, the rest of each preset
+ *           (cards, borders, text greys) is kept.
+ * Fonts     Marcellus (titles), Montserrat (text, spaced capitals), Cormorant Garamond italic
+ *           (quotes). Self-hosted from Fontsource: no request to Google Fonts, nothing to declare
+ *           in the privacy policy.
+ *
+ * The html element carries data-theme="dark" data-surface="mineral" data-accent="atlas"; a light
+ * band is <section data-theme="light" data-surface="bone" data-accent="atlas" class="bg-background">. */
+@import '@fontsource/marcellus';
+@import '@fontsource-variable/montserrat';
+@import '@fontsource/cormorant-garamond/400-italic.css';
+@import '@fontsource/cormorant-garamond/500-italic.css';
+
+:root {
+  --font-display: 'Marcellus', 'Cormorant Garamond', Georgia, serif;
+  --font-sans:
+    'Montserrat Variable', 'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+  --font-quote: 'Cormorant Garamond', Georgia, serif;
+  /* Coreloom's blocks set their small capital labels (eyebrows, footer column titles) in mono:
+     here they are Montserrat, like "KINÉ SPORT" on the moodboard. The site shows no code. */
+  --font-mono: var(--font-sans);
+}
+
+@theme {
+  --font-quote: 'Cormorant Garamond', Georgia, serif;
+  --color-gold: #b0903d;
+}
+
+[data-theme='dark'][data-surface='mineral'],
+:root[data-surface='mineral'] {
+  --bg-base: #0d141e;
+  --bg-1: #121a26;
+  --surface-1: #172130;
+  --surface-2: #1c2838;
+}
+
+[data-theme='light'][data-surface='bone'],
+:where([data-theme='light']) [data-surface='bone'] {
+  --bg-base: #e3ded9;
+  --bg-1: #ebe7e3;
+  --surface-1: #f5f2ef;
+  --surface-2: #e5e0db;
+  --surface-hover: #ddd7d1;
+  --border-subtle: #ddd6ce;
+  --fg-muted: #5f564a; /* 4.5:1 on every bone surface, hover included */
+}
+
+/* Marcellus has a single weight: Coreloom's semibold headings would be faux-bold. */
+:where(h1, h2, h3, .font-display) {
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* "KINÉ SPORT", section eyebrows: Montserrat in spaced capitals, as on the moodboard. */
+.atlas-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}

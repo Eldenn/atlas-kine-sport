@@ -1,0 +1,20 @@
+import tailwindcss from '@tailwindcss/vite'
+import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import react from '@vitejs/plugin-react'
+import { nitro } from 'nitro/vite'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  resolve: { tsconfigPaths: true },
+  plugins: [
+    tailwindcss(),
+    tanstackStart({
+      // Every page is rendered to HTML at build time, starting from "/" and following its links:
+      // search engines get full pages, and the first visit after Hostinger idles the app is fast.
+      prerender: { enabled: true, crawlLinks: true, failOnError: true },
+    }),
+    // Builds .output/server/index.mjs, the Node server Hostinger runs ("Nitro" preset).
+    nitro(),
+    react(),
+  ],
+})
