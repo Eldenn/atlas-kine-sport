@@ -11,7 +11,7 @@ export function PageIntro({
   children?: React.ReactNode
 }) {
   return (
-    <header className="mx-auto max-w-[1120px] px-5 pt-20 pb-12 md:px-7 md:pt-28">
+    <header className="mx-auto box-content max-w-[1120px] px-5 pt-20 pb-12 md:px-7 md:pt-28">
       <p className="atlas-eyebrow m-0 text-primary-text">{eyebrow}</p>
       <h1 className="mt-4 mb-0 max-w-[20ch] font-display text-[clamp(36px,5vw,60px)] leading-[1.05]">
         {title}

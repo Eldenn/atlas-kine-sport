@@ -36,7 +36,7 @@ function Fiche() {
   const p = Route.useLoaderData()
   return (
     <>
-      <div className="mx-auto max-w-[1120px] px-5 pt-8 md:px-7">
+      <div className="mx-auto box-content max-w-[1120px] px-5 pt-8 md:px-7">
         <Breadcrumb aria-label="Fil d’Ariane">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -54,7 +54,7 @@ function Fiche() {
       <PageIntro eyebrow={p.profession} title={p.name}>
         <p>{p.bio}</p>
       </PageIntro>
-      <section className="mx-auto grid max-w-[1120px] gap-12 border-t border-border-subtle px-5 py-12 md:grid-cols-[280px_1fr_1fr] md:px-7">
+      <section className="mx-auto box-content grid max-w-[1120px] gap-12 border-t border-border-subtle px-5 py-12 md:grid-cols-[280px_1fr_1fr] md:px-7">
         <img
           src={p.photo}
           alt={`Portrait de ${p.name}`}
