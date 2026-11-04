@@ -1,8 +1,4 @@
-"""Turns scripts/atlas-3d/poster.png into the two poster sizes in public/images/.
-
-The statue is see-through glass, so most of its pixels are partly transparent: the alpha channel
-is compressed lossily too (alpha_quality 70), which halves the files with no visible change.
-"""
+"""Turns scripts/atlas-3d/poster.png into the two poster sizes in public/images/."""
 
 from pathlib import Path
 
@@ -12,7 +8,5 @@ ROOT = Path(__file__).resolve().parents[2]
 img = Image.open(ROOT / "scripts" / "atlas-3d" / "poster.png").convert("RGBA")
 for width in (1120, 560):
     out = ROOT / "public" / "images" / f"atlas-3d-{width}.webp"
-    img.resize((width, round(img.height * width / img.width)), Image.LANCZOS).save(
-        out, quality=82, alpha_quality=70, method=6
-    )
+    img.resize((width, round(img.height * width / img.width)), Image.LANCZOS).save(out, quality=82, method=6)
     print(out.relative_to(ROOT), out.stat().st_size, "bytes")
