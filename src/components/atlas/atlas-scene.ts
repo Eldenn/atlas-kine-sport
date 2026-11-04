@@ -38,15 +38,16 @@ const deg = (d: number) => (d * Math.PI) / 180
 /**
  * The camera path, one framing per beat of the stage (scroll progress 0, 0.5, 1).
  * turn: the statue's rotation; elevation: the camera's, negative is from below; zoom: 1 frames
- * the whole statue, more is closer; aim: the height looked at, in metres.
+ * the whole statue in the frame element, more is closer; aim: the height looked at, in metres;
+ * shift: where the statue sits sideways, in frame widths (only where the canvas has room).
  */
 const KEYS = [
   // Bouger: the whole statue, three-quarter view, a touch from below. Also the poster.
-  { at: 0, turn: deg(-22), elevation: deg(-4), zoom: 1, aim: HEIGHT * 0.5 },
-  // Récupérer: in profile, close on the shoulders taking the load.
-  { at: 0.5, turn: deg(48), elevation: deg(6), zoom: 1.75, aim: HEIGHT * 0.66 },
+  { at: 0, turn: deg(-22), elevation: deg(-4), zoom: 1, aim: HEIGHT * 0.5, shift: 0 },
+  // Récupérer: in profile, close on the shoulders taking the load, pushed right, off the text.
+  { at: 0.5, turn: deg(58), elevation: deg(6), zoom: 1.7, aim: HEIGHT * 0.64, shift: 0.22 },
   // Performer: the other three-quarter, from low down, the whole figure again.
-  { at: 1, turn: deg(24), elevation: deg(-12), zoom: 1.08, aim: HEIGHT * 0.5 },
+  { at: 1, turn: deg(108), elevation: deg(-12), zoom: 1.1, aim: HEIGHT * 0.5, shift: 0.04 },
 ] as const
 
 const FOV = 26
@@ -57,7 +58,10 @@ const HALF_WIDTH = 0.6
 export type AtlasScene = { dispose: () => void }
 
 export type AtlasSceneOptions = {
+  /** Where it draws: may be much larger than the frame, so a close framing is never cut short. */
   canvas: HTMLCanvasElement
+  /** The statue's frame (the poster's box): the camera frames the statue in it, at zoom 1. */
+  frame: HTMLElement
   modelUrl: string
   /** Scroll progress through the stage, 0 to 1 (read on scroll). */
   progress: () => number
@@ -67,7 +71,7 @@ export type AtlasSceneOptions = {
 }
 
 export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasScene> {
-  const { canvas } = opts
+  const { canvas, frame } = opts
   const renderer = new WebGLRenderer({
     canvas,
     antialias: true,
@@ -133,8 +137,15 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
   scene.add(shadow)
 
   // --- framing ---------------------------------------------------------------------------------
-  let width = 0
+  // The camera is set up for the frame element (its aspect, the statue fitted in it); a view
+  // offset then widens the picture to the whole canvas, the frame at its place inside it. At
+  // progress 0 the frame's part of the canvas is exactly the poster.
+  let width = 0 // frame
   let height = 0
+  let canvasWidth = 0
+  let canvasHeight = 0
+  let frameX = 0 // frame's position in the canvas
+  let frameY = 0
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 }
   /** 0 at the top of the page, 1 once the figure has scrolled out; eased towards. */
   const scroll = { p: 0, target: 0 }
@@ -148,13 +159,15 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
     const a = KEYS[i]!
     const b = KEYS[i + 1]!
     let t = Math.min(1, Math.max(0, (p - a.at) / (b.at - a.at)))
-    t = t * t * (3 - 2 * t)
+    // Part linear, part smoothstep: it settles at each beat but never stands still.
+    t = 0.45 * t + 0.55 * t * t * (3 - 2 * t)
     const mix = (x: number, y: number) => x + (y - x) * t
     return {
       turn: mix(a.turn, b.turn),
       elevation: mix(a.elevation, b.elevation),
       zoom: mix(a.zoom, b.zoom),
       aim: mix(a.aim, b.aim),
+      shift: mix(a.shift, b.shift),
     }
   }
 
@@ -174,16 +187,24 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
       distance * Math.cos(el) * Math.cos(az),
     )
     camera.lookAt(target)
+    // Room to the right of the frame decides how far the statue may move over.
+    const room = Math.max(0, canvasWidth - (frameX + width))
+    const shift = Math.min(f.shift * width, room * 0.6)
+    camera.setViewOffset(width, height, -frameX - shift, -frameY, canvasWidth, canvasHeight)
   }
 
   function resize() {
-    const rect = canvas.getBoundingClientRect()
-    width = Math.max(1, Math.round(rect.width))
-    height = Math.max(1, Math.round(rect.height))
+    const c = canvas.getBoundingClientRect()
+    const f = frame.getBoundingClientRect()
+    canvasWidth = Math.max(1, Math.round(c.width))
+    canvasHeight = Math.max(1, Math.round(c.height))
+    width = Math.max(1, Math.round(f.width))
+    height = Math.max(1, Math.round(f.height))
+    frameX = Math.round(f.left - c.left)
+    frameY = Math.round(f.top - c.top)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75))
-    renderer.setSize(width, height, false)
+    renderer.setSize(canvasWidth, canvasHeight, false)
     camera.aspect = width / height
-    camera.updateProjectionMatrix()
     placeCamera()
   }
 
@@ -203,7 +224,7 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
     return value.p !== value.target
   }
 
-  function frame(now: number) {
+  function tick(now: number) {
     raf = 0
     const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60
     last = now
@@ -224,7 +245,7 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
 
   function schedule() {
     if (opts.still || raf || !onScreen || document.hidden) return
-    raf = requestAnimationFrame(frame)
+    raf = requestAnimationFrame(tick)
   }
 
   const onScroll = () => {
@@ -244,6 +265,7 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
     if (opts.still || !raf) renderer.render(scene, camera)
   })
   resizeObserver.observe(canvas)
+  resizeObserver.observe(frame)
 
   const visibility = new IntersectionObserver(([entry]) => {
     onScreen = entry?.isIntersecting ?? true
