@@ -36,7 +36,32 @@ const soins = [
 function Soins() {
   return (
     <>
-      <PageIntro eyebrow="Soins" title="Du bilan au retour au sport">
+      <PageIntro
+        eyebrow="Soins"
+        title="Du bilan au retour au sport"
+        media={
+          <picture className="mx-auto block w-full max-w-[420px] md:max-w-none">
+            <source
+              type="image/avif"
+              srcSet="/images/soins/soins-420.avif 420w, /images/soins/soins-783.avif 783w"
+              sizes="(min-width: 768px) 46vw, 90vw"
+            />
+            <source
+              type="image/webp"
+              srcSet="/images/soins/soins-420.webp 420w, /images/soins/soins-783.webp 783w"
+              sizes="(min-width: 768px) 46vw, 90vw"
+            />
+            <img
+              src="/images/soins/soins-783.webp"
+              width={783}
+              height={652}
+              alt="Un kinésithérapeute, un genou au sol, palpe le genou d’un sportif en fente avant."
+              decoding="async"
+              className="block h-auto w-full"
+            />
+          </picture>
+        }
+      >
         <p>
           Sur prescription médicale, les séances de kinésithérapie sont remboursées par l’Assurance
           maladie. Les deux praticiens sont conventionnés et pratiquent le tiers payant.
