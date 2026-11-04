@@ -108,7 +108,7 @@ header nav a {
   }
 }
 
-/* Home stage (src/components/atlas/home-stage.tsx): the bronze Atlas and three beats.
+/* Home stage (src/components/atlas/home-stage.tsx): the glass Atlas and three beats.
  * Finished composition first; the held stage under [data-live]; the entrance under motion only. */
 .atlas-stage {
   --p: 0;
