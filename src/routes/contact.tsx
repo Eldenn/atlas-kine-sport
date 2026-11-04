@@ -30,7 +30,7 @@ function Contact() {
           <DoctolibButtons />
         </div>
       </PageIntro>
-      <section className="border-t border-border-subtle px-5 py-20 md:px-7">
+      <section className="atlas-divide px-5 py-20 md:px-7">
         <div className="mx-auto grid max-w-[1120px] gap-14 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
           <div>
             <h2

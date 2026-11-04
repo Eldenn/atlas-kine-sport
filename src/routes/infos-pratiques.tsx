@@ -323,7 +323,7 @@ function Tarifs() {
     <section
       id="tarifs"
       aria-labelledby="tarifs-titre"
-      className={`${anchorOffset} border-t border-border-subtle py-16 md:py-24`}
+      className={`${anchorOffset} atlas-divide py-16 md:py-24`}
     >
       <div className={`${container} flex flex-col gap-12`}>
         <SectionHeading id="tarifs-titre" index={3} title={sections[3].label}>

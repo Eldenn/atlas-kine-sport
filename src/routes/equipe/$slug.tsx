@@ -55,7 +55,7 @@ function Fiche() {
       <PageIntro eyebrow={p.profession} title={p.name}>
         <p>{p.bio}</p>
       </PageIntro>
-      <section className="mx-auto box-content grid max-w-[1120px] grid-cols-[minmax(0,1fr)] gap-12 border-t border-border-subtle px-5 py-12 md:grid-cols-[240px_minmax(0,1fr)] md:px-7 lg:grid-cols-[280px_minmax(0,1fr)_minmax(0,1fr)]">
+      <section className="atlas-divide mx-auto box-content grid max-w-[1120px] grid-cols-[minmax(0,1fr)] gap-12 px-5 py-12 md:grid-cols-[240px_minmax(0,1fr)] md:px-7 lg:grid-cols-[280px_minmax(0,1fr)_minmax(0,1fr)]">
         <img
           src={p.photo}
           alt={`Portrait de ${p.name}`}

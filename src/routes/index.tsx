@@ -46,7 +46,7 @@ function Home() {
       <HomeStage />
 
       {/* The three axes as a numbered sequence, not a grid of icon cards. */}
-      <section aria-labelledby="axes" className="border-t border-border-subtle px-5 py-20 md:px-7">
+      <section aria-labelledby="axes" className="atlas-divide px-5 py-20 md:px-7">
         <div className="mx-auto max-w-[1120px]">
           <p className="atlas-eyebrow m-0 text-primary-text">La méthode</p>
           <h2
@@ -108,7 +108,7 @@ function Home() {
         eyebrow="L’équipe"
         title={<span className="font-display">Vos kinésithérapeutes</span>}
         columns={2}
-        className="border-t border-border-subtle"
+        className="atlas-divide"
       >
         {practitioners.map((p) => (
           <PractitionerCard
@@ -143,7 +143,7 @@ function Home() {
         eyebrow="Nous trouver"
         title={<span className="font-display">Votre prochaine séance commence par un bilan</span>}
         description="Choisissez votre praticien sur Doctolib, ou appelez le cabinet."
-        className="border-t border-border-subtle"
+        className="atlas-divide"
       >
         <ContactDetails
           address={

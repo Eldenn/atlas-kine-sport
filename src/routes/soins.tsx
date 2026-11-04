@@ -60,7 +60,7 @@ function Soins() {
           maladie. Les deux praticiens sont conventionnés et pratiquent le tiers payant.
         </p>
       </PageIntro>
-      <section className="border-t border-border-subtle px-5 py-16 md:px-7">
+      <section className="atlas-divide px-5 py-16 md:px-7">
         <ol className="m-0 mx-auto grid max-w-[1120px] list-none gap-12 p-0">
           {soins.map((soin, i) => (
             <li key={soin.title} className="grid gap-4 md:grid-cols-[200px_1fr]">
@@ -95,7 +95,7 @@ function Soins() {
               'Non. Les méthodes du sport servent aussi à retrouver un quotidien sans douleur, quel que soit votre niveau.',
           },
         ]}
-        className="border-t border-border-subtle"
+        className="atlas-divide"
       />
       <CtaSection
         title={<span className="font-display">Prendre rendez-vous</span>}
