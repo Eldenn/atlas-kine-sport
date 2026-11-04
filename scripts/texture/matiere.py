@@ -1,12 +1,12 @@
 """Matière du fond du site : python3 scripts/texture/matiere.py
 
-Une surface presque lisse, voilée de poussière fine. Trois couches sans raccord, de tailles sans
+Une surface presque lisse, voilée de poussière fine. Deux couches sans raccord, de tailles sans
 rapport simple, superposées en CSS (atlas.css) : leurs motifs ne retombent ensemble qu'au bout de
-plusieurs dizaines de milliers de pixels, l'œil ne voit pas de répétition.
+plus d'un million de pixels, l'œil ne voit pas de répétition. Pas de brume ni de grandes taches
+claires : seulement des grains et des points.
 
-  voiles  1400 px  grains d'un pixel regroupés en voiles, nets d'un côté, fondus de l'autre
+  voiles  1400 px  grains regroupés en voiles, nets d'un côté, fondus de l'autre
   grains   757 px  grains épars, quelques points plus gros, de rares fibres
-  brume    220 px  affichée à 1530 px : variations de lumière très douces, sans détail
 
 Chaque couche existe en deux versions (seed fixe, relancer redonne les mêmes images) :
   -sombre  poussière claire sur noir, fondue en `screen` sur les fonds sombres
@@ -90,11 +90,6 @@ def grains(n=757):
     return dust
 
 
-def brume(n=220):
-    h = 0.6 * lowfreq(n, 30) + 0.4 * lowfreq(n, 10)
-    return np.clip(h, 0, None) / 3  # seulement des éclaircies, jamais d'assombrissement
-
-
 def save(name, dust, amp_dark, amp_light, lossless=True):
     dust = np.clip(dust, 0, 1)
     for suffix, img in (
@@ -114,4 +109,3 @@ os.makedirs(OUT, exist_ok=True)
 # amp = niveau maximal d'un grain : screen sur le bleu minéral, multiply sur le bone
 save('voiles', voiles(), 85, 45)
 save('grains', grains(), 85, 45)
-save('brume', brume(), 7, 5)
