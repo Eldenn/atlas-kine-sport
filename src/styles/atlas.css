@@ -107,3 +107,309 @@ header nav a {
     pointer-events: none;
   }
 }
+
+/* Home stage (src/components/atlas/home-stage.tsx): the Atlas figure and three beats.
+ * Finished composition first; the held stage under [data-live]; the entrance under motion only. */
+.atlas-stage {
+  --p: 0;
+  /* The entrance waits for the intro screen on the first page of a visit. */
+  --enter: 2250ms;
+  position: relative;
+}
+:root[data-intro='seen'] .atlas-stage {
+  --enter: 120ms;
+}
+.atlas-stage__pin {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-areas: 'figure' 'text';
+  grid-template-rows: 40svh auto;
+  align-items: center;
+  gap: 8px;
+  min-height: calc(100svh - 4rem);
+  padding: 16px 20px 24px;
+}
+@media (max-width: 1023px) and (max-height: 740px) {
+  .atlas-stage__pin {
+    grid-template-rows: 32svh auto;
+  }
+  /* Small phones: the held screen keeps one action; "Le cabinet" is in the menu. */
+  .atlas-stage[data-live] .atlas-stage__secondary {
+    display: none;
+  }
+}
+@media (min-width: 1024px) {
+  .atlas-stage__pin {
+    grid-template-areas: 'text figure';
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 32px;
+    height: calc(100svh - 4rem);
+    min-height: 600px;
+    padding: 24px max(28px, calc((100vw - 1240px) / 2));
+  }
+}
+.atlas-stage__figure {
+  grid-area: figure;
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  min-height: 0;
+}
+.atlas-stage__parallax {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+.atlas-stage__atlas {
+  height: 100%;
+}
+/* Live: a mouse moves the figure a few pixels (home-stage.tsx); its own layer, so that does not
+ * redraw the 2,587 shapes of the drawing. */
+.atlas-stage[data-live] .atlas-stage__parallax {
+  will-change: translate;
+  translate: calc(var(--px, 0) * -10px) calc(var(--py, 0) * -6px);
+}
+.atlas-stage__text {
+  grid-area: text;
+  position: relative;
+  z-index: 2;
+}
+/* The name, very large and one tone off the ground, behind the statue; it drifts with the scroll. */
+.atlas-stage__word {
+  position: absolute;
+  inset-inline: 0;
+  top: 32%;
+  z-index: 0;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(120px, 34vw, 520px);
+  line-height: 0.8;
+  letter-spacing: 0.06em;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--surface-1);
+  translate: calc(var(--p) * -28%) -50%;
+  pointer-events: none;
+  user-select: none;
+}
+@media (min-width: 1024px) {
+  .atlas-stage__word {
+    top: 50%;
+    padding-inline-start: 30%;
+  }
+  .atlas-stage__beat-lead {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+}
+.atlas-stage__beat-word {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(48px, 6vw, 96px);
+  line-height: 0.98;
+  color: var(--accent-fg);
+}
+.atlas-stage__beat-lead {
+  max-width: 40ch;
+  margin: 16px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--fg-2);
+}
+
+/* Finished composition: the three words as one headline, then the first lead. */
+.atlas-stage:not([data-live]) .atlas-stage__beats {
+  display: flex;
+  flex-direction: column;
+}
+.atlas-stage:not([data-live]) .atlas-stage__beat {
+  display: contents;
+}
+.atlas-stage:not([data-live]) .atlas-stage__beat-lead {
+  order: 1;
+}
+.atlas-stage:not([data-live]) .atlas-stage__beat:not([data-index='0']) .atlas-stage__beat-lead {
+  display: none;
+}
+
+/* Live: the stage held under the header for under a screen of scroll. */
+.atlas-stage[data-live] {
+  height: 170svh;
+}
+.atlas-stage[data-live] .atlas-stage__pin {
+  position: sticky;
+  top: 4rem;
+  height: calc(100svh - 4rem);
+  min-height: 0;
+}
+.atlas-stage[data-live] .atlas-stage__beats {
+  display: grid;
+}
+/* The motto: its three words always in place, one per row; the leads share the row below, the
+ * active one showing (home-stage.tsx sets data-active and --fill). */
+.atlas-stage[data-live] .atlas-stage__beat {
+  display: contents;
+}
+.atlas-stage[data-live] .atlas-stage__beat[data-index='1'] .atlas-stage__beat-word {
+  grid-row: 2;
+}
+.atlas-stage[data-live] .atlas-stage__beat[data-index='2'] .atlas-stage__beat-word {
+  grid-row: 3;
+}
+.atlas-stage[data-live] .atlas-stage__beat-lead {
+  grid-row: 4;
+  grid-column: 1;
+  opacity: 0;
+  translate: 0 8px;
+  transition:
+    opacity 260ms var(--ease-out),
+    translate 260ms var(--ease-out);
+}
+.atlas-stage[data-live] .atlas-stage__beat[data-active] .atlas-stage__beat-lead {
+  opacity: 1;
+  translate: 0;
+}
+/* A word not reached yet is a gold outline; gold rises in it from the bottom up (--fill, 0 to 1),
+ * a level with a soft edge. The padding keeps accents and descenders inside the painted box. */
+.atlas-stage[data-live] .atlas-stage__beat-word {
+  padding-block: 0.12em;
+  margin-block: -0.12em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--accent-fg);
+  background: linear-gradient(to top, var(--accent-fg) 47%, transparent 53%) 0
+    calc(var(--fill, 1) * 100%) / 100% 200% no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+/* Short phones (iPhone SE): the whole motto, the lead and the action still fit on the held screen. */
+@media (max-width: 1023px) and (max-height: 740px) {
+  .atlas-stage[data-live] .atlas-stage__beat-word {
+    font-size: 40px;
+  }
+  .atlas-stage[data-live] .atlas-stage__beat-lead {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .atlas-stage[data-live] .atlas-stage__text > .atlas-stage__rise:last-child {
+    margin-top: 16px;
+  }
+}
+@media (max-width: 1023px) and (max-height: 600px) {
+  .atlas-stage[data-live] .atlas-stage__pin {
+    grid-template-rows: 26svh auto;
+  }
+}
+
+/* Entrance: the gold lines trace themselves in from the ground up, the figure comes up out of the
+ * dark under them, then the words rise in order. */
+@media (prefers-reduced-motion: no-preference) {
+  .atlas-stage .atlas-figure__lines {
+    /* A gradient 2.4 times the figure's height slides up behind the lines' mask: its soft edge
+     * (0.4 of the height) crosses the figure from the feet to the top of the globe. */
+    mask-image:
+      url('/images/atlas/atlas-lines.svg'), linear-gradient(to top, #000 41.67%, transparent 58.33%);
+    mask-size:
+      100% 100%,
+      100% 240%;
+    mask-position:
+      0 0,
+      0 100%;
+    mask-repeat: no-repeat;
+    mask-composite: intersect;
+    animation: atlas-trace 1800ms cubic-bezier(0.4, 0, 0.3, 1) both;
+    animation-delay: calc(var(--enter) - 150ms);
+  }
+  .atlas-stage .atlas-figure__art {
+    animation: atlas-lights-up 1400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--enter) + 900ms);
+  }
+  .atlas-stage__word {
+    animation: atlas-fade-in 1800ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--enter);
+  }
+  .atlas-stage__rise {
+    animation: atlas-rise 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--enter) + 450ms + var(--i, 0) * 90ms);
+  }
+  .atlas-stage__beat-word {
+    --i: 1;
+  }
+  .atlas-stage__beat-lead {
+    --i: 2;
+  }
+  .atlas-stage__text > .atlas-stage__rise:last-child {
+    --i: 3;
+  }
+}
+@keyframes atlas-trace {
+  from {
+    mask-position:
+      0 0,
+      0 0;
+  }
+}
+@keyframes atlas-lights-up {
+  from {
+    opacity: 0;
+    filter: brightness(0.15);
+  }
+}
+@keyframes atlas-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes atlas-rise {
+  from {
+    opacity: 0;
+    translate: 0 28px;
+  }
+}
+
+/* The Atlas illustration (src/components/atlas/atlas-figure.tsx). */
+.atlas-figure {
+  /* The illustration's gold, for the lines drawn over it. */
+  --atlas-line: #ebaf5e;
+  position: relative;
+  aspect-ratio: 2 / 3;
+  max-width: 100%;
+}
+.atlas-figure__art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Its gold lines again, over it: gold cut out by their mask. A light runs along them where
+ * --glow-* points (% of the box; --glow-a 0 to 1). Only with motion: still, the picture is enough. */
+.atlas-figure__lines {
+  display: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .atlas-figure__lines {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    /* Where the light is, the lines go pale gold; below it (the way it came up) they stay
+     * brighter; above it they dim a little, so it reads. */
+    background:
+      radial-gradient(
+          calc(var(--glow-r, 30) * 1%) calc(var(--glow-r, 30) * 0.667%) at
+            calc(var(--glow-x, 50) * 1%) calc(var(--glow-y, 50) * 1%),
+          rgb(255 250 235 / var(--glow-a, 0)),
+          rgb(255 226 166 / var(--glow-a, 0)) 50%,
+          rgb(255 226 166 / 0)
+        )
+        no-repeat,
+      linear-gradient(
+        to top,
+        rgb(255 228 170 / calc(var(--glow-a, 0) * 0.5)) calc((100% - var(--glow-y, 50) * 1%) - 8%),
+        rgb(255 228 170 / 0) calc((100% - var(--glow-y, 50) * 1%) + 8%)
+      ),
+      color-mix(in oklab, var(--atlas-line), #4a3424 calc(var(--glow-a, 0) * 42%));
+    mask: url('/images/atlas/atlas-lines.svg') 0 0 / 100% 100% no-repeat;
+  }
+}
