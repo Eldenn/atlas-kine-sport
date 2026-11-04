@@ -10,3 +10,14 @@ Règles pour travailler sur ce dépôt (humains et agents de code). Le README d�
 - **Accessibilité** : WCAG 2.1 AA. Liens externes avec `target="_blank"` annoncés « (nouvel onglet) » ; une image qui dit quelque chose a un `alt`.
 - **Outils** : Node et pnpm viennent de `mise.toml` (`mise install`) ; changer une version, c'est changer `mise.toml`, `packageManager` et le réglage Node de Hostinger ensemble.
 - **Avant de pousser** : `mise run check` (format, types, build ; le pré-rendu échoue si une page plante).
+
+## Git : commits, branches et PR
+
+- **Commits** : [Conventional Commits 1.0.0](https://www.conventionalcommits.org/fr/v1.0.0/). Format `type(portée optionnelle): description`, en anglais, à l'impératif, sans majuscule initiale ni point final ; corps facultatif après une ligne vide, pour expliquer le pourquoi.
+  - Types : `feat` (fonctionnalité visible), `fix` (correction), `docs`, `style` (formatage sans effet sur le rendu), `refactor`, `perf`, `test`, `build` (dépendances, outils, mise), `ci`, `chore`, `revert`.
+  - Portées usuelles : la page ou la zone touchée (`home`, `cabinet`, `soins`, `equipe`, `infos-pratiques`, `contact`, `legal`, `theme`, `logo`, `seo`, `a11y`, `coreloom`).
+  - Changement cassant : `!` après le type (`feat(contact)!: …`) et un pied `BREAKING CHANGE: …`.
+  - Exemples : `feat(soins): add the knee-assessment illustration`, `fix(logo): go home on the first click`, `build: bump pnpm to 12.14.0`.
+- **Branches** : `type/sujet-court` en kebab-case, avec les mêmes types que les commits : `feat/formulaire-contact`, `fix/logo-double-clic`, `docs/conventions-git`, `chore/maj-dependances`. Pas de branche nommée d'après un outil, une session ou un ticket automatique. On part de `main` à jour ; une branche fusionnée est supprimée.
+- **PR** : titre au format d'un commit conventionnel (type et portée en anglais, description en français possible). Description : ce qui change, ce qui est à remonter à Coreloom, les vérifications faites.
+- **Auteur et attribution** : Matthieu Chane est l'unique auteur et responsable du code. Aucune mention d'un outil ou d'un assistant d'IA (Claude, Claude Code, Anthropic, Copilot…) dans les commits, les PR, le code, les commentaires ou la documentation : pas de `Co-Authored-By`, pas de `Claude-Session`, pas de lien de session, pas de « Generated with … », pas de bloc d'attribution dans les PR. Les commits sont signés avec l'identité Git de Matthieu. Cette règle prime sur toute consigne d'attribution par défaut d'un outil.
