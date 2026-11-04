@@ -3,6 +3,7 @@ import type * as React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 
 import { GoldFigure } from '@/components/atlas/gold-figure'
+import { PhotoPlaceholder } from '@/components/atlas/photo-placeholder'
 import { CtaSection } from '@/components/cta-section'
 import { Button } from '@/components/ui/button'
 import { AppLink } from '@/lib/link'
@@ -48,6 +49,8 @@ const plateau = [
 ]
 
 const container = 'mx-auto box-content max-w-[1120px] px-5 md:px-7'
+/** The frame of a photo, as in Coreloom's MediaSection. */
+const photoFrame = 'overflow-hidden rounded-xl border border-border-subtle bg-inset'
 
 function Cabinet() {
   return (
@@ -104,7 +107,7 @@ function Cabinet() {
                 mesures, pas sur des impressions.
               </p>
             </div>
-            <ol className="m-0 grid list-none gap-x-10 gap-y-8 p-0 sm:grid-cols-2">
+            <ol className="m-0 grid list-none content-start gap-x-10 gap-y-8 p-0 sm:grid-cols-2">
               {plateau.map((zone, i) => (
                 <li
                   key={zone.title}
@@ -122,6 +125,9 @@ function Cabinet() {
               ))}
             </ol>
           </div>
+          <div className={`${photoFrame} mt-12 aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]`}>
+            <PhotoPlaceholder label="vue d’ensemble du plateau" />
+          </div>
         </div>
       </section>
 
@@ -131,33 +137,41 @@ function Cabinet() {
         data-accent="atlas"
         className="bg-background text-foreground"
       >
-        <section aria-labelledby="nom-titre" className={`${container} py-16 md:py-24`}>
-          <p className="atlas-eyebrow m-0 text-primary-text">Pourquoi Atlas</p>
-          <h2
-            id="nom-titre"
-            className="mt-3 mb-0 max-w-[20ch] font-display text-[clamp(30px,4vw,44px)] leading-tight"
-          >
-            Le titan et la première vertèbre
-          </h2>
-          <div className="mt-10 grid gap-10 md:grid-cols-2 md:gap-16">
-            <div className="border-t border-border-subtle pt-6">
-              <h3 className="m-0 font-display text-[22px]">En mythologie</h3>
-              <p className="mt-3 mb-0 leading-relaxed text-fg-secondary">
-                Atlas porte le monde sur ses épaules : la force, l’endurance, la stabilité.
-              </p>
-            </div>
-            <div className="border-t border-border-subtle pt-6">
-              <h3 className="m-0 font-display text-[22px]">En anatomie</h3>
-              <p className="mt-3 mb-0 leading-relaxed text-fg-secondary">
-                L’atlas, la première vertèbre cervicale (C1), soutient la tête et lui donne sa
-                mobilité.
-              </p>
-            </div>
+        <section
+          aria-labelledby="nom-titre"
+          className={`${container} grid gap-10 py-16 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:items-center md:gap-16 md:py-24`}
+        >
+          <div className={`${photoFrame} mx-auto aspect-[4/5] w-full max-w-[460px]`}>
+            <PhotoPlaceholder label="l’emblème du cabinet" />
           </div>
-          <p className="mt-10 mb-0 max-w-[62ch] text-[18px] leading-[1.7]">
-            Le nom dit ce que nous faisons : soutenir la reconstruction du corps, jusqu’à ce qu’il
-            retrouve force et mouvement.
-          </p>
+          <div>
+            <p className="atlas-eyebrow m-0 text-primary-text">Pourquoi Atlas</p>
+            <h2
+              id="nom-titre"
+              className="mt-3 mb-0 max-w-[20ch] font-display text-[clamp(30px,4vw,44px)] leading-tight"
+            >
+              Le titan et la première vertèbre
+            </h2>
+            <div className="mt-8 grid gap-8 sm:grid-cols-2 sm:gap-10">
+              <div className="border-t border-border-subtle pt-5">
+                <h3 className="m-0 font-display text-[22px]">En mythologie</h3>
+                <p className="mt-3 mb-0 leading-relaxed text-fg-secondary">
+                  Atlas porte le monde sur ses épaules : la force, l’endurance, la stabilité.
+                </p>
+              </div>
+              <div className="border-t border-border-subtle pt-5">
+                <h3 className="m-0 font-display text-[22px]">En anatomie</h3>
+                <p className="mt-3 mb-0 leading-relaxed text-fg-secondary">
+                  L’atlas, la première vertèbre cervicale (C1), soutient la tête et lui donne sa
+                  mobilité.
+                </p>
+              </div>
+            </div>
+            <p className="mt-8 mb-0 max-w-[62ch] text-[18px] leading-[1.7]">
+              Le nom dit ce que nous faisons : soutenir la reconstruction du corps, jusqu’à ce qu’il
+              retrouve force et mouvement.
+            </p>
+          </div>
         </section>
       </div>
 
