@@ -416,25 +416,23 @@ header nav a {
   }
 }
 
-/* Enduit : le grain fin d'un mur crépi sous tout le site, couleurs inchangées.
-   La tuile (scripts/texture/enduit.py, 400 px, 16 Ko, sans raccord) est une carte de gris centrée
-   sur le neutre de soft-light : fondue sur la couleur du fond, elle l'éclaircit ou l'assombrit de
-   quelques niveaux autour de sa valeur, la teinte moyenne reste celle du moodboard. Seuls les fonds
-   de page la portent ; les cartes, champs et boutons restent unis.
-   Soft-light agit moins sur un fond clair que sur un fond sombre : la bande bone empile la même
-   tuile deux fois (un seul téléchargement) pour un grain de force voisine à l'œil. */
-:root {
-  --atlas-enduit: url('/images/texture/enduit.webp');
-}
+/* Matière : un fond presque lisse voilé de poussière fine (grains d'un pixel regroupés en voiles
+   à bord net, quelques points et fibres), sous tout le site, couleurs inchangées.
+   Tuiles 1024 px sans raccord, générées par scripts/texture/matiere.py : poussière claire sur noir
+   fondue en screen sur les fonds sombres, poussière sombre sur blanc fondue en multiply sur les
+   bandes bone. Le noir (screen) et le blanc (multiply) ne changent rien : seule la poussière
+   touche la couleur du fond. Seuls les fonds de page la portent ; cartes, champs et boutons
+   restent unis. */
 body,
 .bg-background {
-  background-image: var(--atlas-enduit);
-  background-size: 400px 400px;
-  background-blend-mode: soft-light;
+  background-image: url('/images/texture/matiere-sombre.webp');
+  background-size: 1024px 1024px;
+  background-blend-mode: screen;
 }
 .bg-background[data-theme='light'],
 [data-theme='light'] .bg-background {
-  background-image: var(--atlas-enduit), var(--atlas-enduit);
+  background-image: url('/images/texture/matiere-claire.webp');
+  background-blend-mode: multiply;
 }
 @media (prefers-contrast: more) {
   body,
