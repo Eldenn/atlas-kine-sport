@@ -86,7 +86,10 @@ function Logo({
   const box = React.useRef<HTMLSpanElement>(null)
   const inView = useInView(box)
   const reduced = useReducedMotion()
-  // Each hover replays the entrance: a new run number restarts the CSS animations.
+  // Each hover replays the entrance. The first one switches the animation on; the next ones restart
+  // the CSS animations in place. (Not by remounting the logo with a new key: hover and focus
+  // come just before a click, and replacing the element under the pointer between mousedown and
+  // mouseup swallows that click, so the logo link needed a second click.)
   const [run, setRun] = React.useState(0)
   const playing =
     animation !== 'none' &&
@@ -122,7 +125,6 @@ function Logo({
   const content = (
     <span
       ref={box}
-      key={run}
       data-slot="logo"
       data-animation={playing ? animation : 'none'}
       data-tint={tint || undefined}
@@ -147,7 +149,17 @@ function Logo({
     </span>
   )
   const replay = () => {
-    if (trigger === 'hover' && !reduced) setRun((n) => n + 1)
+    if (trigger !== 'hover' || reduced) return
+    if (run === 0) {
+      setRun(1)
+      return
+    }
+    // Off for one style recalculation, then on again: the browser starts the animations over.
+    const el = box.current
+    if (!el) return
+    el.dataset.animation = 'none'
+    void el.offsetWidth
+    el.dataset.animation = animation
   }
 
   if (href) {
