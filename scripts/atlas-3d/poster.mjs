@@ -24,6 +24,8 @@ const page = await browser.newPage({
 await page.addInitScript(() => sessionStorage.setItem('atlas-intro', '1'))
 await page.goto(url, { waitUntil: 'networkidle' })
 const canvas = page.locator('[data-atlas-3d] canvas')
+// The poster is the frame's part of the canvas (the canvas itself spans the whole stage).
+const frame = page.locator('[data-atlas-3d] > div')
 await canvas.scrollIntoViewIfNeeded()
 await page.waitForFunction(
   () => getComputedStyle(document.querySelector('[data-atlas-3d] canvas')).opacity === '1',
@@ -31,7 +33,9 @@ await page.waitForFunction(
   { timeout: 30_000 },
 )
 // Transparent around the figure, so the poster sits on any ground.
-await page.addStyleTag({ content: '*{background:transparent!important}' })
-await canvas.screenshot({ path: 'scripts/atlas-3d/poster.png', omitBackground: true })
+await page.addStyleTag({
+  content: '*{background:transparent!important}.atlas-stage__word{visibility:hidden}',
+})
+await frame.screenshot({ path: 'scripts/atlas-3d/poster.png', omitBackground: true })
 await browser.close()
 console.log('scripts/atlas-3d/poster.png')

@@ -28,10 +28,20 @@ const atRest = () => 0
 
 export function Atlas3D({
   className,
+  frameClassName,
+  canvasClassName,
   progress = atRest,
   sizes = '(min-width: 1024px) 560px, 100vw',
 }: {
   className?: string
+  /** The statue's frame, which holds the poster: a 5:6 box. */
+  frameClassName?: string
+  /**
+   * The canvas. It is absolutely positioned against the nearest positioned ancestor, which can be
+   * much larger than the frame: a close framing then runs past the frame instead of being cut.
+   * By default it covers the frame.
+   */
+  canvasClassName?: string
   /** Scroll progress through the stage that holds the statue, 0 to 1. */
   progress?: () => number
   /** The poster's `sizes`, for the width the frame takes in its layout. */
@@ -59,6 +69,7 @@ export function Atlas3D({
         .then(({ createAtlasScene }) =>
           createAtlasScene({
             canvas,
+            frame,
             modelUrl: MODEL_URL,
             progress: () => progressRef.current(),
             still: reduce.matches,
@@ -107,33 +118,37 @@ export function Atlas3D({
   }, [])
 
   return (
-    <div
-      ref={frameRef}
-      data-atlas-3d
-      role="img"
-      aria-label={LABEL}
-      className={cn('relative mx-auto aspect-[5/6] w-full max-w-[560px]', className)}
-    >
-      <img
-        src="/images/atlas-3d-1120.webp"
-        srcSet="/images/atlas-3d-560.webp 560w, /images/atlas-3d-1120.webp 1120w"
-        sizes={sizes}
-        alt=""
-        width={560}
-        height={755}
-        className={cn(
-          'absolute inset-0 size-full object-contain transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]',
-          ready && 'opacity-0',
+    <div data-atlas-3d role="img" aria-label={LABEL} className={className}>
+      <div
+        ref={frameRef}
+        className={cn('relative mx-auto aspect-[5/6] w-full max-w-[560px]', frameClassName)}
+      >
+        <img
+          src="/images/atlas-3d-1120.webp"
+          srcSet="/images/atlas-3d-560.webp 560w, /images/atlas-3d-1120.webp 1120w"
+          sizes={sizes}
+          alt=""
+          width={560}
+          height={755}
+          className={cn(
+            'absolute inset-0 size-full object-contain transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]',
+            ready && 'opacity-0',
+          )}
+        />
+        {!canvasClassName && (
+          <canvas ref={canvasRef} aria-hidden className={canvasClasses(ready)} />
         )}
-      />
-      <canvas
-        ref={canvasRef}
-        aria-hidden
-        className={cn(
-          'absolute inset-0 size-full opacity-0 transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]',
-          ready && 'opacity-100',
-        )}
-      />
+      </div>
+      {!!canvasClassName && (
+        <canvas ref={canvasRef} aria-hidden className={cn(canvasClasses(ready), canvasClassName)} />
+      )}
     </div>
+  )
+}
+
+function canvasClasses(ready: boolean) {
+  return cn(
+    'absolute inset-0 size-full opacity-0 transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]',
+    ready && 'opacity-100',
   )
 }

@@ -3,10 +3,10 @@
 // Finished composition (what reduced motion, a failed script and the pre-rendered page show): the
 // statue beside "Bouger. Récupérer. Performer.", the lead and the two actions, on one screen.
 //
-// Live (data-live, set once the script runs and motion is allowed): the section is three screens
-// tall and its content sticks under the header. Scrolling through it moves the camera along the
-// statue (atlas-scene.ts, KEYS) and swaps the beat on the left: Bouger, then Récupérer, then
-// Performer, each readable at rest. Native scroll only, nothing is locked.
+// Live (data-live, set once the script runs and motion is allowed): the section is held under the
+// header for a little over a screen of scroll. Everything moves with the finger: the camera goes
+// round the statue (atlas-scene.ts, KEYS), the words run through like a reel (Bouger, Récupérer,
+// Performer, each readable at its rest point), the name behind drifts. Native scroll only.
 //
 // After the intro screen (intro.tsx) fades out, the statue comes up out of the dark and the words
 // rise: CSS only (atlas.css, .atlas-stage), timed after the intro on the first page of a visit.
@@ -40,7 +40,6 @@ function stageProgress(el: HTMLElement) {
 export function HomeStage() {
   const ref = React.useRef<HTMLElement>(null)
   const [live, setLive] = React.useState(false)
-  const [beat, setBeat] = React.useState(0)
 
   React.useEffect(() => {
     const el = ref.current
@@ -48,12 +47,19 @@ export function HomeStage() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)')
     let raf = 0
 
+    const beatEls = el.querySelectorAll<HTMLElement>('.atlas-stage__beat')
     const update = () => {
       raf = 0
       const p = stageProgress(el)
       el.style.setProperty('--p', p.toFixed(4))
-      // Rest points at 0, 0.5 and 1, the same as the camera's framings.
-      setBeat(p < 0.25 ? 0 : p < 0.75 ? 1 : 2)
+      // Each beat rests at 0, 0.5 or 1 (the camera's framings) and runs past it with the scroll:
+      // d is its distance from rest, in half-stages; it rises in from below and leaves upwards.
+      beatEls.forEach((beat, i) => {
+        const d = (p - i * 0.5) / 0.5
+        const a = Math.min(1, Math.max(0, (Math.abs(d) - 0.12) / 0.38))
+        beat.style.setProperty('--beat-o', (1 - a * a * (3 - 2 * a)).toFixed(3))
+        beat.style.setProperty('--beat-y', `${(-d * 72).toFixed(1)}px`)
+      })
     }
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update)
@@ -81,7 +87,6 @@ export function HomeStage() {
       ref={ref}
       aria-labelledby="accueil-titre"
       data-live={live || undefined}
-      data-beat={beat}
       className="atlas-stage"
     >
       <div className="atlas-stage__pin">
@@ -93,7 +98,9 @@ export function HomeStage() {
           <Atlas3D
             progress={live ? progress : undefined}
             sizes="(min-width: 1024px) 640px, 100vw"
-            className="h-full w-auto max-w-full"
+            className="flex h-full w-full justify-center"
+            frameClassName="atlas-stage__frame h-full w-auto max-w-full"
+            canvasClassName="atlas-stage__canvas"
           />
         </div>
 
