@@ -157,14 +157,7 @@ header nav a {
   height: 100%;
   min-height: 0;
 }
-/* Phones: the figure's band clips the close framing, so it never runs into the text below. */
-@media (max-width: 1023px) {
-  .atlas-stage[data-live] .atlas-stage__figure {
-    overflow: clip;
-    mask-image: linear-gradient(to bottom, #000 86%, transparent);
-  }
-}
-.atlas-stage__camera {
+.atlas-stage__parallax {
   display: flex;
   justify-content: center;
   height: 100%;
@@ -172,23 +165,11 @@ header nav a {
 .atlas-stage__atlas {
   height: 100%;
 }
-/* Live: home-stage.tsx moves the camera (zoom on a point, brought to another) and the mouse
- * moves the figure a few pixels. */
-.atlas-stage[data-live] .atlas-stage__camera {
+/* Live: a mouse moves the figure a few pixels (home-stage.tsx); its own layer, so that does not
+ * redraw the 2,587 shapes of the drawing. */
+.atlas-stage[data-live] .atlas-stage__parallax {
+  will-change: translate;
   translate: calc(var(--px, 0) * -10px) calc(var(--py, 0) * -6px);
-}
-.atlas-stage[data-live] .atlas-stage__atlas {
-  /* Its own layer: the scroll moves it without redrawing the 2,587 shapes of the drawing. */
-  will-change: transform;
-  transform-origin: calc(var(--cam-fx, 50) * 1%) calc(var(--cam-fy, 50) * 1%);
-  transform: translate(calc(var(--cam-dx, 0) * 1%), calc(var(--cam-dy, 0) * 1%))
-    scale(var(--cam-zoom, 1));
-}
-@media (min-width: 1024px) {
-  /* The close framing leaves the stage through its foot: a short fade rather than a cut. */
-  .atlas-stage[data-live] .atlas-stage__pin {
-    mask-image: linear-gradient(to top, transparent, #000 24px);
-  }
 }
 .atlas-stage__text {
   grid-area: text;
@@ -372,7 +353,8 @@ header nav a {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    /* Where the light is, the lines go pale gold; elsewhere they dim a little, so it reads. */
+    /* Where the light is, the lines go pale gold; below it (the way it came up) they stay
+     * brighter; above it they dim a little, so it reads. */
     background:
       radial-gradient(
           calc(var(--glow-r, 30) * 1%) calc(var(--glow-r, 30) * 0.667%) at
@@ -382,7 +364,12 @@ header nav a {
           rgb(255 226 166 / 0)
         )
         no-repeat,
-      color-mix(in oklab, var(--atlas-line), #4a3424 calc(var(--glow-a, 0) * 40%));
+      linear-gradient(
+        to top,
+        rgb(255 228 170 / calc(var(--glow-a, 0) * 0.5)) calc((100% - var(--glow-y, 50) * 1%) - 8%),
+        rgb(255 228 170 / 0) calc((100% - var(--glow-y, 50) * 1%) + 8%)
+      ),
+      color-mix(in oklab, var(--atlas-line), #4a3424 calc(var(--glow-a, 0) * 42%));
     mask: url('/images/atlas/atlas-lines.svg') 0 0 / 100% 100% no-repeat;
   }
 }

@@ -4,11 +4,12 @@
 // figure beside "Bouger. Récupérer. Performer.", the lead and the two actions, on one screen.
 //
 // Live (data-live, set once the script runs and motion is allowed): the section is held under the
-// header for under a screen of scroll. Everything moves with the finger: a camera closes in on the
-// figure and pulls back (CAMERA), a light runs along its gold lines to the part each beat is about
-// (the shoulders under the load, then the legs), the words change halfway between framings and
-// drift with the scroll, the name behind drifts. A mouse moves the figure and the light a little.
-// Native scroll only.
+// header for under a screen of scroll. The figure stays whole and still; everything else moves with
+// the finger. A light climbs its gold lines from the ground to the globe (LIGHT), the way force
+// travels up the body: the legs for Bouger, the back and shoulders for Récupérer, the globe held
+// up for Performer, and the lines it has passed stay lit. The words change halfway between two
+// beats and drift with the scroll, the name behind drifts. A mouse moves the figure and the light
+// a little. Native scroll only.
 //
 // After the intro screen (intro.tsx) fades out, the gold lines trace themselves in, the figure
 // comes up out of the dark and the words rise: CSS only (atlas.css, .atlas-stage), timed after the
@@ -35,39 +36,30 @@ const beats = [
 ] as const
 
 /**
- * The camera and the light, one key per beat (scroll progress 0, 0.5, 1). Positions are in % of
- * the figure's box. zoom: 1 is the whole figure; fx, fy: the point zoomed on; tx, ty: where that
- * point is brought; gx, gy: the light's centre on the lines, gr its radius (% of the width), ga its
- * strength (0 to 1).
+ * The light on the figure's lines, one key per beat (scroll progress 0, 0.5, 1), in % of the
+ * figure's box: x, y its centre, r its radius (% of the width).
  */
-const CAMERA = [
-  // Bouger: the whole figure, as drawn.
-  { at: 0, zoom: 1, fx: 50, fy: 50, tx: 50, ty: 50, gx: 52, gy: 20, gr: 30, ga: 0 },
-  // Récupérer: close on the shoulders and arms taking the load; the light on them.
-  { at: 0.5, zoom: 1.5, fx: 52, fy: 38, tx: 57, ty: 50, gx: 52, gy: 41, gr: 30, ga: 1 },
-  // Performer: the whole figure again, from a little lower; the light on the legs.
-  { at: 1, zoom: 1.08, fx: 50, fy: 70, tx: 50, ty: 67, gx: 54, gy: 76, gr: 34, ga: 1 },
+const LIGHT = [
+  // Bouger: the legs and the footing.
+  { at: 0, x: 50, y: 84, r: 40 },
+  // Récupérer: the back and shoulders taking the load.
+  { at: 0.5, x: 52, y: 44, r: 34 },
+  // Performer: the globe, held up.
+  { at: 1, x: 52, y: 22, r: 46 },
 ] as const
 
-/** The camera at progress p: part linear, part smoothstep, so it settles at each beat but never stops. */
-function framing(p: number) {
+/** The light at progress p: part linear, part smoothstep, so it settles at each beat but never stops. */
+function lightAt(p: number) {
   let i = 0
-  while (i < CAMERA.length - 2 && p > CAMERA[i + 1]!.at) i++
-  const a = CAMERA[i]!
-  const b = CAMERA[i + 1]!
+  while (i < LIGHT.length - 2 && p > LIGHT[i + 1]!.at) i++
+  const a = LIGHT[i]!
+  const b = LIGHT[i + 1]!
   let t = Math.min(1, Math.max(0, (p - a.at) / (b.at - a.at)))
   t = 0.45 * t + 0.55 * t * t * (3 - 2 * t)
-  const mix = (key: keyof (typeof CAMERA)[number]) => a[key] + (b[key] - a[key]) * t
   return {
-    zoom: mix('zoom'),
-    fx: mix('fx'),
-    fy: mix('fy'),
-    tx: mix('tx'),
-    ty: mix('ty'),
-    gx: mix('gx'),
-    gy: mix('gy'),
-    gr: mix('gr'),
-    ga: mix('ga'),
+    x: a.x + (b.x - a.x) * t,
+    y: a.y + (b.y - a.y) * t,
+    r: a.r + (b.r - a.r) * t,
   }
 }
 
@@ -101,23 +93,18 @@ export function HomeStage() {
       pointer.y += (pointer.ty - pointer.y) * 0.12
       const settling = Math.abs(pointer.tx - pointer.x) + Math.abs(pointer.ty - pointer.y) > 0.002
       const p = stageProgress(el)
-      const f = framing(p)
+      const light = lightAt(p)
       const set = (name: string, value: number, digits = 2) =>
         el.style.setProperty(name, value.toFixed(digits))
       set('--p', p, 4)
-      set('--cam-zoom', f.zoom, 4)
-      set('--cam-fx', f.fx)
-      set('--cam-fy', f.fy)
-      set('--cam-dx', f.tx - f.fx)
-      set('--cam-dy', f.ty - f.fy)
-      set('--glow-x', f.gx + pointer.x * 6)
-      set('--glow-y', f.gy + pointer.y * 4)
-      set('--glow-r', f.gr)
-      set('--glow-a', f.ga, 3)
+      set('--glow-x', light.x + pointer.x * 6)
+      set('--glow-y', light.y + pointer.y * 4)
+      set('--glow-r', light.r)
+      set('--glow-a', 1)
       set('--px', pointer.x, 3)
       set('--py', pointer.y, 3)
-      // Each beat rests at 0, 0.5 or 1 (the camera's framings). The nearest one shows, so the word
-      // changes halfway between two framings (a quick fade); its height follows the scroll, so it
+      // Each beat rests at 0, 0.5 or 1 (the light's keys). The nearest one shows, so the word
+      // changes halfway between two beats (a quick fade); its height follows the scroll, so it
       // keeps moving with the finger. d is the distance from rest, in half-stages.
       const active = p < 0.25 ? 0 : p < 0.75 ? 1 : 2
       beatEls.forEach((beat, i) => {
@@ -169,7 +156,7 @@ export function HomeStage() {
         </p>
 
         <div className="atlas-stage__figure">
-          <div className="atlas-stage__camera">
+          <div className="atlas-stage__parallax">
             <AtlasFigure className="atlas-stage__atlas" />
           </div>
         </div>
