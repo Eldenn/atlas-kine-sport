@@ -1,10 +1,14 @@
-// The 3D Atlas of the home page: a bronze Atlas on one knee, the Earth on his shoulders. Plain
-// Three.js in a canvas the React component hands over ("layered" pattern: the scene owns its render
-// loop, React only mounts and disposes it). Loaded on demand, after the page is interactive.
+// The 3D Atlas of the home page: a glass Atlas veined with gold, on one knee, the Earth on his
+// shoulders. Plain Three.js in a canvas the React component hands over ("layered" pattern: the scene
+// owns its render loop, React only mounts and disposes it). Loaded on demand, after the page is
+// interactive.
 //
 // The statue is public/3d/atlas.glb (made with Meshy, optimised by scripts/atlas-3d/optimize.sh:
-// ~59k triangles, 1024px WebP textures, Meshopt geometry). Its bronze is metallic, so it reflects a
-// studio environment generated here (RoomEnvironment): no HDR file, nothing fetched from elsewhere.
+// ~62k triangles, a 1024px WebP texture, Meshopt geometry). Its texture paints dark glass crossed by
+// gold veins; here it is drawn see-through (glassMaterial): the page, and the far side of the globe
+// and of the limbs, show through the body while the veins, the edges and the reflections hold the
+// form. The reflections come from a studio environment generated here (RoomEnvironment): no HDR
+// file, nothing fetched from elsewhere.
 //
 // The home page holds it on a sticky stage for three beats (Bouger, Récupérer, Performer): the
 // scroll through that stage drives a camera path between three framings (KEYS). Between scrolls
@@ -12,18 +16,23 @@
 // same as the poster image shown before it loads.
 import {
   ACESFilmicToneMapping,
+  BackSide,
   Box3,
   CanvasTexture,
   DirectionalLight,
+  FrontSide,
   Group,
   Mesh,
   MeshBasicMaterial,
-  MeshStandardMaterial,
+  MeshPhysicalMaterial,
+  type MeshStandardMaterial,
   PerspectiveCamera,
   PlaneGeometry,
   PMREMGenerator,
   Scene,
+  type Side,
   SRGBColorSpace,
+  type Texture,
   Vector3,
   WebGLRenderer,
 } from 'three'
@@ -86,7 +95,7 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
   const scene = new Scene()
   const camera = new PerspectiveCamera(FOV, 1, 0.1, 50)
 
-  // Reflections for the bronze: a neutral studio, dimmed so the lights below do the modelling.
+  // Reflections for the glass: a neutral studio, dimmed so the lights below do the modelling.
   const pmrem = new PMREMGenerator(renderer)
   const room = new RoomEnvironment()
   const environment = pmrem.fromScene(room, 0.04).texture
@@ -109,12 +118,21 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
 
   const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(opts.modelUrl)
   const model = gltf.scene
+  const meshes: Mesh[] = []
   model.traverse((object) => {
-    if (object instanceof Mesh) {
-      const material = object.material as MeshStandardMaterial
-      material.side = 0 // FrontSide: the mesh is closed, the back faces only cost fill rate
-    }
+    if (object instanceof Mesh) meshes.push(object)
   })
+  // Glass: the far side of the mesh first, then the near side, both see-through, so the back of the
+  // globe and of the limbs shows through the front.
+  for (const mesh of meshes) {
+    const loaded = mesh.material as MeshStandardMaterial
+    const back = new Mesh(mesh.geometry, glassMaterial(loaded.map, BackSide))
+    back.renderOrder = 1
+    mesh.add(back)
+    mesh.material = glassMaterial(loaded.map, FrontSide)
+    mesh.renderOrder = 2
+    loaded.dispose()
+  }
   // Normalise: feet on the floor, centred, HEIGHT tall.
   const box = new Box3().setFromObject(model)
   const size = box.getSize(new Vector3())
@@ -133,6 +151,7 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
   )
   shadow.rotation.x = -Math.PI / 2
   shadow.position.set(0, 0.002, 0)
+  shadow.renderOrder = 0 // under the glass
   shadow.scale.set(1, 0.8, 1)
   scene.add(shadow)
 
@@ -328,6 +347,41 @@ export async function createAtlasScene(opts: AtlasSceneOptions): Promise<AtlasSc
       renderer.dispose()
     },
   }
+}
+
+/**
+ * See-through glass for the statue. The colour is the model's texture (dark glass, gold veins), lit
+ * and reflecting like a lacquered surface; the opacity is worked out per pixel: the glass itself is
+ * nearly clear, while the gold veins (bright and saturated texels), the edges turned away from the
+ * camera (Fresnel) and the reflections stay opaque. No depth is written, so what lies behind shows.
+ */
+function glassMaterial(map: Texture | null, side: Side) {
+  const material = new MeshPhysicalMaterial({
+    map,
+    metalness: 0,
+    roughness: 0.35,
+    clearcoat: 1,
+    clearcoatRoughness: 0.1,
+    transparent: true,
+    depthWrite: false,
+    side,
+  })
+  material.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <dithering_fragment>',
+      `#include <dithering_fragment>
+      vec3 texel = pow(max(diffuseColor.rgb, 0.0), vec3(1.0 / 2.2));
+      float bright = dot(texel, vec3(0.2126, 0.7152, 0.0722));
+      float top = max(texel.r, max(texel.g, texel.b));
+      float saturation = (top - min(texel.r, min(texel.g, texel.b))) / max(top, 1e-3);
+      float vein = smoothstep(0.4, 0.62, bright) * smoothstep(0.3, 0.5, saturation);
+      float edge = pow(1.0 - abs(dot(normalize(vViewPosition), normal)), 2.5);
+      vec3 shine = totalSpecular + (clearcoatSpecularDirect + clearcoatSpecularIndirect) * material.clearcoat;
+      float reflection = smoothstep(0.04, 0.5, dot(shine, vec3(0.2126, 0.7152, 0.0722)));
+      gl_FragColor.a = clamp(0.18 + vein * 0.75 + edge * 0.6 + reflection * 0.6, 0.0, 1.0);`,
+    )
+  }
+  return material
 }
 
 function shadowTexture() {

@@ -1,4 +1,4 @@
-// The home page's opening: the bronze Atlas on a held stage, in three beats.
+// The home page's opening: the glass Atlas on a held stage, in three beats.
 //
 // Finished composition (what reduced motion, a failed script and the pre-rendered page show): the
 // statue beside "Bouger. Récupérer. Performer.", the lead and the two actions, on one screen.
