@@ -4,9 +4,9 @@
 // statue beside "Bouger. Récupérer. Performer.", the lead and the two actions, on one screen.
 //
 // Live (data-live, set once the script runs and motion is allowed): the section is held under the
-// header for a little over a screen of scroll. Everything moves with the finger: the camera goes
-// round the statue (atlas-scene.ts, KEYS), the words run through like a reel (Bouger, Récupérer,
-// Performer, each readable at its rest point), the name behind drifts. Native scroll only.
+// header for under a screen of scroll. Everything moves with the finger: the camera goes
+// round the statue (atlas-scene.ts, KEYS), the words change halfway between framings and drift
+// with the scroll (Bouger, Récupérer, Performer), the name behind drifts. Native scroll only.
 //
 // After the intro screen (intro.tsx) fades out, the statue comes up out of the dark and the words
 // rise: CSS only (atlas.css, .atlas-stage), timed after the intro on the first page of a visit.
@@ -31,10 +31,14 @@ const beats = [
   },
 ] as const
 
+/** 0 when the pin first sticks under the header, 1 when it lets go. */
 function stageProgress(el: HTMLElement) {
+  const pin = el.firstElementChild as HTMLElement | null
+  if (!pin) return 0
   const rect = el.getBoundingClientRect()
-  const run = rect.height - window.innerHeight
-  return run > 0 ? Math.min(1, Math.max(0, -rect.top / run)) : 0
+  const stuckAt = parseFloat(getComputedStyle(pin).top) || 0
+  const run = rect.height - pin.offsetHeight
+  return run > 0 ? Math.min(1, Math.max(0, (stuckAt - rect.top) / run)) : 0
 }
 
 export function HomeStage() {
@@ -52,13 +56,14 @@ export function HomeStage() {
       raf = 0
       const p = stageProgress(el)
       el.style.setProperty('--p', p.toFixed(4))
-      // Each beat rests at 0, 0.5 or 1 (the camera's framings) and runs past it with the scroll:
-      // d is its distance from rest, in half-stages; it rises in from below and leaves upwards.
+      // Each beat rests at 0, 0.5 or 1 (the camera's framings). The nearest one shows, so the word
+      // changes halfway between two framings (a quick fade); its height follows the scroll, so it
+      // keeps moving with the finger. d is the distance from rest, in half-stages.
+      const active = p < 0.25 ? 0 : p < 0.75 ? 1 : 2
       beatEls.forEach((beat, i) => {
         const d = (p - i * 0.5) / 0.5
-        const a = Math.min(1, Math.max(0, (Math.abs(d) - 0.12) / 0.38))
-        beat.style.setProperty('--beat-o', (1 - a * a * (3 - 2 * a)).toFixed(3))
-        beat.style.setProperty('--beat-y', `${(-d * 72).toFixed(1)}px`)
+        beat.toggleAttribute('data-active', i === active)
+        beat.style.setProperty('--beat-y', `${(-d * 36).toFixed(1)}px`)
       })
     }
     const onScroll = () => {
