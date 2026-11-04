@@ -448,3 +448,46 @@ body,
     background-image: none;
   }
 }
+
+/* Section break: a gold hairline at the content width that fades out towards both edges, with a
+   small lozenge in the middle (the line stops short of it). Replaces the full-bleed 1px
+   border-subtle rules, which read as pale lines on the mineral background. Set on the section
+   itself: <section class="atlas-divide">. Unlayered, so it wins over a Coreloom block's own
+   border-t. A section right after a bone band needs no rule: the change of surface separates. */
+.atlas-divide {
+  --divide-gold: color-mix(in srgb, var(--border-accent) 65%, transparent);
+  position: relative;
+  border-top-width: 0;
+}
+.atlas-divide::before,
+.atlas-divide::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  pointer-events: none;
+}
+.atlas-divide::before {
+  width: min(1120px, calc(100% - 40px));
+  height: 1px;
+  translate: -50% 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--divide-gold) calc(50% - 12px),
+    transparent calc(50% - 12px) calc(50% + 12px),
+    var(--divide-gold) calc(50% + 12px),
+    transparent
+  );
+}
+.atlas-divide::after {
+  width: 7px;
+  height: 7px;
+  translate: -50% -50%;
+  rotate: 45deg;
+  border: 1px solid var(--border-accent);
+}
+[data-surface='bone'] + .atlas-divide::before,
+[data-surface='bone'] + .atlas-divide::after {
+  display: none;
+}

@@ -86,9 +86,7 @@ function SiteFooter({
     'rounded-xs transition-colors outline-none hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring'
 
   return (
-    <footer
-      className={cn('border-t border-border-subtle px-5', full ? 'pt-14' : 'py-8', className)}
-    >
+    <footer className={cn('atlas-divide px-5', full ? 'pt-14' : 'py-8', className)}>
       {full && (
         <div
           className={cn(
