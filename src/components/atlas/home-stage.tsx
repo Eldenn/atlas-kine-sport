@@ -9,7 +9,9 @@
 // travels up the body: the legs for Bouger, the back and shoulders for Récupérer, the globe held
 // up for Performer, and the lines it has passed stay lit. The words change halfway between two
 // beats and drift with the scroll, the name behind drifts. A mouse moves the figure and the light
-// a little. Native scroll only.
+// a little. The motto is set from the start, its words in gold outline like the figure's lines
+// before it fills; each word fills with gold from the bottom up as the light reaches its beat
+// (FILL), until the whole motto reads. The lead below changes at each beat. Native scroll only.
 //
 // After the intro screen (intro.tsx) fades out, the gold lines trace themselves in, the figure
 // comes up out of the dark and the words rise: CSS only (atlas.css, .atlas-stage), timed after the
@@ -46,6 +48,13 @@ const LIGHT = [
   { at: 0.5, x: 52, y: 44, r: 34 },
   // Performer: the globe, held up.
   { at: 1, x: 52, y: 22, r: 46 },
+] as const
+
+/** When each word of the motto fills with gold, in scroll progress (start, end). */
+const FILL = [
+  [-1, 0], // Bouger: already full on arrival
+  [0.18, 0.5],
+  [0.68, 1],
 ] as const
 
 /** The light at progress p: part linear, part smoothstep, so it settles at each beat but never stops. */
@@ -103,14 +112,14 @@ export function HomeStage() {
       set('--glow-a', 1)
       set('--px', pointer.x, 3)
       set('--py', pointer.y, 3)
-      // Each beat rests at 0, 0.5 or 1 (the light's keys). The nearest one shows, so the word
-      // changes halfway between two beats (a quick fade); its height follows the scroll, so it
-      // keeps moving with the finger. d is the distance from rest, in half-stages.
+      // Each beat rests at 0, 0.5 or 1 (the light's keys): its word fills on the way there, and
+      // its lead shows from halfway between two beats (a quick fade).
       const active = p < 0.25 ? 0 : p < 0.75 ? 1 : 2
       beatEls.forEach((beat, i) => {
-        const d = (p - i * 0.5) / 0.5
+        const [start, end] = FILL[i] ?? [0, 0]
+        const fill = Math.min(1, Math.max(0, (p - start) / (end - start)))
         beat.toggleAttribute('data-active', i === active)
-        beat.style.setProperty('--beat-y', `${(-d * 36).toFixed(1)}px`)
+        beat.style.setProperty('--fill', fill.toFixed(3))
       })
       if (settling) schedule()
     }
