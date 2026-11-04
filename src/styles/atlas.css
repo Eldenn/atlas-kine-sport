@@ -176,28 +176,30 @@ header nav a {
   position: relative;
   z-index: 2;
 }
-/* The name, very large and one tone off the ground, behind the statue; it drifts with the scroll. */
+/* The name behind the figure: centred on it, faint, and still (no scroll drift, no mouse). Inside
+ * .atlas-stage__figure but outside its parallax layer, under the drawing. */
 .atlas-stage__word {
   position: absolute;
-  inset-inline: 0;
-  top: 32%;
-  z-index: 0;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(120px, 34vw, 520px);
+  font-size: min(25vw, 340px);
   line-height: 0.8;
   letter-spacing: 0.06em;
-  text-align: center;
+  /* Balances the tracking after the last letter, so the letters themselves sit on the centre. */
+  padding-inline-start: 0.06em;
   white-space: nowrap;
-  color: var(--surface-1);
-  translate: calc(var(--p) * -28%) -50%;
+  color: color-mix(in srgb, var(--surface-1) 45%, transparent);
+  translate: -50% -50%;
   pointer-events: none;
   user-select: none;
 }
 @media (min-width: 1024px) {
+  /* Beside the text the figure sits right of centre: the word stays inside the window. */
   .atlas-stage__word {
-    top: 50%;
-    padding-inline-start: 30%;
+    font-size: min(17vw, 340px);
   }
   .atlas-stage__beat-lead {
     margin-top: 20px;
