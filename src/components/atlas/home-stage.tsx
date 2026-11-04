@@ -174,9 +174,6 @@ export function HomeStage() {
           <h1 id="accueil-titre" className="sr-only">
             Atlas Kiné Sport, kinésithérapie du sport à Chasseneuil-du-Poitou
           </h1>
-          <p className="atlas-eyebrow atlas-stage__rise m-0 text-primary-text">
-            Kiné sport · Chasseneuil-du-Poitou
-          </p>
           <div className="atlas-stage__beats">
             {beats.map((b, i) => (
               <div key={b.word} className="atlas-stage__beat" data-index={i}>
