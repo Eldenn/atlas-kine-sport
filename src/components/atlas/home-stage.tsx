@@ -8,7 +8,7 @@
 // the finger. A light climbs its gold lines from the ground to the globe (LIGHT), the way force
 // travels up the body: the legs for Bouger, the back and shoulders for Récupérer, the globe held
 // up for Performer, and the lines it has passed stay lit. The words change halfway between two
-// beats and drift with the scroll, the name behind drifts. A mouse moves the figure and the light
+// beats and drift with the scroll; the name behind the figure stays still, centred on it. A mouse moves the figure and the light
 // a little. The motto is set from the start, its words in gold outline like the figure's lines
 // before it fills; each word fills with gold from the bottom up as the light reaches its beat
 // (FILL), until the whole motto reads. The lead below changes at each beat. Native scroll only.
@@ -160,11 +160,10 @@ export function HomeStage() {
       className="atlas-stage"
     >
       <div className="atlas-stage__pin">
-        <p aria-hidden className="atlas-stage__word">
-          ATLAS
-        </p>
-
         <div className="atlas-stage__figure">
+          <p aria-hidden className="atlas-stage__word">
+            ATLAS
+          </p>
           <div className="atlas-stage__parallax">
             <AtlasFigure className="atlas-stage__atlas" />
           </div>
