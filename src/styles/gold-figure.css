@@ -50,8 +50,8 @@
      * brighter; above it they dim a little, so it reads. Same recipe as .atlas-figure__lines. */
     background:
       radial-gradient(
-          calc(var(--gf-r) * 1%) calc(var(--gf-r) * 1.2%) at calc(var(--gf-x) * 1%)
-            calc(var(--gf-y) * 1%),
+          calc(var(--gf-r) * 1%) calc(var(--gf-r) * var(--gold-figure-ratio, 1.2) * 1%) at
+            calc(var(--gf-x) * 1%) calc(var(--gf-y) * 1%),
           rgb(255 250 235 / var(--gf-a)),
           rgb(255 226 166 / var(--gf-a)) 50%,
           rgb(255 226 166 / 0)
@@ -128,5 +128,51 @@
     --gf-y: var(--gold-figure-rest-y, 50);
     --gf-r: 27;
     --gf-a: 0.55;
+  }
+}
+
+/* Numbered markers over a gold figure (the Cabinet page's scene), keyed to a legend: each marker
+ * sits at --x/--y (% of the box). They come in once the lines are traced. Hovering an entry of the
+ * legend (data-marker) lights its marker. */
+.gold-marker {
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  width: clamp(22px, 3.2vw, 34px);
+  aspect-ratio: 1;
+  border: 1px solid var(--gold-line);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-background), transparent 15%);
+  color: var(--gold-line);
+  font-size: clamp(10px, 1.1vw, 12px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  transition:
+    background-color 200ms,
+    color 200ms,
+    scale 200ms;
+}
+.gold-scene:has([data-marker='1']:hover) .gold-marker[data-marker='1'],
+.gold-scene:has([data-marker='2']:hover) .gold-marker[data-marker='2'],
+.gold-scene:has([data-marker='3']:hover) .gold-marker[data-marker='3'],
+.gold-scene:has([data-marker='4']:hover) .gold-marker[data-marker='4'] {
+  background: var(--gold-line);
+  color: var(--color-background);
+  scale: 1.15;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gold-marker {
+    animation: gold-marker-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--enter) + 1900ms + var(--i, 0) * 120ms);
+  }
+}
+@keyframes gold-marker-in {
+  from {
+    opacity: 0;
+    scale: 0.6;
   }
 }

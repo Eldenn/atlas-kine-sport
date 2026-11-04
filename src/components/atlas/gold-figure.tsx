@@ -20,6 +20,7 @@ export function GoldFigure({
   alt,
   rest,
   className,
+  children,
 }: {
   /** `srcSet` strings for each format. */
   avif: string
@@ -35,6 +36,8 @@ export function GoldFigure({
   /** Where the light settles, in % of the box. */
   rest: { x: number; y: number }
   className?: string
+  /** Laid over the picture, in its box (markers, for instance). */
+  children?: React.ReactNode
 }) {
   return (
     <div
@@ -44,6 +47,7 @@ export function GoldFigure({
           '--gold-figure-lines': `url('${lines}')`,
           '--gold-figure-rest-x': rest.x,
           '--gold-figure-rest-y': rest.y,
+          '--gold-figure-ratio': width / height,
         } as React.CSSProperties
       }
     >
@@ -60,6 +64,7 @@ export function GoldFigure({
         />
       </picture>
       <span aria-hidden className="gold-figure__lines" />
+      {children}
     </div>
   )
 }
