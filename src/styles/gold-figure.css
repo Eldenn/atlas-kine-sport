@@ -1,0 +1,132 @@
+/* A gold-line illustration animated like the home page's Atlas (components/atlas/gold-figure.tsx).
+ * The light's position is a set of registered properties so keyframes can move it. */
+@property --gf-x {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 50;
+}
+@property --gf-y {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 108;
+}
+@property --gf-r {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 42;
+}
+@property --gf-a {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.gold-figure {
+  /* The illustration's gold, for the lines drawn over it. */
+  --gold-line: #f4ae50;
+  /* Like the home stage, the entrance waits for the intro screen on the first page of a visit. */
+  --enter: 2250ms;
+  position: relative;
+}
+:root[data-intro='seen'] .gold-figure {
+  --enter: 120ms;
+}
+.gold-figure__art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.gold-figure__lines {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gold-figure__lines {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    /* Where the light is, the lines go pale gold; below it (the way it came up) they stay
+     * brighter; above it they dim a little, so it reads. Same recipe as .atlas-figure__lines. */
+    background:
+      radial-gradient(
+          calc(var(--gf-r) * 1%) calc(var(--gf-r) * 1.2%) at calc(var(--gf-x) * 1%)
+            calc(var(--gf-y) * 1%),
+          rgb(255 250 235 / var(--gf-a)),
+          rgb(255 226 166 / var(--gf-a)) 50%,
+          rgb(255 226 166 / 0)
+        )
+        no-repeat,
+      linear-gradient(
+        to top,
+        rgb(255 228 170 / calc(var(--gf-a) * 0.4)) calc((100% - var(--gf-y) * 1%) - 10%),
+        rgb(255 228 170 / 0) calc((100% - var(--gf-y) * 1%) + 10%)
+      ),
+      color-mix(in oklab, var(--gold-line), #4a3424 calc(var(--gf-a) * 30%));
+    /* A gradient 2.4 times the figure's height slides up behind the lines' mask: its soft edge
+     * crosses the figure from the feet to the top of the heads. */
+    mask-image: var(--gold-figure-lines), linear-gradient(to top, #000 41.67%, transparent 58.33%);
+    mask-size:
+      100% 100%,
+      100% 240%;
+    mask-position:
+      0 0,
+      0 100%;
+    mask-repeat: no-repeat;
+    mask-composite: intersect;
+    animation:
+      gold-figure-trace 1800ms cubic-bezier(0.4, 0, 0.3, 1) calc(var(--enter) - 150ms) both,
+      gold-figure-climb 2600ms cubic-bezier(0.45, 0, 0.2, 1) calc(var(--enter) + 1700ms) both,
+      gold-figure-breathe 3600ms ease-in-out calc(var(--enter) + 4300ms) infinite alternate;
+  }
+  .gold-figure__art {
+    animation: gold-figure-lights-up 1400ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--enter) + 900ms)
+      both;
+  }
+}
+
+@keyframes gold-figure-trace {
+  from {
+    mask-position:
+      0 0,
+      0 0;
+  }
+}
+@keyframes gold-figure-lights-up {
+  from {
+    opacity: 0;
+    filter: brightness(0.15);
+  }
+}
+/* The light rises from the feet and comes to rest on the point the picture is about. */
+@keyframes gold-figure-climb {
+  from {
+    --gf-x: 50;
+    --gf-y: 108;
+    --gf-r: 42;
+    --gf-a: 0;
+  }
+  25% {
+    --gf-a: 1;
+  }
+  to {
+    --gf-x: var(--gold-figure-rest-x, 50);
+    --gf-y: var(--gold-figure-rest-y, 50);
+    --gf-r: 22;
+    --gf-a: 0.9;
+  }
+}
+@keyframes gold-figure-breathe {
+  from {
+    --gf-x: var(--gold-figure-rest-x, 50);
+    --gf-y: var(--gold-figure-rest-y, 50);
+    --gf-r: 22;
+    --gf-a: 0.9;
+  }
+  to {
+    --gf-x: var(--gold-figure-rest-x, 50);
+    --gf-y: var(--gold-figure-rest-y, 50);
+    --gf-r: 27;
+    --gf-a: 0.55;
+  }
+}
