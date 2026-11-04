@@ -1,16 +1,17 @@
 #!/usr/bin/env sh
-# Optimises the Atlas statue exported from Meshy (40 MB, 1.24M triangles, a 2048px PNG texture)
-# into public/3d/atlas.glb (~0.9 MB): welded, simplified to ~62k triangles with meshoptimizer,
-# texture resized to 1024px and converted to WebP, geometry compressed with Meshopt.
+# Optimises the Atlas statue exported from Tripo (53 MB, 1.46M triangles, 2048px textures for
+# colour, metalness-roughness and normals) into public/3d/atlas.glb (~0.8 MB): welded, simplified
+# to ~60k triangles with meshoptimizer, textures resized to 1024px and converted to WebP, geometry
+# compressed with Meshopt.
 #
-#   sh scripts/atlas-3d/optimize.sh path/to/Meshy_AI_Atlas_Reimagined_…_texture.glb [ratio]
+#   sh scripts/atlas-3d/optimize.sh path/to/atlas_3d.glb [ratio]
 #
-# ratio is the share of triangles kept (default 0.05): aim for 50k to 60k triangles.
+# ratio is the share of triangles kept (default 0.041): aim for 50k to 60k triangles.
 #
 # Then regenerate the poster: scripts/atlas-3d/poster.mjs and poster-webp.py.
 set -eu
 src="$1"
-ratio="${2:-0.05}"
+ratio="${2:-0.041}"
 tmp="$(mktemp -d)"
 gt="npx --yes @gltf-transform/cli@4.5.1"
 $gt weld "$src" "$tmp/1.glb"

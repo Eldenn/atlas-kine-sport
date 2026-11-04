@@ -10,8 +10,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const MODEL_URL = '/3d/atlas.glb'
-const LABEL =
-  'Statue d’Atlas en verre veiné d’or : un genou à terre, il porte la Terre sur ses épaules.'
+const LABEL = 'Atlas, un genou à terre, porte la Terre sur ses épaules.'
 
 type Connection = { saveData?: boolean }
 
