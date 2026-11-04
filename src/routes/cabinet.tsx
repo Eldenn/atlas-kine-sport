@@ -55,19 +55,17 @@ const photoFrame = 'overflow-hidden rounded-xl border border-border-subtle bg-in
 function Cabinet() {
   return (
     <>
-      {/* Unlike the other pages: the title and the lead side by side, then the whole plateau as one
-          wide scene with its legend, instead of an intro and media sections. */}
-      <header className={`${container} pt-20 pb-10 md:pt-28 md:pb-14`}>
+      {/* Unlike the other pages: a centred opening over the whole plateau, drawn as one wide scene
+          with its legend, instead of an intro and media sections. */}
+      <header className={`${container} pt-20 pb-10 text-center md:pt-28 md:pb-14`}>
         <p className="atlas-eyebrow m-0 text-primary-text">Le cabinet</p>
-        <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-end lg:gap-16">
-          <h1 className="m-0 max-w-[16ch] font-display text-[clamp(36px,5vw,60px)] leading-[1.05]">
-            Transformer l’obstacle en progression
-          </h1>
-          <p className="m-0 max-w-[52ch] text-[18px] leading-[1.7] text-fg-secondary">
-            Une blessure interrompt une saison, un projet, parfois un quotidien. Ici, la rééducation
-            est active : vous travaillez avec le kiné, pas seulement sous ses mains.
-          </p>
-        </div>
+        <h1 className="mx-auto mt-4 mb-0 max-w-[22ch] font-display text-[clamp(36px,5vw,60px)] leading-[1.05] text-balance">
+          Transformer l’obstacle en progression
+        </h1>
+        <p className="mx-auto mt-6 mb-0 max-w-[56ch] text-[18px] leading-[1.7] text-pretty text-fg-secondary">
+          Une blessure interrompt une saison, un projet, parfois un quotidien. Ici, la rééducation
+          est active : vous travaillez avec le kiné, pas seulement sous ses mains.
+        </p>
       </header>
 
       <section aria-labelledby="plateau-titre" className="gold-scene pb-16 md:pb-24">
@@ -176,6 +174,7 @@ function Cabinet() {
       </div>
 
       <CtaSection
+        className="pt-16 md:pt-24"
         title={<span className="font-display">Commencer par un bilan</span>}
         description="Le premier rendez-vous fait le point sur votre blessure, vos objectifs et votre sport."
         actions={
