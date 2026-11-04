@@ -10,9 +10,9 @@ import numpy as np
 from PIL import Image
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else 'public/images/texture/enduit.webp'
-N = 640  # px ; affichée à 640 px CSS
-AMP = 6  # niveaux de gris par écart-type : le grain reste sous le texte
-QUALITY = 85
+N = 400  # px ; affichée à 400 px CSS
+AMP = 12  # niveaux de gris par écart-type : le grain reste sous le texte
+QUALITY = 70
 rng = np.random.default_rng(7)
 fy = np.fft.fftfreq(N)[:, None]
 fx = np.fft.fftfreq(N)[None, :]
@@ -31,43 +31,36 @@ def band(lo_px, hi_px):
     return np.exp(-((np.log(f) - np.log(2 / (lo_px + hi_px))) ** 2) / (2 * 0.6**2))
 
 
-# 1. large soft clouds (the uneven tone of a lime/plaster wall)
-clouds = field(band(120, 420))
-# 2. mid mottling
-mottle = field(band(25, 80))
-# 3. trowel strokes: oriented ridges, direction changing in patches
-strokes = np.zeros((N, N))
-mask_base = [field(band(200, 500)) for _ in range(4)]
-for k, ang in enumerate(np.linspace(0, np.pi, 4, endpoint=False) + rng.uniform(0, 0.4)):
-    d = np.cos(theta - ang)
-    wedge = np.exp(-(1 - d**2) / (2 * 0.4**2)) * band(30, 110)
-    ridges = np.abs(field(wedge))  # sharp crests like trowel marks
-    ridges = (ridges - ridges.mean()) / ridges.std()
-    m = np.clip(mask_base[k] - 0.3, 0, None)
-    strokes += ridges * m
-strokes = (strokes - strokes.mean()) / strokes.std()
-# 4. fine sand grain
-grain = field(np.exp(-((f - 0.35) ** 2) / (2 * 0.12**2)))
-# 5. tiny pits (air bubbles) - darker dots
-pits = np.zeros((N, N))
-pts = rng.integers(0, N, (int(N * N / 9000), 2))
-yy, xx = np.mgrid[0:N, 0:N]
-for py, px in pts:
-    r = rng.uniform(0.8, 1.8)
-    dy = (yy - py + N / 2) % N - N / 2
-    dx = (xx - px + N / 2) % N - N / 2
-    pits -= np.exp(-(dx**2 + dy**2) / (2 * r**2)) * rng.uniform(0.6, 1)
+# Crépi fin : l'essentiel du relief est un grain de 2 à 8 px, éclairé en biais, piqué de petits
+# trous plus sombres ; les variations de teinte à grande échelle restent à peine perceptibles.
+clouds = field(band(120, 400))  # teinte très douce, à grande échelle
+grain = field(band(3, 8))  # le sable de l'enduit
+lumps = field(band(8, 22))  # petits amas
 
-# relief, then lit from the upper left like a wall under a window
-# skimmed patches: plateaus with soft edges, where the trowel flattened the plaster
-p = field(band(60, 200))
-patches = 1 / (1 + np.exp(-4 * (p - 0.4)))
-H = 1.0 * mottle + 0.55 * strokes + 1.6 * patches + 0.25 * grain + 1.2 * pits
+
+def splat(count, radius):
+    # impulsions aléatoires lissées par une gaussienne périodique (sans raccord)
+    imp = np.zeros((N, N))
+    pts = rng.integers(0, N, (count, 2))
+    np.add.at(imp, (pts[:, 0], pts[:, 1]), rng.uniform(0.5, 1, count))
+    kern = np.exp(-(f**2) * (2 * np.pi * radius) ** 2 / 2)
+    return np.real(np.fft.ifft2(np.fft.fft2(imp) * kern))
+
+
+# trous (bulles d'air, grains arrachés) : plus nombreux petits, quelques plus gros
+pits = splat(N * N // 600, 0.7) + 0.6 * splat(N * N // 4000, 1.4)
+# regroupés par endroits, et déchiquetés par le grain : pas de points ronds réguliers
+pits *= np.clip(1 + 0.9 * field(band(25, 90)), 0.1, None) * np.clip(1 + 0.6 * grain, 0.2, None)
+pits = pits / pits.std()
+rough = np.maximum(grain, 0) ** 1.6  # crêtes du sable, plus vives que les creux
+
+# relief éclairé depuis le haut à gauche ; un trou se creuse : ombre en haut, lumière en bas
+H = 0.7 * grain + 0.6 * rough + 0.5 * lumps - 0.9 * pits
 gy = (np.roll(H, -1, 0) - np.roll(H, 1, 0)) / 2
 gx = (np.roll(H, -1, 1) - np.roll(H, 1, 1)) / 2
-shade = -(gx * 0.7 + gy * 0.7)
+shade = -(gx + gy) * 0.7
 shade = (shade - shade.mean()) / shade.std()
-tex = 1.0 * clouds + 0.75 * shade + 0.25 * mottle + 0.35 * patches
+tex = 0.85 * shade + 0.3 * grain - 0.9 * pits + 0.2 * lumps + 0.25 * clouds
 tex = (tex - tex.mean()) / tex.std()
 g = np.clip(128 + AMP * np.clip(tex, -3, 3), 0, 255).round().astype(np.uint8)
 Image.fromarray(g, 'L').save(OUT, 'WEBP', quality=QUALITY, method=6)
