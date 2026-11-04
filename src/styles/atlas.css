@@ -415,3 +415,36 @@ header nav a {
     mask: url('/images/atlas/atlas-lines.svg') 0 0 / 100% 100% no-repeat;
   }
 }
+
+/* Matière : un fond presque lisse voilé de poussière fine, sous tout le site, couleurs inchangées.
+   Deux couches sans raccord générées par scripts/texture/matiere.py, de tailles sans rapport
+   simple (1400 et 757 px) et décalées : leurs motifs ne se recalent jamais à l'échelle d'une page.
+   Poussière claire sur noir fondue en screen sur les fonds sombres, poussière sombre sur blanc
+   fondue en multiply sur les bandes bone : le noir et le blanc ne changent rien, seule la
+   poussière touche la couleur du fond. Cartes, champs et boutons restent unis. */
+body,
+.bg-background {
+  background-image:
+    url('/images/texture/matiere-grains-sombre.webp'),
+    url('/images/texture/matiere-voiles-sombre.webp');
+  background-size:
+    757px 757px,
+    1400px 1400px;
+  background-position:
+    0 0,
+    -310px -190px;
+  background-blend-mode: screen;
+}
+.bg-background[data-theme='light'],
+[data-theme='light'] .bg-background {
+  background-image:
+    url('/images/texture/matiere-grains-claire.webp'),
+    url('/images/texture/matiere-voiles-claire.webp');
+  background-blend-mode: multiply;
+}
+@media (prefers-contrast: more) {
+  body,
+  .bg-background {
+    background-image: none;
+  }
+}
