@@ -3,10 +3,10 @@ import type * as React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 
 import { GoldFigure } from '@/components/atlas/gold-figure'
-import { PhotoPlaceholder } from '@/components/atlas/photo-placeholder'
-import { CtaSection } from '@/components/cta-section'
-import { Button } from '@/components/ui/button'
-import { AppLink } from '@/lib/link'
+import { BookingBand } from '@/components/atlas/booking-band'
+import { PhotoSlot } from '@/components/atlas/photo-slot'
+import { photos } from '@/content/photos'
+import { cn } from '@/lib/utils'
 import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/cabinet')({
@@ -50,7 +50,7 @@ const plateau = [
 
 const container = 'mx-auto box-content max-w-[1120px] px-5 md:px-7'
 /** The frame of a photo, as in Coreloom's MediaSection. */
-const photoFrame = 'overflow-hidden rounded-xl border border-border-subtle bg-inset'
+const photoFrame = 'overflow-hidden bg-inset'
 
 function Cabinet() {
   return (
@@ -96,8 +96,7 @@ function Cabinet() {
 
           <div className="mt-12 grid gap-10 border-t border-border-subtle pt-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,2fr)] lg:gap-16">
             <div>
-              <p className="atlas-eyebrow m-0 text-primary-text">Plateau technique</p>
-              <h2 id="plateau-titre" className="mt-3 mb-0 font-display text-[32px] leading-tight">
+              <h2 id="plateau-titre" className="m-0 font-display text-[32px] leading-tight">
                 Conçu comme une salle d’entraînement
               </h2>
               <p className="mt-4 mb-0 leading-relaxed text-fg-secondary">
@@ -113,7 +112,7 @@ function Cabinet() {
                   className="grid grid-cols-[auto_1fr] gap-4"
                 >
                   <span aria-hidden className="atlas-eyebrow pt-1 text-primary-text tabular-nums">
-                    0{i + 1}
+                    {i + 1}
                   </span>
                   <div>
                     <h3 className="m-0 font-display text-[22px]">{zone.title}</h3>
@@ -123,25 +122,29 @@ function Cabinet() {
               ))}
             </ol>
           </div>
-          <div className={`${photoFrame} mt-12 aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]`}>
-            <PhotoPlaceholder label="vue d’ensemble du plateau" />
-          </div>
+          {photos.plateauVue && (
+            <div className={`${photoFrame} mt-12 aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]`}>
+              <PhotoSlot photo={photos.plateauVue} sizes="(min-width: 1176px) 1120px, 100vw" />
+            </div>
+          )}
         </div>
       </section>
 
-      <div
-        data-theme="light"
-        data-surface="bone"
-        data-accent="atlas"
-        className="bg-background text-foreground"
-      >
+      <div className="atlas-divide">
         <section
           aria-labelledby="nom-titre"
-          className={`${container} grid gap-10 py-16 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:items-center md:gap-16 md:py-24`}
+          className={cn(
+            container,
+            'grid gap-10 py-16 md:py-24',
+            photos.embleme &&
+              'md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:items-center md:gap-16',
+          )}
         >
-          <div className={`${photoFrame} mx-auto aspect-[4/5] w-full max-w-[460px]`}>
-            <PhotoPlaceholder label="l’emblème du cabinet" />
-          </div>
+          {photos.embleme && (
+            <div className={`${photoFrame} mx-auto aspect-[4/5] w-full max-w-[460px]`}>
+              <PhotoSlot photo={photos.embleme} sizes="(min-width: 768px) 460px, 100vw" />
+            </div>
+          )}
           <div>
             <p className="atlas-eyebrow m-0 text-primary-text">Pourquoi Atlas</p>
             <h2
@@ -173,16 +176,11 @@ function Cabinet() {
         </section>
       </div>
 
-      <CtaSection
-        className="pt-16 md:pt-24"
-        title={<span className="font-display">Commencer par un bilan</span>}
-        description="Le premier rendez-vous fait le point sur votre blessure, vos objectifs et votre sport."
-        actions={
-          <Button asChild size="lg">
-            <AppLink href="/contact">Prendre rendez-vous</AppLink>
-          </Button>
-        }
-      />
+      <BookingBand title="Commencer par un bilan">
+        <p className="m-0">
+          Le premier rendez-vous fait le point sur votre blessure, vos objectifs et votre sport.
+        </p>
+      </BookingBand>
     </>
   )
 }

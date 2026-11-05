@@ -1,16 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { MapPinIcon, PhoneIcon } from 'lucide-react'
 
 import { DoctolibButtons } from '@/components/atlas/doctolib-buttons'
 import { HomeStage } from '@/components/atlas/home-stage'
-import { PhotoPlaceholder } from '@/components/atlas/photo-placeholder'
-import { ContactDetails, ContactSection, OpeningHours } from '@/components/contact-section'
-import { MediaSection } from '@/components/media-section'
-import { PractitionerCard, PractitionerGrid } from '@/components/practitioner-card'
-import { Quote } from '@/components/quote'
-import { Button } from '@/components/ui/button'
+import { PhotoSlot } from '@/components/atlas/photo-slot'
+import { PractitionerFeature } from '@/components/atlas/practitioner-feature'
 import { cabinet, practitioners } from '@/content/cabinet'
+import { photos } from '@/content/photos'
 import { AppLink } from '@/lib/link'
 import { seo } from '@/lib/seo'
+import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/')({
   head: () =>
@@ -22,143 +21,171 @@ export const Route = createFileRoute('/')({
   component: Home,
 })
 
-const axes = [
-  {
-    step: '01',
-    title: 'Évaluer',
-    text: 'Un bilan complet à la première séance : douleur, mobilité, force, et ce que votre sport exige de vous.',
-  },
-  {
-    step: '02',
-    title: 'Soigner',
-    text: 'Thérapie manuelle et rééducation des blessures musculaires, tendineuses et articulaires.',
-  },
-  {
-    step: '03',
-    title: 'Progresser',
-    text: 'Un reconditionnement dont la charge augmente quand vos mesures le permettent, pas avant.',
-  },
-]
+const container = 'mx-auto box-content max-w-[1120px] px-5 md:px-7'
+const bone = { 'data-theme': 'light', 'data-surface': 'bone', 'data-accent': 'atlas' } as const
 
 function Home() {
+  const plateau = photos.plateau
   return (
     <>
       <HomeStage />
 
-      {/* The three axes as a numbered sequence, not a grid of icon cards. */}
-      <section aria-labelledby="axes" className="atlas-divide px-5 py-20 md:px-7">
-        <div className="mx-auto max-w-[1120px]">
-          <p className="atlas-eyebrow m-0 text-primary-text">La méthode</p>
-          <h2
-            id="axes"
-            className="mt-4 mb-12 max-w-[22ch] font-display text-[clamp(30px,4vw,44px)] leading-[1.1]"
-          >
-            Trois temps, dans cet ordre
+      {/* The name, as the moodboard sets it (p. 4): the place where the site says who it is. */}
+      <section
+        {...bone}
+        aria-labelledby="nom"
+        className="bg-background py-20 text-foreground md:py-28"
+      >
+        <div className={container}>
+          <h2 id="nom" className="atlas-name__word">
+            ATLAS
           </h2>
-          <ol className="m-0 grid list-none gap-10 p-0 md:grid-cols-3">
-            {axes.map((axe) => (
-              <li key={axe.step} className="border-border-accent border-t pt-6">
-                <span className="font-display text-[40px] leading-none text-primary-text">
-                  {axe.step}
-                </span>
-                <h3 className="mt-4 mb-2 font-display text-[26px]">{axe.title}</h3>
-                <p className="m-0 leading-relaxed text-fg-secondary">{axe.text}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <div
-        data-theme="light"
-        data-surface="bone"
-        data-accent="atlas"
-        className="bg-background text-foreground"
-      >
-        <MediaSection
-          eyebrow={<span className="atlas-eyebrow">Plateau technique</span>}
-          title="Une salle pensée pour la rééducation"
-          media={<PhotoPlaceholder label="piste de sprint et zone de charges" />}
-          actions={
-            <Button asChild variant="outline">
-              <AppLink href="/cabinet">Voir le cabinet</AppLink>
-            </Button>
-          }
-        >
-          <p>
-            Piste de sprint, charges libres, capteurs de force et analyse vidéo du geste. Vous voyez
-            vos progrès en chiffres, séance après séance.
+          <dl className="atlas-name__pair">
+            <div className="atlas-name__meaning">
+              <dt>En anatomie</dt>
+              <dd>
+                La première vertèbre cervicale (C1), qui soutient la tête et lui donne sa mobilité.
+              </dd>
+            </div>
+            <div className="atlas-name__meaning">
+              <dt>En mythologie</dt>
+              <dd>Le titan qui porte le monde : la force, l’endurance, la stabilité.</dd>
+            </div>
+          </dl>
+          <p className="atlas-name__line">
+            Notre métier : la <strong>reconstruction du corps</strong>, jusqu’à ce qu’il retrouve
+            force et mouvement.
           </p>
-        </MediaSection>
-      </div>
-
-      <section className="px-5 py-20 md:px-7">
-        <div className="mx-auto max-w-[860px]">
-          <Quote variant="large" align="center">
-            <span className="font-quote">
-              Dans la mythologie, Atlas porte le monde. En anatomie, l’atlas est la première
-              vertèbre, celle qui soutient la tête. Notre rôle est le même : vous soutenir le temps
-              de retrouver force et mouvement, puis vous laisser aller plus loin.
-            </span>
-          </Quote>
         </div>
       </section>
 
-      <PractitionerGrid
-        eyebrow="L’équipe"
-        title={<span className="font-display">Vos kinésithérapeutes</span>}
-        columns={2}
-        className="atlas-divide"
-      >
-        {practitioners.map((p) => (
-          <PractitionerCard
-            key={p.slug}
-            name={p.name}
-            profession={p.profession}
-            photo={<img src={p.photo} alt="" width={480} height={600} loading="lazy" />}
-            specialties={p.areas.slice(0, 4)}
-            facts={[{ label: 'RPPS', value: p.rpps }]}
-            headingLevel={3}
-            orientation="horizontal"
-            actions={
-              <>
-                <Button asChild>
-                  <a href={p.doctolib} target="_blank" rel="noopener noreferrer">
-                    Prendre rendez-vous
-                    <span className="sr-only"> avec {p.name} sur Doctolib (nouvel onglet)</span>
-                  </a>
-                </Button>
-                <Button asChild variant="ghost">
-                  <AppLink href={`/equipe/${p.slug}`}>
-                    Son parcours<span className="sr-only"> : {p.name}</span>
-                  </AppLink>
-                </Button>
-              </>
-            }
-          />
-        ))}
-      </PractitionerGrid>
+      {/* How the work is done and where, in one section. The plateau photo joins it when it exists. */}
+      <section aria-labelledby="approche" className="py-20 md:py-28">
+        <div
+          className={cn(
+            container,
+            'grid gap-10',
+            plateau
+              ? 'md:grid-cols-2 md:items-center md:gap-16'
+              : 'lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-20',
+          )}
+        >
+          {plateau && (
+            <div className="aspect-[4/3] overflow-hidden md:order-2">
+              <PhotoSlot photo={plateau} sizes="(min-width: 768px) 50vw, 100vw" />
+            </div>
+          )}
+          <h2
+            id="approche"
+            className="m-0 max-w-[18ch] font-display text-[clamp(32px,4.4vw,52px)] leading-[1.08] text-balance"
+          >
+            Une rééducation active, sur un plateau conçu comme une salle d’entraînement
+          </h2>
+          <div className="text-[17px] leading-[1.7] text-fg-secondary lg:pt-3">
+            <p className="m-0">
+              Le premier rendez-vous est un bilan : douleur, mobilité, force, et ce que votre sport
+              exige de vous. Ensuite vous travaillez avec le kiné, pas seulement sous ses mains.
+            </p>
+            <p className="mt-4 mb-0">
+              Piste de sprint, charges libres, capteurs de force et analyse vidéo du geste : la
+              charge augmente quand vos mesures le permettent, pas avant.
+            </p>
+            <p className="mt-8 mb-0 flex flex-wrap gap-x-8 gap-y-3">
+              <AppLink href="/soins" className="atlas-link">
+                Les soins, du bilan au retour au sport
+              </AppLink>
+              <AppLink href="/cabinet" className="atlas-link">
+                Le plateau technique
+              </AppLink>
+            </p>
+          </div>
+        </div>
+      </section>
 
-      <ContactSection
-        eyebrow="Nous trouver"
-        title={<span className="font-display">Votre prochaine séance commence par un bilan</span>}
-        description="Choisissez votre praticien sur Doctolib, ou appelez le cabinet."
-        className="atlas-divide"
+      {/* The team on bone: the studio portraits sit on a light ground, not in dark cards. */}
+      <section
+        {...bone}
+        aria-labelledby="equipe"
+        className="bg-background py-20 text-foreground md:py-28"
       >
-        <ContactDetails
-          address={
-            <>
-              {cabinet.address.street}
-              <br />
-              {cabinet.address.postalCode} {cabinet.address.city}
-            </>
-          }
-          directionsHref={cabinet.directionsHref}
-          phone={cabinet.phone}
-        />
-        <OpeningHours hours={cabinet.hours} />
-        <DoctolibButtons />
-      </ContactSection>
+        <div className={container}>
+          <h2 id="equipe" className="m-0 font-display text-[clamp(32px,4.4vw,52px)] leading-[1.08]">
+            Vos kinésithérapeutes
+          </h2>
+          <div className="mt-12 grid gap-14 sm:grid-cols-2 sm:gap-10 lg:gap-16">
+            {practitioners.map((p) => (
+              <PractitionerFeature key={p.slug} practitioner={p} areas={p.areas.slice(0, 4)} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="venir" className="py-20 md:py-28">
+        <div
+          className={cn(
+            container,
+            'grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-20',
+          )}
+        >
+          <div>
+            <h2
+              id="venir"
+              className="m-0 max-w-[16ch] font-display text-[clamp(32px,4.4vw,52px)] leading-[1.08]"
+            >
+              Votre première séance commence par un bilan
+            </h2>
+            <p className="mt-6 mb-0 max-w-[48ch] text-[17px] leading-[1.7] text-fg-secondary">
+              Chaque kiné a son agenda Doctolib. Pour une question, appelez le cabinet.
+            </p>
+            <div className="mt-8">
+              <DoctolibButtons />
+            </div>
+          </div>
+          <dl className="m-0 grid content-start gap-7 text-[16px] leading-relaxed lg:pt-3">
+            <div>
+              <dt className="sr-only">Adresse</dt>
+              <dd className="m-0 grid grid-cols-[20px_1fr] gap-x-4">
+                <MapPinIcon aria-hidden className="mt-1 size-5 text-primary-text" />
+                <span>
+                  {cabinet.address.street}
+                  <br />
+                  {cabinet.address.postalCode} {cabinet.address.city}
+                  <br />
+                  <a
+                    href={cabinet.directionsHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="atlas-link mt-2 text-[15px]"
+                  >
+                    Itinéraire<span className="sr-only"> (nouvel onglet)</span>
+                  </a>
+                </span>
+              </dd>
+            </div>
+            <div>
+              <dt className="sr-only">Téléphone</dt>
+              <dd className="m-0 grid grid-cols-[20px_1fr] gap-x-4">
+                <PhoneIcon aria-hidden className="mt-1 size-5 text-primary-text" />
+                <a
+                  href={`tel:+33${cabinet.phone.replace(/\s/g, '').slice(1)}`}
+                  className="atlas-link py-0"
+                >
+                  {cabinet.phone}
+                </a>
+              </dd>
+            </div>
+            <div className="border-t border-border-subtle pt-6">
+              <dt className="atlas-eyebrow text-primary-text">Horaires</dt>
+              <dd className="mt-3 mb-0 text-fg-secondary">
+                {cabinet.hoursText}{' '}
+                <AppLink href="/infos-pratiques" className="atlas-link py-0 text-[15px]">
+                  Infos pratiques
+                </AppLink>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </section>
     </>
   )
 }

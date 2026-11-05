@@ -21,6 +21,10 @@ export const cabinet = {
     city: 'Chasseneuil-du-Poitou',
   },
   phone: '07 72 50 80 17',
+  /** The week in one line, where a day-by-day table would repeat itself. */
+  hoursText: 'Du lundi au vendredi, 8 h 30 – 13 h et 14 h – 19 h. Fermé le week-end.',
+  /** Facts that reassure, under the home page's actions. */
+  facts: ['Chasseneuil-du-Poitou', 'Conventionnés', 'Tiers payant'],
   // TODO(Matthieu): the address the contact form sends to (masked on the current site).
   email: null as string | null,
   // TODO(Matthieu): step-free access, parking, bus line. Until then the page asks visitors to call.

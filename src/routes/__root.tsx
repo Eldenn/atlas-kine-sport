@@ -125,10 +125,11 @@ function Layout() {
             Aller au contenu
           </a>
           <SiteHeader
+            maxWidth="max-w-[1176px]"
             brand={<Brand compact />}
             links={nav.map((link) => ({ ...link, active: pathname.startsWith(link.href) }))}
             actions={
-              <Button asChild size="sm" className="hidden lg:inline-flex">
+              <Button asChild className="hidden lg:inline-flex">
                 <AppLink href="/contact">Prendre rendez-vous</AppLink>
               </Button>
             }

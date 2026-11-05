@@ -1,7 +1,6 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { PageIntro } from '@/components/atlas/page-intro'
-import { Badge } from '@/components/ui/badge'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -61,14 +60,14 @@ function Fiche() {
           alt={`Portrait de ${p.name}`}
           width={480}
           height={600}
-          className="aspect-[4/5] w-full max-w-[280px] rounded-lg object-cover md:row-span-2 lg:row-span-1"
+          className="aspect-[4/5] w-full max-w-[280px] object-cover md:row-span-2 lg:row-span-1"
         />
         <div>
           <h2 className="m-0 font-display text-[26px]">Domaines d’intervention</h2>
-          <ul className="mt-5 mb-0 flex list-none flex-wrap gap-2 p-0">
+          <ul className="mt-5 mb-0 list-none p-0 text-[16px] leading-relaxed">
             {p.areas.map((area) => (
-              <li key={area}>
-                <Badge variant="outline">{area}</Badge>
+              <li key={area} className="border-b border-border-subtle py-2.5 first:pt-0">
+                {area}
               </li>
             ))}
           </ul>

@@ -1,11 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { BookingBand } from '@/components/atlas/booking-band'
 import { GoldFigure } from '@/components/atlas/gold-figure'
 import { PageIntro } from '@/components/atlas/page-intro'
-import { CtaSection } from '@/components/cta-section'
 import { Faq } from '@/components/faq'
-import { Button } from '@/components/ui/button'
-import { AppLink } from '@/lib/link'
 import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/soins')({
@@ -95,17 +93,14 @@ function Soins() {
               'Non. Les méthodes du sport servent aussi à retrouver un quotidien sans douleur, quel que soit votre niveau.',
           },
         ]}
-        className="atlas-divide"
+        className="border-t-0 pt-4"
       />
-      <CtaSection
-        title={<span className="font-display">Prendre rendez-vous</span>}
-        description="Choisissez votre praticien sur Doctolib."
-        actions={
-          <Button asChild size="lg">
-            <AppLink href="/contact">Voir les agendas</AppLink>
-          </Button>
-        }
-      />
+      <BookingBand>
+        <p className="m-0">
+          Chaque kiné a son agenda Doctolib. Apportez l’ordonnance, la carte Vitale et la carte de
+          mutuelle.
+        </p>
+      </BookingBand>
     </>
   )
 }
