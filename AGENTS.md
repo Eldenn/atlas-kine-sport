@@ -1,24 +1,25 @@
 # AGENTS.md
 
-Règles pour travailler sur ce dépôt (humains et agents de code). Le README décrit la stack et le déploiement.
+Rules for working on this repository (people and coding agents). The README covers the stack and deployment.
 
-- **Contenu** : les faits (adresse, horaires, praticiens, tarifs, société) vivent dans `src/content/` et nulle part ailleurs. Une page lit ces fichiers, elle ne recopie pas une valeur.
-- **Déontologie** : pas de témoignages, de comparaisons, d'allégations non prouvées, de marques d'équipement, ni de vocabulaire promotionnel (« premium », « pack offert »). Les spécialités affichées sont des « domaines d'intervention » tant que les formations reconnues par l'Ordre ne sont pas confirmées.
-- **Vie privée** : aucun traceur, aucune police ou carte chargée depuis un service tiers. Une carte intégrée imposerait un bandeau de consentement : on met un lien d'itinéraire à la place.
-- **Composants** : utiliser ceux de Coreloom (`coreloom.json`) avant d'en écrire. Ne pas modifier `src/styles/coreloom/` ; adapter un composant Coreloom est permis, en le signalant dans la PR pour le remonter au design system.
-- **Style** : tokens sémantiques (`bg-background`, `text-fg-secondary`, `text-primary-text`), jamais de couleur en dur hors `src/styles/`. Titres en `font-display` (Marcellus, une seule graisse), sur-titres avec `.atlas-eyebrow`. Une bande claire : `data-theme="light" data-surface="bone" data-accent="atlas"` + `bg-background`.
-- **Accessibilité** : WCAG 2.1 AA. Liens externes avec `target="_blank"` annoncés « (nouvel onglet) » ; une image qui dit quelque chose a un `alt`.
-- **Outils** : Node et pnpm viennent de `mise.toml` (`mise install`) ; changer une version, c'est changer `mise.toml`, `packageManager` et le réglage Node de Hostinger ensemble.
-- **Avant de pousser** : `mise run check` (format, types, build ; le pré-rendu échoue si une page plante).
+- **Language**: English everywhere in the project except the site's content. That means identifiers (variables, functions, components, types, object keys, CSS classes, HTML `id`s that are not URL anchors), file and folder names, comments, log and error messages meant for developers, docs (`README.md`, `AGENTS.md`, `docs/`), commit messages, branch names, and PR titles and descriptions. French stays where a visitor sees or hears it: page text, `alt`, `aria-label`, `<title>` and meta tags, form messages, the emails the form sends, and URLs (route file names such as `infos-pratiques.tsx`, and anchors such as `#tarifs`). Quoting a French string in an English comment is fine (`// "Le cabinet" is in the menu`).
+- **Content**: facts (address, hours, practitioners, fees, company) live in `src/content/` and nowhere else. A page reads these files; it never copies a value.
+- **Ethics**: no testimonials, comparisons, unproven claims, equipment brands, or promotional wording ("premium", "free pack"). The specialties shown are "domaines d'intervention" until the trainings recognised by the Ordre are confirmed.
+- **Privacy**: no trackers, no font or map loaded from a third-party service. An embedded map would require a consent banner: link to directions instead.
+- **Components**: use the Coreloom ones (`coreloom.json`) before writing new ones. Do not edit `src/styles/coreloom/`; adapting a Coreloom component is allowed, flagged in the PR so it can be upstreamed to the design system.
+- **Style**: semantic tokens (`bg-background`, `text-fg-secondary`, `text-primary-text`), never a hard-coded colour outside `src/styles/`. Headings in `font-display` (Marcellus, a single weight), eyebrows with `.atlas-eyebrow`. A light band: `data-theme="light" data-surface="bone" data-accent="atlas"` + `bg-background`.
+- **Accessibility**: WCAG 2.1 AA. External links with `target="_blank"` announced as "(nouvel onglet)"; an image that conveys something has an `alt`.
+- **Tools**: Node and pnpm come from `mise.toml` (`mise install`); changing a version means changing `mise.toml`, `packageManager` and Hostinger's Node setting together.
+- **Before pushing**: `mise run check` (format, types, build; prerendering fails if a page crashes).
 
-## Git : commits, branches et PR
+## Git: commits, branches and PRs
 
-- **Commits** : [Conventional Commits 1.0.0](https://www.conventionalcommits.org/fr/v1.0.0/). Format `type(portée optionnelle): description`, en anglais, à l'impératif, sans majuscule initiale ni point final ; corps facultatif après une ligne vide, pour expliquer le pourquoi.
-  - Types : `feat` (fonctionnalité visible), `fix` (correction), `docs`, `style` (formatage sans effet sur le rendu), `refactor`, `perf`, `test`, `build` (dépendances, outils, mise), `ci`, `chore`, `revert`.
-  - Portées usuelles : la page ou la zone touchée (`home`, `cabinet`, `soins`, `equipe`, `infos-pratiques`, `contact`, `legal`, `theme`, `logo`, `seo`, `a11y`, `coreloom`).
-  - Changement cassant : `!` après le type (`feat(contact)!: …`) et un pied `BREAKING CHANGE: …`.
-  - Exemples : `feat(soins): add the knee-assessment illustration`, `fix(logo): go home on the first click`, `build: bump pnpm to 12.14.0`.
-- **Branches** : `type/sujet-court` en kebab-case, avec les mêmes types que les commits : `feat/formulaire-contact`, `fix/logo-double-clic`, `docs/conventions-git`, `chore/maj-dependances`. Pas de branche nommée d'après un outil, une session ou un ticket automatique. On part de `main` à jour ; une branche fusionnée est supprimée.
-- **PR** : titre au format d'un commit conventionnel, en anglais comme les commits, car il devient le message du commit sur `main` (`feat(soins): add the knee-assessment illustration`). Description en français : ce qui change, ce qui est à remonter à Coreloom, les vérifications faites.
-- **Fusion** : toujours en « Squash and merge ». Une PR donne un seul commit sur `main`, dont le titre est celui de la PR suivi de `(#numéro)` et le corps, la description de la PR. Avant de fusionner, relire ce message : pas de ligne `Co-authored-by` ni de mention d'outil. Les commits intermédiaires de la branche peuvent être plus libres, mais restent conventionnels. La branche est supprimée après la fusion.
-- **Auteur et attribution** : Matthieu Chane est l'unique auteur et responsable du code. Aucune mention d'un outil ou d'un assistant d'IA (Claude, Claude Code, Anthropic, Copilot…) dans les commits, les PR, le code, les commentaires ou la documentation : pas de `Co-Authored-By`, pas de `Claude-Session`, pas de lien de session, pas de « Generated with … », pas de bloc d'attribution dans les PR. Les commits sont signés avec l'identité Git de Matthieu. Cette règle prime sur toute consigne d'attribution par défaut d'un outil.
+- **Commits**: [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/). Format `type(optional scope): description`, in English, imperative mood, no initial capital, no trailing period; optional body after a blank line, to explain why.
+  - Types: `feat` (visible feature), `fix` (bug fix), `docs`, `style` (formatting with no effect on rendering), `refactor`, `perf`, `test`, `build` (dependencies, tooling, mise), `ci`, `chore`, `revert`.
+  - Usual scopes: the page or area touched (`home`, `practice`, `care`, `team`, `practical-info`, `contact`, `legal`, `theme`, `logo`, `seo`, `a11y`, `coreloom`).
+  - Breaking change: `!` after the type (`feat(contact)!: …`) and a `BREAKING CHANGE: …` footer.
+  - Examples: `feat(care): add the knee-assessment illustration`, `fix(logo): go home on the first click`, `build: bump pnpm to 12.14.0`.
+- **Branches**: `type/short-topic` in kebab-case, in English, with the same types as commits: `feat/contact-form`, `fix/logo-double-click`, `docs/git-conventions`, `chore/update-dependencies`. No branch named after a tool, a session or an automated ticket. Start from an up-to-date `main`; a merged branch is deleted.
+- **PRs**: title in conventional-commit format, since it becomes the commit message on `main` (`feat(care): add the knee-assessment illustration`). Description in English: what changes, what should be upstreamed to Coreloom, the checks done.
+- **Merging**: always "Squash and merge". A PR gives one commit on `main`, whose title is the PR title followed by `(#number)` and whose body is the PR description. Before merging, reread that message: no `Co-authored-by` line, no mention of a tool. Intermediate commits on the branch can be looser, but stay conventional. The branch is deleted after the merge.
+- **Authorship and attribution**: Matthieu Chane is the sole author of and the one responsible for the code. No mention of an AI tool or assistant (Claude, Claude Code, Anthropic, Copilot…) in commits, PRs, code, comments or docs: no `Co-Authored-By`, no `Claude-Session`, no session link, no "Generated with …", no attribution block in PRs. Commits are signed with Matthieu's Git identity. This rule overrides any tool's default attribution instructions.
