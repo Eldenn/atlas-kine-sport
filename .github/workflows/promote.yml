@@ -1,6 +1,8 @@
 # Moves the `production` branch, which the production app on Hostinger deploys from.
 # - Release: run with the defaults; `production` fast-forwards to what staging shows (`main`).
 # - Rollback: run with an older commit SHA and "rollback" ticked; `production` is moved back to it.
+# Switched off until the production app exists: the job only runs when the repository variable
+# PRODUCTION_DEPLOY_ENABLED is "true" (Settings → Secrets and variables → Actions → Variables).
 name: Promote to production
 
 on:
@@ -24,6 +26,7 @@ concurrency:
 
 jobs:
   promote:
+    if: vars.PRODUCTION_DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

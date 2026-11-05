@@ -9,6 +9,8 @@ The site runs as two Node.js apps on the Hostinger "Unlimited Web Hosting" plan 
 
 ## Flow
 
+> **Production deployment is switched off for now.** The _Promote to production_ workflow is skipped until the repository variable `PRODUCTION_DEPLOY_ENABLED` is set to `true` (Settings → Secrets and variables → Actions → Variables). Until then only staging deploys.
+
 ```
 feat/… ──PR, squash──▶ main ──auto-deploy──▶ staging
                          │
