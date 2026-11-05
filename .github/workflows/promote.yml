@@ -1,0 +1,64 @@
+# Moves the `production` branch, which the production app on Hostinger deploys from.
+# - Release: run with the defaults; `production` fast-forwards to what staging shows (`main`).
+# - Rollback: run with an older commit SHA and "rollback" ticked; `production` is moved back to it.
+name: Promote to production
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit, tag or branch to put live
+        required: true
+        default: main
+      rollback:
+        description: Allow moving production back to an older commit
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: promote-production
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve the commit
+        id: target
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          sha=$(git rev-parse --verify "origin/$REF^{commit}" 2>/dev/null || git rev-parse --verify "$REF^{commit}")
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          git log -1 --format='Putting live: %h %s' "$sha"
+
+      - name: Check the commit is on main
+        env:
+          SHA: ${{ steps.target.outputs.sha }}
+        run: |
+          git merge-base --is-ancestor "$SHA" origin/main \
+            || { echo "::error::$SHA is not on main: only reviewed code goes live."; exit 1; }
+
+      - name: Move production
+        env:
+          SHA: ${{ steps.target.outputs.sha }}
+          ROLLBACK: ${{ inputs.rollback }}
+        run: |
+          if ! git rev-parse --verify --quiet origin/production >/dev/null; then
+            git push origin "$SHA:refs/heads/production"
+          elif git merge-base --is-ancestor origin/production "$SHA"; then
+            git push origin "$SHA:refs/heads/production"
+          elif [ "$ROLLBACK" = "true" ]; then
+            git push --force-with-lease=production:origin/production origin "$SHA:refs/heads/production"
+          else
+            echo "::error::production is not behind $SHA. To go back to an older version, tick \"rollback\"."
+            exit 1
+          fi
+          echo "production is now at $(git rev-parse --short "$SHA")" >> "$GITHUB_STEP_SUMMARY"

@@ -18,6 +18,7 @@ import { Route as DelmanAhmedMustafaRouteImport } from './routes/delman-ahmed-mu
 import { Route as InfosPratiquesRouteImport } from './routes/infos-pratiques'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as MoeineKhalifehRouteImport } from './routes/moeine-khalifeh'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SoinsRouteImport } from './routes/soins'
@@ -69,6 +70,11 @@ const MoeineKhalifehRoute = MoeineKhalifehRouteImport.update({
   path: '/moeine-khalifeh',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/infos-pratiques': typeof InfosPratiquesRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/moeine-khalifeh': typeof MoeineKhalifehRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/soins': typeof SoinsRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/infos-pratiques': typeof InfosPratiquesRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/moeine-khalifeh': typeof MoeineKhalifehRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/soins': typeof SoinsRoute
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/infos-pratiques': typeof InfosPratiquesRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/moeine-khalifeh': typeof MoeineKhalifehRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/soins': typeof SoinsRoute
@@ -156,6 +165,7 @@ export interface FileRouteTypes {
     | '/infos-pratiques'
     | '/mentions-legales'
     | '/moeine-khalifeh'
+    | '/robots.txt'
     | '/services'
     | '/sitemap.xml'
     | '/soins'
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/infos-pratiques'
     | '/mentions-legales'
     | '/moeine-khalifeh'
+    | '/robots.txt'
     | '/services'
     | '/sitemap.xml'
     | '/soins'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/infos-pratiques'
     | '/mentions-legales'
     | '/moeine-khalifeh'
+    | '/robots.txt'
     | '/services'
     | '/sitemap.xml'
     | '/soins'
@@ -205,6 +217,7 @@ export interface RootRouteChildren {
   InfosPratiquesRoute: typeof InfosPratiquesRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   MoeineKhalifehRoute: typeof MoeineKhalifehRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SoinsRoute: typeof SoinsRoute
@@ -277,6 +290,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MoeineKhalifehRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services': {
       id: '/services'
       path: '/services'
@@ -325,6 +345,7 @@ const rootRouteChildren: RootRouteChildren = {
   InfosPratiquesRoute: InfosPratiquesRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
   MoeineKhalifehRoute: MoeineKhalifehRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SoinsRoute: SoinsRoute,

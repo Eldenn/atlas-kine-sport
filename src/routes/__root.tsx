@@ -14,6 +14,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { practice, legalLinks, nav, practitioners, SITE_URL } from '@/content/practice'
 import { CoreloomI18nProvider } from '@/lib/i18n'
 import { AppLink, CoreloomLinkProvider } from '@/lib/link'
+import { isStaging } from '@/lib/site-env'
 import montserratWoff2 from '@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2?url'
 import marcellusWoff2 from '@fontsource/marcellus/files/marcellus-latin-400-normal.woff2?url'
 import appCss from '@/styles/globals.css?url'
@@ -25,6 +26,8 @@ export const Route = createRootRoute({
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { name: 'theme-color', content: '#121a26' },
       { property: 'og:site_name', content: practice.name },
+      // The staging app must never show up in search results.
+      ...(isStaging ? [{ name: 'robots', content: 'noindex, nofollow' }] : []),
     ],
     links: [
       { rel: 'stylesheet', href: appCss },
@@ -145,6 +148,11 @@ function Layout() {
           <Footer />
           <Toaster />
           <Intro />
+          {isStaging && (
+            <p className="pointer-events-none fixed bottom-3 left-3 z-50 m-0 rounded-md bg-primary px-2.5 py-1 text-[12px] font-medium text-primary-foreground">
+              Préproduction
+            </p>
+          )}
         </TooltipProvider>
       </CoreloomLinkProvider>
     </CoreloomI18nProvider>

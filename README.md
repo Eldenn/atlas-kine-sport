@@ -47,26 +47,9 @@ Installed files are ours: review the diff before committing.
 
 ## Deploying on Hostinger
 
-"Unlimited Web Hosting" plan, Node.js application connected to this GitHub repository (every push to the selected branch redeploys).
+Two Node.js apps on the "Unlimited Web Hosting" plan: **staging** (`staging.atlas-kine-sport.fr`, deploys every merge into `main`, never indexed) and **production** (`atlas-kine-sport.fr`, deploys the `production` branch, moved by the _Promote to production_ GitHub Action). Settings, environment variables, release and rollback: [`docs/deployment.md`](docs/deployment.md).
 
-| hPanel setting   | Value              |
-| ---------------- | ------------------ |
-| Application type | Nitro              |
-| Node version     | 22                 |
-| Package manager  | pnpm               |
-| Build script     | `build`            |
-| Output directory | `.output`          |
-| Entry file       | `server/index.mjs` |
-
-Environment variables, set in hPanel (never in the code, never prefixed with `VITE_`):
-
-| Variable                   | Value                                                                                  |
-| -------------------------- | -------------------------------------------------------------------------------------- |
-| `HOSTINGER_MAIL_API_TOKEN` | Mail API token (_Emails → Agentic Mail → API access_)                                  |
-| `HOSTINGER_MAILBOX_ID`     | ID of the sending mailbox (returned by `GET https://api.mail.hostinger.com/api/v1/me`) |
-| `CONTACT_TO`               | Address(es) that receive the contact form's messages, separated by commas              |
-
-Without these variables, `pnpm dev` prints the message in the terminal instead of sending it; in production, the form says sending is unavailable and points to the phone number.
+Without the mail variables, `pnpm dev` prints the contact message in the terminal instead of sending it; in production, the form says sending is unavailable and points to the phone number.
 
 ## Content rules
 
