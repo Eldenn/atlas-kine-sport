@@ -178,7 +178,7 @@ importers:
       '@fontsource-variable/space-grotesk':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource/cormorant-garamond':
+      '@fontsource/cinzel':
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource/marcellus':
@@ -354,8 +354,8 @@ packages:
   '@fontsource-variable/space-grotesk@5.3.0':
     resolution: {integrity: sha512-2IxmvfB08i9vnGB3Ym/AXvhRE+8XOjWMXIyDum03c+tPwH0FUoMNQfGpU8NXPxjbws0Vvss3AH0Zqt4oJBBAdw==}
 
-  '@fontsource/cormorant-garamond@5.3.0':
-    resolution: {integrity: sha512-weuGsCirGVWBWqpt6YUp0yLThTe4G8YO45noq8wxeJCRvEpq5lFrxNMFSTxcyOyV5k5otzJ8guDzYegdYlcLMQ==}
+  '@fontsource/cinzel@5.3.0':
+    resolution: {integrity: sha512-KEOYTsrRppW0uRIPWBDPrQgunCS6f8u4nzZxYRBfo9SCknKojLYjK7B0ZoVmJhyVLefz271ZQRF9EOpHZlfhRw==}
 
   '@fontsource/marcellus@5.3.0':
     resolution: {integrity: sha512-cMnanjpiPIC7Rq4GXIA/Zal5WLSoDV5Mc681tMkWsWfKHXnRnLGlhuGeBnLF6HrqtFkiSdiuy4NCSPfOrz266w==}
@@ -2298,7 +2298,7 @@ snapshots:
 
   '@fontsource-variable/space-grotesk@5.3.0': {}
 
-  '@fontsource/cormorant-garamond@5.3.0': {}
+  '@fontsource/cinzel@5.3.0': {}
 
   '@fontsource/marcellus@5.3.0': {}
 

@@ -1,10 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { PageIntro } from '@/components/atlas/page-intro'
-import { PractitionerCard } from '@/components/practitioner-card'
-import { Button } from '@/components/ui/button'
+import { PractitionerFeature } from '@/components/atlas/practitioner-feature'
 import { practitioners } from '@/content/cabinet'
-import { AppLink } from '@/lib/link'
 import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/equipe/')({
@@ -23,39 +21,24 @@ function Equipe() {
       <PageIntro eyebrow="L’équipe" title="Deux kinésithérapeutes du sport">
         <p>Chacun a son agenda Doctolib : choisissez selon vos besoins ou vos disponibilités.</p>
       </PageIntro>
-      {/* One card per row, portrait beside the text: the portraits stay near their native size. */}
-      <section className="mx-auto box-content flex max-w-[1120px] flex-col gap-6 px-5 pb-20 md:px-7">
-        {practitioners.map((p) => (
-          <PractitionerCard
-            key={p.slug}
-            name={p.name}
-            profession={p.profession}
-            photo={<img src={p.photo} alt="" width={480} height={600} loading="lazy" />}
-            specialties={p.areas}
-            bio={p.bio}
-            facts={[
-              { label: 'RPPS', value: p.rpps },
-              { label: 'Conventionnement', value: p.convention },
-            ]}
-            headingLevel={2}
-            orientation="horizontal"
-            actions={
-              <>
-                <Button asChild>
-                  <a href={p.doctolib} target="_blank" rel="noopener noreferrer">
-                    Prendre rendez-vous
-                    <span className="sr-only"> avec {p.name} sur Doctolib (nouvel onglet)</span>
-                  </a>
-                </Button>
-                <Button asChild variant="ghost">
-                  <AppLink href={`/equipe/${p.slug}`}>
-                    Fiche complète<span className="sr-only"> de {p.name}</span>
-                  </AppLink>
-                </Button>
-              </>
-            }
-          />
-        ))}
+      {/* On bone, like the home page: the studio portraits sit on a light ground. */}
+      <section
+        data-theme="light"
+        data-surface="bone"
+        data-accent="atlas"
+        aria-label="Les kinésithérapeutes"
+        className="bg-background py-16 text-foreground md:py-24"
+      >
+        <div className="mx-auto box-content grid max-w-[1120px] gap-16 px-5 sm:grid-cols-2 sm:gap-10 md:px-7 lg:gap-16">
+          {practitioners.map((p) => (
+            <PractitionerFeature
+              key={p.slug}
+              practitioner={p}
+              headingLevel={2}
+              bio={<p className="m-0">{p.bio}</p>}
+            />
+          ))}
+        </div>
       </section>
     </>
   )

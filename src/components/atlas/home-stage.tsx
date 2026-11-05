@@ -20,6 +20,7 @@ import * as React from 'react'
 
 import { AtlasFigure } from '@/components/atlas/atlas-figure'
 import { Button } from '@/components/ui/button'
+import { cabinet } from '@/content/cabinet'
 import { AppLink } from '@/lib/link'
 
 const beats = [
@@ -181,13 +182,16 @@ export function HomeStage() {
               </div>
             ))}
           </div>
-          <div className="atlas-stage__rise mt-6 flex flex-wrap gap-3 lg:mt-8 [&>*]:max-lg:h-10 [&>*]:max-lg:px-4">
-            <Button asChild size="lg">
-              <AppLink href="/contact">Prendre rendez-vous</AppLink>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="atlas-stage__secondary">
-              <AppLink href="/cabinet">Découvrir le cabinet</AppLink>
-            </Button>
+          <div className="atlas-stage__rise mt-6 lg:mt-8">
+            <div className="flex flex-wrap items-center gap-x-7 gap-y-3 [&>[data-slot=button]]:max-lg:h-10 [&>[data-slot=button]]:max-lg:px-4">
+              <Button asChild size="lg">
+                <AppLink href="/contact">Prendre rendez-vous</AppLink>
+              </Button>
+              <AppLink href="/cabinet" className="atlas-link atlas-stage__secondary">
+                Découvrir le cabinet
+              </AppLink>
+            </div>
+            <p className="atlas-stage__facts">{cabinet.facts.join(' · ')}</p>
           </div>
         </div>
       </div>

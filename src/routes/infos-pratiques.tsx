@@ -2,17 +2,15 @@ import { createFileRoute } from '@tanstack/react-router'
 import { AccessibilityIcon, CheckIcon, InfoIcon } from 'lucide-react'
 import type * as React from 'react'
 
-import { DoctolibButtons } from '@/components/atlas/doctolib-buttons'
+import { BookingBand } from '@/components/atlas/booking-band'
 import { PageIntro } from '@/components/atlas/page-intro'
 import { ContactDetails, OpeningHours } from '@/components/contact-section'
-import { CtaSection } from '@/components/cta-section'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { cabinet, type Practitioner, practitioners } from '@/content/cabinet'
 import { byCategory, type Tarif, tarifsDelman, tarifsMoeine } from '@/content/tarifs'
@@ -48,19 +46,16 @@ const tarifs: Record<string, Tarif[]> = {
 
 function SectionHeading({
   id,
-  index,
   title,
   children,
 }: {
   id: string
-  index: number
   title: string
   children?: React.ReactNode
 }) {
   return (
     <div>
-      <p className="atlas-eyebrow m-0 text-primary-text">{String(index + 1).padStart(2, '0')}</p>
-      <h2 id={id} className="mt-3 mb-0 font-display text-[clamp(28px,3.2vw,36px)] leading-[1.15]">
+      <h2 id={id} className="m-0 font-display text-[clamp(28px,3.2vw,36px)] leading-[1.15]">
         {title}
       </h2>
       {!!children && (
@@ -79,15 +74,12 @@ function PageNav() {
       className="border-y border-border-subtle bg-background/85 backdrop-blur-md md:sticky md:top-16 md:z-10"
     >
       <ul className={`${container} m-0 flex list-none flex-wrap gap-x-6 gap-y-2 py-3.5`}>
-        {sections.map((s, i) => (
+        {sections.map((s) => (
           <li key={s.id}>
             <a
               href={`#${s.id}`}
               className="inline-flex items-baseline gap-2 rounded-xs text-[14px] text-fg-secondary underline-offset-4 outline-none hover:text-foreground hover:underline focus-visible:ring-[3px] focus-visible:ring-ring"
             >
-              <span aria-hidden className="font-mono text-[11px] text-primary-text">
-                {String(i + 1).padStart(2, '0')}
-              </span>
               {s.label}
             </a>
           </li>
@@ -102,7 +94,7 @@ function VenirAuCabinet() {
     <section id="venir" aria-labelledby="venir-titre" className={`${anchorOffset} py-16 md:py-24`}>
       <div className={`${container} grid gap-12 lg:grid-cols-2 lg:gap-16`}>
         <div className="flex flex-col gap-10">
-          <SectionHeading id="venir-titre" index={0} title={sections[0].label}>
+          <SectionHeading id="venir-titre" title={sections[0].label}>
             <p className="m-0">
               Le cabinet reçoit sur rendez-vous, du lundi au vendredi, à Chasseneuil-du-Poitou.
             </p>
@@ -142,15 +134,7 @@ function PractitionerPayment({ p }: { p: Practitioner }) {
     ['Conventionnement', p.convention],
     [
       'Paiement accepté',
-      <ul key="pay" className="m-0 flex list-none flex-wrap gap-2 p-0">
-        {p.paymentMethods.map((m) => (
-          <li key={m}>
-            <Badge variant="outline" className="font-sans text-[12.5px] tracking-normal">
-              {m}
-            </Badge>
-          </li>
-        ))}
-      </ul>,
+      p.paymentMethods.map((m, i) => (i === 0 ? m : m.toLowerCase())).join(', '),
     ],
   ]
   return (
@@ -197,7 +181,7 @@ function Remboursement() {
       >
         <div className={`${container} grid gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]`}>
           <div className="flex flex-col gap-8">
-            <SectionHeading id="remboursement-titre" index={1} title={sections[1].label}>
+            <SectionHeading id="remboursement-titre" title={sections[1].label}>
               <p className="m-0">
                 Les deux kinésithérapeutes sont conventionnés. Les séances prescrites par un médecin
                 sont facturées au tarif de la Sécurité sociale, sans dépassement d’honoraires, avec
@@ -259,7 +243,7 @@ function PremiereSeance() {
       className={`${anchorOffset} py-16 md:py-24`}
     >
       <div className={`${container} grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]`}>
-        <SectionHeading id="premiere-seance-titre" index={2} title={sections[2].label}>
+        <SectionHeading id="premiere-seance-titre" title={sections[2].label}>
           <p className="m-0">Ce qu’il faut savoir avant de venir.</p>
         </SectionHeading>
         <Accordion type="single" collapsible defaultValue="q-0">
@@ -326,7 +310,7 @@ function Tarifs() {
       className={`${anchorOffset} atlas-divide py-16 md:py-24`}
     >
       <div className={`${container} flex flex-col gap-12`}>
-        <SectionHeading id="tarifs-titre" index={3} title={sections[3].label}>
+        <SectionHeading id="tarifs-titre" title={sections[3].label}>
           <p className="m-0">
             Préparation physique, coaching et massages hors prescription ne sont pas pris en charge
             par l’Assurance maladie. Tarifs indicatifs, à confirmer avec le praticien.
@@ -356,12 +340,9 @@ function InfosPratiques() {
       <Remboursement />
       <PremiereSeance />
       <Tarifs />
-      <CtaSection
-        className="pt-4"
-        title={<span className="font-display">Prendre rendez-vous</span>}
-        description="Chaque kinésithérapeute gère son agenda sur Doctolib."
-        actions={<DoctolibButtons />}
-      />
+      <BookingBand>
+        <p className="m-0">Chaque kinésithérapeute gère son agenda sur Doctolib.</p>
+      </BookingBand>
     </>
   )
 }
