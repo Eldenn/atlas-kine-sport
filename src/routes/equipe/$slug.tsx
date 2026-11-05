@@ -10,7 +10,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { Button } from '@/components/ui/button'
-import { practitioners } from '@/content/cabinet'
+import { practitioners } from '@/content/practice'
 import { AppLink } from '@/lib/link'
 import { seo } from '@/lib/seo'
 
@@ -29,10 +29,10 @@ export const Route = createFileRoute('/equipe/$slug')({
           description: `${loaderData.name}, kinésithérapeute du sport à Chasseneuil-du-Poitou : ${loaderData.areas.slice(1, 4).join(', ').toLowerCase()}. Rendez-vous sur Doctolib.`,
         })
       : {},
-  component: Fiche,
+  component: PractitionerPage,
 })
 
-function Fiche() {
+function PractitionerPage() {
   const p = Route.useLoaderData()
   return (
     <>

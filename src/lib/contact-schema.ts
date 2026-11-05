@@ -2,10 +2,10 @@ import { z } from 'zod'
 
 /** What a visitor can write about. Booking is not here: it goes through Doctolib. */
 export const contactTopics = {
-  soins: 'Une question sur les soins',
-  sportifs: 'Un club, une équipe, un suivi de sportifs',
-  pratique: 'Infos pratiques (accès, horaires, paiement)',
-  autre: 'Autre chose',
+  care: 'Une question sur les soins',
+  athletes: 'Un club, une équipe, un suivi de sportifs',
+  practical: 'Infos pratiques (accès, horaires, paiement)',
+  other: 'Autre chose',
 } as const
 
 export type ContactTopic = keyof typeof contactTopics

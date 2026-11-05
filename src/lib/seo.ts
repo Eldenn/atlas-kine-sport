@@ -1,4 +1,4 @@
-import { SITE_URL } from '@/content/cabinet'
+import { SITE_URL } from '@/content/practice'
 
 /** The image shown when a page is shared (messaging apps, social networks): 1200 × 630. */
 const OG_IMAGE = {

@@ -12,8 +12,8 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Card } from '@/components/ui/card'
-import { cabinet, type Practitioner, practitioners } from '@/content/cabinet'
-import { byCategory, type Tarif, tarifsDelman, tarifsMoeine } from '@/content/tarifs'
+import { practice, type Practitioner, practitioners } from '@/content/practice'
+import { byCategory, type Fee, delmanFees, moeineFees } from '@/content/fees'
 import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/infos-pratiques')({
@@ -24,7 +24,7 @@ export const Route = createFileRoute('/infos-pratiques')({
       description:
         'Horaires, accès, conventionnement, moyens de paiement et tarifs des prestations non remboursées du cabinet Atlas Kiné Sport.',
     }),
-  component: InfosPratiques,
+  component: PracticalInfoPage,
 })
 
 const sections = [
@@ -39,9 +39,9 @@ const container = 'mx-auto box-content max-w-[1120px] px-5 md:px-7'
 // Room for the sticky site header (64 px) and the page's own nav under it.
 const anchorOffset = 'scroll-mt-20 md:scroll-mt-32'
 
-const tarifs: Record<string, Tarif[]> = {
-  'delman-ahmed-mustafa': tarifsDelman,
-  'moeine-khalifeh': tarifsMoeine,
+const feesBySlug: Record<string, Fee[]> = {
+  'delman-ahmed-mustafa': delmanFees,
+  'moeine-khalifeh': moeineFees,
 }
 
 function SectionHeading({
@@ -89,12 +89,12 @@ function PageNav() {
   )
 }
 
-function VenirAuCabinet() {
+function GettingHere() {
   return (
-    <section id="venir" aria-labelledby="venir-titre" className={`${anchorOffset} py-16 md:py-24`}>
+    <section id="venir" aria-labelledby="venir-title" className={`${anchorOffset} py-16 md:py-24`}>
       <div className={`${container} grid gap-12 lg:grid-cols-2 lg:gap-16`}>
         <div className="flex flex-col gap-10">
-          <SectionHeading id="venir-titre" title={sections[0].label}>
+          <SectionHeading id="venir-title" title={sections[0].label}>
             <p className="m-0">
               Le cabinet reçoit sur rendez-vous, du lundi au vendredi, à Chasseneuil-du-Poitou.
             </p>
@@ -102,19 +102,19 @@ function VenirAuCabinet() {
           <ContactDetails
             address={
               <>
-                {cabinet.address.street}
+                {practice.address.street}
                 <br />
-                {cabinet.address.postalCode} {cabinet.address.city}
+                {practice.address.postalCode} {practice.address.city}
               </>
             }
-            directionsHref={cabinet.directionsHref}
-            phone={cabinet.phone}
+            directionsHref={practice.directionsHref}
+            phone={practice.phone}
             items={[
               {
                 icon: <AccessibilityIcon />,
                 label: 'Accès et accessibilité',
                 value:
-                  cabinet.access ??
+                  practice.access ??
                   'Une question sur l’accès, le stationnement ou une mobilité réduite ? Appelez le cabinet, on vous explique.',
               },
             ]}
@@ -122,7 +122,7 @@ function VenirAuCabinet() {
         </div>
         <Card className="gap-5 self-start px-6 py-6 md:px-8 md:py-7">
           <h3 className="m-0 font-display text-[22px]">Horaires</h3>
-          <OpeningHours hours={cabinet.hours} className="text-[15px]" />
+          <OpeningHours hours={practice.hours} className="text-[15px]" />
         </Card>
       </div>
     </section>
@@ -161,7 +161,7 @@ function PractitionerPayment({ p }: { p: Practitioner }) {
   )
 }
 
-function Remboursement() {
+function CoverageAndPayment() {
   const bring = [
     'L’ordonnance de votre médecin',
     'Votre carte Vitale à jour',
@@ -176,12 +176,12 @@ function Remboursement() {
     >
       <section
         id="remboursement"
-        aria-labelledby="remboursement-titre"
+        aria-labelledby="remboursement-title"
         className={`${anchorOffset} py-16 md:py-24`}
       >
         <div className={`${container} grid gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]`}>
           <div className="flex flex-col gap-8">
-            <SectionHeading id="remboursement-titre" title={sections[1].label}>
+            <SectionHeading id="remboursement-title" title={sections[1].label}>
               <p className="m-0">
                 Les deux kinésithérapeutes sont conventionnés. Les séances prescrites par un médecin
                 sont facturées au tarif de la Sécurité sociale, sans dépassement d’honoraires, avec
@@ -213,7 +213,7 @@ function Remboursement() {
   )
 }
 
-function PremiereSeance() {
+function FirstSession() {
   // TODO(Matthieu): the cancellation rule (notice period) to add to the second answer.
   const items = [
     {
@@ -223,7 +223,7 @@ function PremiereSeance() {
     },
     {
       question: 'Comment déplacer ou annuler un rendez-vous ?',
-      answer: `Depuis votre espace Doctolib, ou en appelant le cabinet au ${cabinet.phone}. Prévenez le plus tôt possible : le créneau pourra être proposé à un autre patient.`,
+      answer: `Depuis votre espace Doctolib, ou en appelant le cabinet au ${practice.phone}. Prévenez le plus tôt possible : le créneau pourra être proposé à un autre patient.`,
     },
     {
       question: 'Comment se passe la première séance ?',
@@ -239,11 +239,11 @@ function PremiereSeance() {
   return (
     <section
       id="premiere-seance"
-      aria-labelledby="premiere-seance-titre"
+      aria-labelledby="premiere-seance-title"
       className={`${anchorOffset} py-16 md:py-24`}
     >
       <div className={`${container} grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]`}>
-        <SectionHeading id="premiere-seance-titre" title={sections[2].label}>
+        <SectionHeading id="premiere-seance-title" title={sections[2].label}>
           <p className="m-0">Ce qu’il faut savoir avant de venir.</p>
         </SectionHeading>
         <Accordion type="single" collapsible defaultValue="q-0">
@@ -261,9 +261,9 @@ function PremiereSeance() {
   )
 }
 
-function TarifGroups({ p }: { p: Practitioner }) {
-  const groups = byCategory(tarifs[p.slug] ?? [])
-  const titleId = `tarifs-${p.slug}`
+function PractitionerFees({ p }: { p: Practitioner }) {
+  const groups = byCategory(feesBySlug[p.slug] ?? [])
+  const titleId = `fees-${p.slug}`
   return (
     <div
       aria-labelledby={titleId}
@@ -302,15 +302,15 @@ function TarifGroups({ p }: { p: Practitioner }) {
   )
 }
 
-function Tarifs() {
+function Fees() {
   return (
     <section
       id="tarifs"
-      aria-labelledby="tarifs-titre"
+      aria-labelledby="tarifs-title"
       className={`${anchorOffset} atlas-divide py-16 md:py-24`}
     >
       <div className={`${container} flex flex-col gap-12`}>
-        <SectionHeading id="tarifs-titre" title={sections[3].label}>
+        <SectionHeading id="tarifs-title" title={sections[3].label}>
           <p className="m-0">
             Préparation physique, coaching et massages hors prescription ne sont pas pris en charge
             par l’Assurance maladie. Tarifs indicatifs, à confirmer avec le praticien.
@@ -318,7 +318,7 @@ function Tarifs() {
         </SectionHeading>
         <div className="flex flex-col gap-12">
           {practitioners.map((p) => (
-            <TarifGroups key={p.slug} p={p} />
+            <PractitionerFees key={p.slug} p={p} />
           ))}
         </div>
       </div>
@@ -326,7 +326,7 @@ function Tarifs() {
   )
 }
 
-function InfosPratiques() {
+function PracticalInfoPage() {
   return (
     <>
       <PageIntro eyebrow="Infos pratiques" title="Horaires, accès et tarifs">
@@ -336,10 +336,10 @@ function InfosPratiques() {
         </p>
       </PageIntro>
       <PageNav />
-      <VenirAuCabinet />
-      <Remboursement />
-      <PremiereSeance />
-      <Tarifs />
+      <GettingHere />
+      <CoverageAndPayment />
+      <FirstSession />
+      <Fees />
       <BookingBand>
         <p className="m-0">Chaque kinésithérapeute gère son agenda sur Doctolib.</p>
       </BookingBand>

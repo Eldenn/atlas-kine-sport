@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { LegalLayout } from '@/components/legal-layout'
-import { cabinet, hebergeur, practitioners, SITE_URL, societe } from '@/content/cabinet'
+import { practice, host, practitioners, SITE_URL, company } from '@/content/practice'
 import { AppLink } from '@/lib/link'
 import { seo } from '@/lib/seo'
 
@@ -13,11 +13,11 @@ export const Route = createFileRoute('/mentions-legales')({
       description:
         'Éditeur, praticiens, hébergeur et propriété intellectuelle du site atlas-kine-sport.fr.',
     }),
-  component: MentionsLegales,
+  component: LegalNoticePage,
 })
 
-function MentionsLegales() {
-  const { address } = cabinet
+function LegalNoticePage() {
+  const { address } = practice
   return (
     <LegalLayout
       title="Mentions légales"
@@ -36,18 +36,18 @@ function MentionsLegales() {
           content: (
             <>
               <p>
-                <strong>{societe.name}</strong>, société civile de moyens (SCM) au capital de{' '}
-                {societe.capital}.
+                <strong>{company.name}</strong>, société civile de moyens (SCM) au capital de{' '}
+                {company.capital}.
                 <br />
                 Siège : {address.street}, {address.postalCode} {address.city}.
                 <br />
-                SIREN {societe.siren} · SIRET {societe.siret} · TVA intracommunautaire {societe.vat}
+                SIREN {company.siren} · SIRET {company.siret} · TVA intracommunautaire {company.vat}
                 .
                 <br />
-                Téléphone : {cabinet.phone}.
+                Téléphone : {practice.phone}.
               </p>
               <p>
-                Directeurs de la publication : {societe.managers.join(' et ')}, associés-gérants.
+                Directeurs de la publication : {company.managers.join(' et ')}, associés-gérants.
               </p>
               <p>
                 La société civile de moyens met en commun les locaux et le matériel. Elle n’exerce
@@ -89,8 +89,7 @@ function MentionsLegales() {
           title: 'Hébergeur',
           content: (
             <p>
-              {hebergeur.name}, {hebergeur.address}. Site :{' '}
-              <a href={hebergeur.website}>hostinger.fr</a>.
+              {host.name}, {host.address}. Site : <a href={host.website}>hostinger.fr</a>.
             </p>
           ),
         },
@@ -100,7 +99,7 @@ function MentionsLegales() {
           content: (
             <p>
               Les textes, photographies, le nom et l’emblème Atlas sont la propriété de{' '}
-              {societe.name} ou de leurs auteurs. Toute reproduction sans autorisation est
+              {company.name} ou de leurs auteurs. Toute reproduction sans autorisation est
               interdite.
             </p>
           ),

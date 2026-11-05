@@ -3,7 +3,7 @@
 // The portrait and the name lead to the full profile. Used on the home page and on L'équipe.
 import { ArrowUpRightIcon } from 'lucide-react'
 
-import type { Practitioner } from '@/content/cabinet'
+import type { Practitioner } from '@/content/practice'
 import { AppLink } from '@/lib/link'
 import { cn } from '@/lib/utils'
 

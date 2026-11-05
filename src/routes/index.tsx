@@ -5,7 +5,7 @@ import { DoctolibButtons } from '@/components/atlas/doctolib-buttons'
 import { HomeStage } from '@/components/atlas/home-stage'
 import { PhotoSlot } from '@/components/atlas/photo-slot'
 import { PractitionerFeature } from '@/components/atlas/practitioner-feature'
-import { cabinet, practitioners } from '@/content/cabinet'
+import { practice, practitioners } from '@/content/practice'
 import { photos } from '@/content/photos'
 import { AppLink } from '@/lib/link'
 import { seo } from '@/lib/seo'
@@ -16,7 +16,7 @@ export const Route = createFileRoute('/')({
     seo({
       path: '/',
       title: 'Atlas Kiné Sport · Kinésithérapie du sport à Chasseneuil-du-Poitou',
-      description: cabinet.description,
+      description: practice.description,
     }),
   component: Home,
 })
@@ -25,7 +25,7 @@ const container = 'mx-auto box-content max-w-[1120px] px-5 md:px-7'
 const bone = { 'data-theme': 'light', 'data-surface': 'bone', 'data-accent': 'atlas' } as const
 
 function Home() {
-  const plateau = photos.plateau
+  const floorPhoto = photos.trainingFloor
   return (
     <>
       <HomeStage />
@@ -33,11 +33,11 @@ function Home() {
       {/* The name, as the moodboard sets it (p. 4): the place where the site says who it is. */}
       <section
         {...bone}
-        aria-labelledby="nom"
+        aria-labelledby="name-title"
         className="bg-background py-20 text-foreground md:py-28"
       >
         <div className={container}>
-          <h2 id="nom" className="atlas-name__word">
+          <h2 id="name-title" className="atlas-name__word">
             ATLAS
           </h2>
           <dl className="atlas-name__pair">
@@ -59,24 +59,24 @@ function Home() {
         </div>
       </section>
 
-      {/* How the work is done and where, in one section. The plateau photo joins it when it exists. */}
-      <section aria-labelledby="approche" className="py-20 md:py-28">
+      {/* How the work is done and where, in one section. The training-floor photo joins it when it exists. */}
+      <section aria-labelledby="approach-title" className="py-20 md:py-28">
         <div
           className={cn(
             container,
             'grid gap-10',
-            plateau
+            floorPhoto
               ? 'md:grid-cols-2 md:items-center md:gap-16'
               : 'lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-20',
           )}
         >
-          {plateau && (
+          {floorPhoto && (
             <div className="aspect-[4/3] overflow-hidden md:order-2">
-              <PhotoSlot photo={plateau} sizes="(min-width: 768px) 50vw, 100vw" />
+              <PhotoSlot photo={floorPhoto} sizes="(min-width: 768px) 50vw, 100vw" />
             </div>
           )}
           <h2
-            id="approche"
+            id="approach-title"
             className="m-0 max-w-[18ch] font-display text-[clamp(32px,4.4vw,52px)] leading-[1.08] text-balance"
           >
             Une rééducation active, sur un plateau conçu comme une salle d’entraînement
@@ -105,11 +105,14 @@ function Home() {
       {/* The team on bone: the studio portraits sit on a light ground, not in dark cards. */}
       <section
         {...bone}
-        aria-labelledby="equipe"
+        aria-labelledby="team-title"
         className="bg-background py-20 text-foreground md:py-28"
       >
         <div className={container}>
-          <h2 id="equipe" className="m-0 font-display text-[clamp(32px,4.4vw,52px)] leading-[1.08]">
+          <h2
+            id="team-title"
+            className="m-0 font-display text-[clamp(32px,4.4vw,52px)] leading-[1.08]"
+          >
             Vos kinésithérapeutes
           </h2>
           <div className="mt-12 grid gap-14 sm:grid-cols-2 sm:gap-10 lg:gap-16">
@@ -120,7 +123,7 @@ function Home() {
         </div>
       </section>
 
-      <section aria-labelledby="venir" className="py-20 md:py-28">
+      <section aria-labelledby="visit-title" className="py-20 md:py-28">
         <div
           className={cn(
             container,
@@ -129,7 +132,7 @@ function Home() {
         >
           <div>
             <h2
-              id="venir"
+              id="visit-title"
               className="m-0 max-w-[16ch] font-display text-[clamp(32px,4.4vw,52px)] leading-[1.08]"
             >
               Votre première séance commence par un bilan
@@ -147,12 +150,12 @@ function Home() {
               <dd className="m-0 grid grid-cols-[20px_1fr] gap-x-4">
                 <MapPinIcon aria-hidden className="mt-1 size-5 text-primary-text" />
                 <span>
-                  {cabinet.address.street}
+                  {practice.address.street}
                   <br />
-                  {cabinet.address.postalCode} {cabinet.address.city}
+                  {practice.address.postalCode} {practice.address.city}
                   <br />
                   <a
-                    href={cabinet.directionsHref}
+                    href={practice.directionsHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="atlas-link mt-2 text-[15px]"
@@ -167,17 +170,17 @@ function Home() {
               <dd className="m-0 grid grid-cols-[20px_1fr] gap-x-4">
                 <PhoneIcon aria-hidden className="mt-1 size-5 text-primary-text" />
                 <a
-                  href={`tel:+33${cabinet.phone.replace(/\s/g, '').slice(1)}`}
+                  href={`tel:+33${practice.phone.replace(/\s/g, '').slice(1)}`}
                   className="atlas-link py-0"
                 >
-                  {cabinet.phone}
+                  {practice.phone}
                 </a>
               </dd>
             </div>
             <div className="border-t border-border-subtle pt-6">
               <dt className="atlas-eyebrow text-primary-text">Horaires</dt>
               <dd className="mt-3 mb-0 text-fg-secondary">
-                {cabinet.hoursText}{' '}
+                {practice.hoursText}{' '}
                 <AppLink href="/infos-pratiques" className="atlas-link py-0 text-[15px]">
                   Infos pratiques
                 </AppLink>

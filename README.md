@@ -1,68 +1,73 @@
 # Atlas Kiné Sport
 
-Site du cabinet de kinésithérapie du sport Atlas, à Chasseneuil-du-Poitou : [atlas-kine-sport.fr](https://atlas-kine-sport.fr).
+Website of Atlas, a sports physiotherapy practice in Chasseneuil-du-Poitou, France: [atlas-kine-sport.fr](https://atlas-kine-sport.fr).
 
-- **Stack** : [TanStack Start](https://tanstack.com/start) (React 19, TanStack Router et Form), Tailwind CSS v4, composants [Coreloom UI](https://github.com/Eldenn/coreloom-ui), Nitro pour le serveur Node.
-- **Rendu** : toutes les pages sont pré-rendues au build (`prerender.crawlLinks`) ; le serveur Node sert les redirections des anciennes adresses, le sitemap et, bientôt, l'envoi du formulaire de contact.
-- **DA** : moodboard du cabinet (bleu minéral `#121A26`, bone `#EBE7E3`, or antique `#B0903D`, Marcellus / Montserrat / Cormorant Garamond). Voir `src/styles/atlas.css`.
+- **Stack**: [TanStack Start](https://tanstack.com/start) (React 19, TanStack Router and Form), Tailwind CSS v4, [Coreloom UI](https://github.com/Eldenn/coreloom-ui) components, Nitro for the Node server.
+- **Rendering**: every page is prerendered at build time (`prerender.crawlLinks`); the Node server handles redirects from the old site's URLs, the sitemap and the contact form.
+- **Art direction**: the practice's moodboard (mineral blue `#121A26`, bone `#EBE7E3`, antique gold `#B0903D`, Marcellus / Montserrat / Cormorant Garamond). See `src/styles/atlas.css`.
+- **Language**: the code, comments, docs and Git history are in English; the site's content is in French. See `AGENTS.md`.
 
-## Développer
+## Development
 
-Les outils sont fixés par [mise](https://mise.jdx.dev) dans `mise.toml` : Node 22 (la version choisie sur Hostinger) et pnpm 12.13.
-
-```bash
-mise install             # Node et pnpm aux bonnes versions
-mise run dev             # http://localhost:3000 (installe les dépendances d'abord)
-mise run check           # avant de pousser : format, types, build
-mise run start           # build de production servi comme sur Hostinger
-mise tasks               # toutes les tâches
-```
-
-`pnpm install` n'installe que des versions publiées depuis au moins 14 jours (`pnpm-workspace.yaml`). Hostinger n'utilise pas mise : il lit `package.json` et `pnpm-lock.yaml`.
-
-## Où est quoi
-
-| Chemin                                  | Contenu                                                                                                                                 |
-| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/content/cabinet.ts`                | Toutes les infos du cabinet : adresse, horaires, praticiens (RPPS, Doctolib), société, hébergeur                                        |
-| `src/content/tarifs.ts`                 | Prestations non remboursées (information, sans mise en avant : code de déontologie)                                                     |
-| `src/routes/`                           | Une page par fichier ; `a-propos`, `services`, `delman-ahmed-mustafa`, `moeine-khalifeh` redirigent (301) les adresses de l'ancien site |
-| `src/components/atlas/`                 | Composants propres au site (logo, en-tête de page, boutons Doctolib, emplacement photo)                                                 |
-| `src/components/`, `src/components/ui/` | Composants Coreloom installés (registre shadcn), listés dans `coreloom.json`                                                            |
-| `src/styles/coreloom/`                  | Styles Coreloom, à ne pas modifier : la DA Atlas se règle dans `atlas.css` et `atlas-accent.css`                                        |
-
-## Mettre à jour Coreloom UI
+Tools are pinned by [mise](https://mise.jdx.dev) in `mise.toml`: Node 22 (the version selected on Hostinger) and pnpm 12.13.
 
 ```bash
-pnpm dlx shadcn@latest add @coreloom/showcase --overwrite   # depuis le registre
-mise run coreloom:sync ../coreloom-ui                      # ou depuis un clone local, pour tous les items de coreloom.json
+mise install             # Node and pnpm at the right versions
+mise run dev             # http://localhost:3000 (installs dependencies first)
+mise run check           # before pushing: format, types, build
+mise run start           # production build, served as on Hostinger
+mise tasks               # every task
 ```
 
-Les fichiers installés nous appartiennent : relire le diff avant de valider.
+`pnpm install` only installs versions published at least 14 days ago (`pnpm-workspace.yaml`). Hostinger does not use mise: it reads `package.json` and `pnpm-lock.yaml`.
 
-## Déployer sur Hostinger
+## Where things are
 
-Hébergement « Unlimited Web Hosting », application Node.js connectée à ce dépôt GitHub (chaque push sur la branche choisie redéploie).
+| Path                                    | Contents                                                                                                                |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `src/content/practice.ts`               | Everything about the practice: address, hours, practitioners (RPPS, Doctolib), company, host                            |
+| `src/content/fees.ts`                   | Services outside reimbursed care (information only, never promoted: code of ethics)                                     |
+| `src/content/photos.ts`                 | Photo slots; the shot list is in `docs/photo-shoot.md`                                                                  |
+| `src/routes/`                           | One page per file; `a-propos`, `services`, `delman-ahmed-mustafa`, `moeine-khalifeh` redirect (301) the old site's URLs |
+| `src/components/atlas/`                 | Site-specific components (logo, page intro, Doctolib buttons, photo slot)                                               |
+| `src/components/`, `src/components/ui/` | Installed Coreloom components (shadcn registry), listed in `coreloom.json`                                              |
+| `src/styles/coreloom/`                  | Coreloom styles, not to be edited: the Atlas look is set in `atlas.css` and `atlas-accent.css`                          |
+| `scripts/`                              | Asset generators (Atlas illustration, background texture) and the Coreloom sync script                                  |
 
-| Réglage hPanel          | Valeur             |
-| ----------------------- | ------------------ |
-| Type d'application      | Nitro              |
-| Version de Node         | 22                 |
-| Gestionnaire de paquets | pnpm               |
-| Script de build         | `build`            |
-| Dossier de sortie       | `.output`          |
-| Fichier d'entrée        | `server/index.mjs` |
+Route file names are the site's French URLs (`/soins`, `/infos-pratiques`); the components inside them have English names.
 
-Variables d'environnement, à définir dans hPanel (jamais dans le code, jamais préfixées `VITE_`) :
+## Updating Coreloom UI
 
-| Variable                   | Valeur                                                                                          |
-| -------------------------- | ----------------------------------------------------------------------------------------------- |
-| `HOSTINGER_MAIL_API_TOKEN` | Jeton de la Mail API (_Emails → Agentic Mail → API access_)                                     |
-| `HOSTINGER_MAILBOX_ID`     | Identifiant de la boîte qui envoie (renvoyé par `GET https://api.mail.hostinger.com/api/v1/me`) |
-| `CONTACT_TO`               | Adresse(s) qui reçoivent les messages du formulaire, séparées par des virgules                  |
+```bash
+pnpm dlx shadcn@latest add @coreloom/showcase --overwrite   # from the registry
+mise run coreloom:sync ../coreloom-ui                      # or from a local clone, for every item in coreloom.json
+```
 
-Sans ces variables, `pnpm dev` affiche le message dans le terminal au lieu de l'envoyer ; en production, le formulaire indique que l'envoi est indisponible et renvoie vers le téléphone.
+Installed files are ours: review the diff before committing.
 
-## Règles de contenu
+## Deploying on Hostinger
 
-Le code de déontologie des masseurs-kinésithérapeutes (R.4321-67 et suivants) s'applique au site : pas de témoignages de patients, pas de comparaison avec d'autres cabinets, pas de promesse non démontrée, pas de marque d'équipement, tarifs présentés comme une information. Les n° RPPS (et d'Ordre, à ajouter) figurent sur les fiches et dans les mentions légales.
+"Unlimited Web Hosting" plan, Node.js application connected to this GitHub repository (every push to the selected branch redeploys).
+
+| hPanel setting   | Value              |
+| ---------------- | ------------------ |
+| Application type | Nitro              |
+| Node version     | 22                 |
+| Package manager  | pnpm               |
+| Build script     | `build`            |
+| Output directory | `.output`          |
+| Entry file       | `server/index.mjs` |
+
+Environment variables, set in hPanel (never in the code, never prefixed with `VITE_`):
+
+| Variable                   | Value                                                                                  |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| `HOSTINGER_MAIL_API_TOKEN` | Mail API token (_Emails → Agentic Mail → API access_)                                  |
+| `HOSTINGER_MAILBOX_ID`     | ID of the sending mailbox (returned by `GET https://api.mail.hostinger.com/api/v1/me`) |
+| `CONTACT_TO`               | Address(es) that receive the contact form's messages, separated by commas              |
+
+Without these variables, `pnpm dev` prints the message in the terminal instead of sending it; in production, the form says sending is unavailable and points to the phone number.
+
+## Content rules
+
+The French code of ethics for physiotherapists (R.4321-67 and following) applies to the site: no patient testimonials, no comparison with other practices, no unproven claims, no equipment brands, and fees presented as information. RPPS numbers (and Ordre numbers, to be added) appear on the practitioner pages and in the legal notice.

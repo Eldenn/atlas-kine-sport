@@ -14,10 +14,10 @@ export const Route = createFileRoute('/soins')({
       description:
         'Kinésithérapie du sport, rééducation de l’épaule, du genou, de la cheville et du rachis, reconditionnement et suivi du sportif.',
     }),
-  component: Soins,
+  component: CarePage,
 })
 
-const soins = [
+const steps = [
   {
     title: 'Évaluer',
     text: 'Le bilan initial mesure la douleur, la mobilité et la force, et part de ce que votre sport ou votre quotidien vous demande. Il fixe les objectifs et les tests qui diront quand passer à l’étape suivante.',
@@ -32,7 +32,7 @@ const soins = [
   },
 ]
 
-function Soins() {
+function CarePage() {
   return (
     <>
       <PageIntro
@@ -41,10 +41,10 @@ function Soins() {
         media={
           <GoldFigure
             className="mx-auto w-full max-w-[420px] md:max-w-none"
-            avif="/images/soins/soins-420.avif 420w, /images/soins/soins-783.avif 783w"
-            webp="/images/soins/soins-420.webp 420w, /images/soins/soins-783.webp 783w"
-            src="/images/soins/soins-783.webp"
-            lines="/images/soins/soins-lines.webp"
+            avif="/images/care/care-420.avif 420w, /images/care/care-783.avif 783w"
+            webp="/images/care/care-420.webp 420w, /images/care/care-783.webp 783w"
+            src="/images/care/care-783.webp"
+            lines="/images/care/care-lines.webp"
             width={783}
             height={652}
             sizes="(min-width: 768px) 46vw, 90vw"
@@ -60,13 +60,13 @@ function Soins() {
       </PageIntro>
       <section className="atlas-divide px-5 py-16 md:px-7">
         <ol className="m-0 mx-auto grid max-w-[1120px] list-none gap-12 p-0">
-          {soins.map((soin, i) => (
-            <li key={soin.title} className="grid gap-4 md:grid-cols-[200px_1fr]">
+          {steps.map((step, i) => (
+            <li key={step.title} className="grid gap-4 md:grid-cols-[200px_1fr]">
               <p className="atlas-eyebrow m-0 text-primary-text">0{i + 1}</p>
               <div>
-                <h2 className="m-0 font-display text-[32px]">{soin.title}</h2>
+                <h2 className="m-0 font-display text-[32px]">{step.title}</h2>
                 <p className="mt-3 mb-0 max-w-[62ch] leading-relaxed text-fg-secondary">
-                  {soin.text}
+                  {step.text}
                 </p>
               </div>
             </li>
