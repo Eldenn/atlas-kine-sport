@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { LegalLayout } from '@/components/legal-layout'
-import { cabinet, hebergeur, societe } from '@/content/cabinet'
+import { practice, host, company } from '@/content/practice'
 import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/confidentialite')({
@@ -12,10 +12,10 @@ export const Route = createFileRoute('/confidentialite')({
       description:
         'Quelles données le site atlas-kine-sport.fr traite, pourquoi, combien de temps, et comment exercer vos droits.',
     }),
-  component: Confidentialite,
+  component: PrivacyPage,
 })
 
-function Confidentialite() {
+function PrivacyPage() {
   return (
     <LegalLayout
       title="Politique de confidentialité"
@@ -33,8 +33,8 @@ function Confidentialite() {
           title: 'Responsable du traitement',
           content: (
             <p>
-              {societe.name}, {cabinet.address.street}, {cabinet.address.postalCode}{' '}
-              {cabinet.address.city}. Téléphone : {cabinet.phone}.
+              {company.name}, {practice.address.street}, {practice.address.postalCode}{' '}
+              {practice.address.city}. Téléphone : {practice.phone}.
             </p>
           ),
         },
@@ -54,7 +54,7 @@ function Confidentialite() {
                 <br />
                 <strong>Durée</strong> : 12 mois après notre dernier échange, puis suppression.
                 <br />
-                <strong>Destinataires</strong> : les praticiens du cabinet, et {hebergeur.name} qui
+                <strong>Destinataires</strong> : les praticiens du cabinet, et {host.name} qui
                 héberge le site et la messagerie.
               </p>
               <p>

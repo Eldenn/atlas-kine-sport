@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { PageIntro } from '@/components/atlas/page-intro'
 import { PractitionerFeature } from '@/components/atlas/practitioner-feature'
-import { practitioners } from '@/content/cabinet'
+import { practitioners } from '@/content/practice'
 import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/equipe/')({
@@ -12,10 +12,10 @@ export const Route = createFileRoute('/equipe/')({
       title: 'L’équipe',
       description: 'Delman Ahmed Mustafa et Moeine Khalifeh, masseurs-kinésithérapeutes du sport.',
     }),
-  component: Equipe,
+  component: TeamPage,
 })
 
-function Equipe() {
+function TeamPage() {
   return (
     <>
       <PageIntro eyebrow="L’équipe" title="Deux kinésithérapeutes du sport">

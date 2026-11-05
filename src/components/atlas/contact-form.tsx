@@ -19,7 +19,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
-import { cabinet } from '@/content/cabinet'
+import { practice } from '@/content/practice'
 import { contactSchema, contactTopics, type ContactResult } from '@/lib/contact-schema'
 import { AppLink } from '@/lib/link'
 import { sendContactMessage } from '@/server/contact'
@@ -153,7 +153,7 @@ export function ContactForm() {
                 <>
                   ou appelez le cabinet au{' '}
                   <a href="tel:+33772508017" className="underline">
-                    {cabinet.phone}
+                    {practice.phone}
                   </a>
                   .
                 </>

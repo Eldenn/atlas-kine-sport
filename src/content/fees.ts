@@ -2,13 +2,13 @@
 // Shown as plain information: the code of ethics forbids promoting them (R.4321-67).
 // The page groups lines by `category`, in the order categories first appear.
 
-export interface Tarif {
+export interface Fee {
   category: string
   label: string
   price: string
 }
 
-export const tarifsDelman: Tarif[] = [
+export const delmanFees: Fee[] = [
   {
     category: 'Préparation physique',
     label: 'Abonnement mensuel, suivi de préparation physique (sur devis)',
@@ -16,7 +16,7 @@ export const tarifsDelman: Tarif[] = [
   },
 ]
 
-export const tarifsMoeine: Tarif[] = [
+export const moeineFees: Fee[] = [
   { category: 'Bilans', label: 'Bilan coaching (1 h)', price: '90 €' },
   {
     category: 'Bilans',
@@ -70,8 +70,8 @@ export const tarifsMoeine: Tarif[] = [
 ]
 
 /** The lines grouped by category, in the order categories first appear. */
-export function byCategory(tarifs: Tarif[]) {
-  const groups = new Map<string, Tarif[]>()
-  for (const t of tarifs) groups.set(t.category, [...(groups.get(t.category) ?? []), t])
+export function byCategory(fees: Fee[]) {
+  const groups = new Map<string, Fee[]>()
+  for (const t of fees) groups.set(t.category, [...(groups.get(t.category) ?? []), t])
   return [...groups].map(([category, items]) => ({ category, items }))
 }

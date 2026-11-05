@@ -2,7 +2,7 @@
 // side. Takes the place of Coreloom's centred CTA card, which reads as a template.
 import { ArrowUpRightIcon } from 'lucide-react'
 
-import { practitioners } from '@/content/cabinet'
+import { practitioners } from '@/content/practice'
 
 export function BookingBand({
   title = 'Prendre rendez-vous',
@@ -16,13 +16,13 @@ export function BookingBand({
       data-theme="light"
       data-surface="bone"
       data-accent="atlas"
-      aria-labelledby="rendez-vous"
+      aria-labelledby="booking-title"
       className="bg-background py-16 text-foreground md:py-24"
     >
       <div className="mx-auto box-content grid max-w-[1120px] gap-10 px-5 md:px-7 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-20">
         <div>
           <h2
-            id="rendez-vous"
+            id="booking-title"
             className="m-0 max-w-[18ch] font-display text-[clamp(30px,4vw,44px)] leading-[1.1]"
           >
             {title}

@@ -4,7 +4,7 @@ import { ContactForm } from '@/components/atlas/contact-form'
 import { DoctolibButtons } from '@/components/atlas/doctolib-buttons'
 import { PageIntro } from '@/components/atlas/page-intro'
 import { ContactDetails, OpeningHours } from '@/components/contact-section'
-import { cabinet } from '@/content/cabinet'
+import { practice } from '@/content/practice'
 import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/contact')({
@@ -49,15 +49,15 @@ function Contact() {
             <ContactDetails
               address={
                 <>
-                  {cabinet.address.street}
+                  {practice.address.street}
                   <br />
-                  {cabinet.address.postalCode} {cabinet.address.city}
+                  {practice.address.postalCode} {practice.address.city}
                 </>
               }
-              directionsHref={cabinet.directionsHref}
-              phone={cabinet.phone}
+              directionsHref={practice.directionsHref}
+              phone={practice.phone}
             />
-            <OpeningHours hours={cabinet.hours} />
+            <OpeningHours hours={practice.hours} />
           </aside>
         </div>
       </section>

@@ -1,17 +1,16 @@
-"""Matière du fond du site : python3 scripts/texture/matiere.py
+"""The site's background texture: python3 scripts/texture/dust.py
 
-Une surface presque lisse, voilée de poussière fine. Deux couches sans raccord, de tailles sans
-rapport simple, superposées en CSS (atlas.css) : leurs motifs ne retombent ensemble qu'au bout de
-plus d'un million de pixels, l'œil ne voit pas de répétition. Pas de brume ni de grandes taches
-claires : seulement des grains et des points.
+An almost smooth surface, veiled with fine dust. Two seamless layers whose sizes share no simple
+ratio, stacked in CSS (atlas.css): their patterns only line up again after more than a million
+pixels, so the eye sees no repetition. No haze and no large light patches: only grains and dots.
 
-  voiles  1400 px  grains regroupés en voiles, nets d'un côté, fondus de l'autre
-  grains   757 px  grains épars, quelques points plus gros, de rares fibres
+  veils   1400 px  grains clustered into veils, sharp on one side, faded on the other
+  grains   757 px  scattered grains, a few larger dots, rare fibres
 
-Chaque couche existe en deux versions (seed fixe, relancer redonne les mêmes images) :
-  -sombre  poussière claire sur noir, fondue en `screen` sur les fonds sombres
-  -claire  poussière sombre sur blanc, fondue en `multiply` sur les bandes bone
-Le noir (screen) et le blanc (multiply) ne changent rien : seule la poussière touche le fond.
+Each layer comes in two versions (fixed seed: running it again gives the same images):
+  -dark   light dust on black, blended with `screen` over the dark backgrounds
+  -light  dark dust on white, blended with `multiply` over the bone bands
+Black (screen) and white (multiply) change nothing: only the dust touches the background.
 """
 import os
 
@@ -32,7 +31,7 @@ def wrap(d, n):
 
 
 def lowfreq(n, px):
-    # bruit périodique lissé : px = taille des variations
+    # smoothed periodic noise: px = size of the variations
     fy = np.fft.fftfreq(n)[:, None]
     fx = np.fft.fftfreq(n)[None, :]
     f = np.hypot(fx, fy)
@@ -40,9 +39,9 @@ def lowfreq(n, px):
     return (w - w.mean()) / w.std()
 
 
-def voiles(n=1400, cells=17):
-    # cellules de Voronoï sur le tore : bords droits, comme des plis ; chaque cellule a sa densité
-    # et s'estompe dans une direction tirée au hasard
+def veils(n=1400, cells=17):
+    # Voronoi cells on the torus: straight edges, like folds; each cell has its own density
+    # and fades out in a random direction
     yy, xx = grid(n)
     seeds = rng.uniform(0, n, (cells, 2))
     dist = np.stack([np.hypot(wrap(xx - sx, n), wrap(yy - sy, n)) for sx, sy in seeds])
@@ -55,7 +54,7 @@ def voiles(n=1400, cells=17):
         along = wrap(xx - sx, n) * np.cos(ang) + wrap(yy - sy, n) * np.sin(ang)
         fade = np.clip(0.5 + along / rng.uniform(160, 480), 0, 1) ** rng.uniform(1, 2.5)
         density[m] = (level * fade)[m]
-    # jamais uniforme : trouée par un bruit doux, à deux échelles
+    # never uniform: holed by soft noise, at two scales
     density *= np.clip(1 + 0.6 * lowfreq(n, 60) + 0.3 * lowfreq(n, 15), 0, None)
     dust = np.zeros((n, n))
     hit = rng.random((n, n)) < 0.14 * density
@@ -66,17 +65,17 @@ def voiles(n=1400, cells=17):
 def grains(n=757):
     yy, xx = grid(n)
     dust = np.zeros((n, n))
-    # grains isolés, plus ou moins serrés selon l'endroit
+    # lone grains, denser in some places than others
     p = 0.003 * np.clip(1 + 0.8 * lowfreq(n, 50), 0.1, None)
     hit = rng.random((n, n)) < p
     dust[hit] = rng.uniform(0.1, 0.4, hit.sum())
-    # points plus gros
+    # larger dots
     for _ in range(int(n * n / 18000)):
         cx, cy = rng.uniform(0, n, 2)
         r = rng.uniform(0.5, 1.1)
         d2 = wrap(xx - cx, n) ** 2 + wrap(yy - cy, n) ** 2
         dust = np.maximum(dust, rng.uniform(0.3, 0.7) * np.exp(-d2 / (2 * r**2)))
-    # rares fibres : petites courbes de 6 à 22 px, 1 px d'épaisseur
+    # rare fibres: short curves of 6 to 22 px, 1 px thick
     for _ in range(5):
         x, y = rng.uniform(0, n, 2)
         a = rng.uniform(0, 2 * np.pi)
@@ -93,19 +92,19 @@ def grains(n=757):
 def save(name, dust, amp_dark, amp_light, lossless=True):
     dust = np.clip(dust, 0, 1)
     for suffix, img in (
-        ('sombre', dust * amp_dark),
-        ('claire', 255 - dust * amp_light),
+        ('dark', dust * amp_dark),
+        ('light', 255 - dust * amp_light),
     ):
-        path = f'{OUT}matiere-{name}-{suffix}.webp'
+        path = f'{OUT}dust-{name}-{suffix}.webp'
         im = Image.fromarray(img.round().astype(np.uint8), 'L')
         if lossless:
             im.save(path, 'WEBP', lossless=True, method=6)
         else:
             im.save(path, 'WEBP', quality=80, method=6)
-        print(path, os.path.getsize(path), 'octets')
+        print(path, os.path.getsize(path), 'bytes')
 
 
 os.makedirs(OUT, exist_ok=True)
-# amp = niveau maximal d'un grain : screen sur le bleu minéral, multiply sur le bone
-save('voiles', voiles(), 85, 45)
+# amp = a grain's maximum level: screen over the mineral blue, multiply over the bone
+save('veils', veils(), 85, 45)
 save('grains', grains(), 85, 45)

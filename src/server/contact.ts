@@ -74,11 +74,11 @@ export const sendContactMessage = createServerFn({ method: 'POST' })
     if (!token || !mailbox || !to) {
       if (import.meta.env.DEV) {
         // Local development without credentials: show what would be sent.
-        console.info('[contact] Hostinger non configuré, message non envoyé :\n', email)
+        console.info('[contact] Hostinger not configured, message not sent:\n', email)
         return { ok: true }
       }
       console.error(
-        '[contact] HOSTINGER_MAIL_API_TOKEN, HOSTINGER_MAILBOX_ID ou CONTACT_TO manquant',
+        '[contact] HOSTINGER_MAIL_API_TOKEN, HOSTINGER_MAILBOX_ID or CONTACT_TO missing',
       )
       return { ok: false, reason: 'unavailable' }
     }
@@ -107,7 +107,7 @@ export const sendContactMessage = createServerFn({ method: 'POST' })
       console.error('[contact] Hostinger Mail API', response.status, await response.text())
       return { ok: false, reason: 'failed' }
     } catch (error) {
-      console.error('[contact] Hostinger Mail API injoignable', error)
+      console.error('[contact] Hostinger Mail API unreachable', error)
       return { ok: false, reason: 'failed' }
     }
   })

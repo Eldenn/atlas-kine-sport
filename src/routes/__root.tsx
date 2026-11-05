@@ -11,7 +11,7 @@ import { SiteHeader } from '@/components/site-header'
 import { Button } from '@/components/ui/button'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { cabinet, legalLinks, nav, practitioners, SITE_URL } from '@/content/cabinet'
+import { practice, legalLinks, nav, practitioners, SITE_URL } from '@/content/practice'
 import { CoreloomI18nProvider } from '@/lib/i18n'
 import { AppLink, CoreloomLinkProvider } from '@/lib/link'
 import montserratWoff2 from '@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2?url'
@@ -24,7 +24,7 @@ export const Route = createRootRoute({
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { name: 'theme-color', content: '#121a26' },
-      { property: 'og:site_name', content: cabinet.name },
+      { property: 'og:site_name', content: practice.name },
     ],
     links: [
       { rel: 'stylesheet', href: appCss },
@@ -60,19 +60,19 @@ export const Route = createRootRoute({
 const structuredData = {
   '@context': 'https://schema.org',
   '@type': 'Physiotherapy',
-  name: cabinet.name,
-  description: cabinet.description,
+  name: practice.name,
+  description: practice.description,
   url: SITE_URL,
   image: `${SITE_URL}/og-image.jpg`,
   logo: `${SITE_URL}/images/emblem-bone.png`,
-  hasMap: cabinet.directionsHref,
+  hasMap: practice.directionsHref,
   medicalSpecialty: 'PhysicalTherapy',
   telephone: '+33772508017',
   address: {
     '@type': 'PostalAddress',
-    streetAddress: cabinet.address.street,
-    postalCode: cabinet.address.postalCode,
-    addressLocality: cabinet.address.city,
+    streetAddress: practice.address.street,
+    postalCode: practice.address.postalCode,
+    addressLocality: practice.address.city,
     addressCountry: 'FR',
   },
   openingHoursSpecification: [
@@ -152,7 +152,7 @@ function Layout() {
 }
 
 function Footer() {
-  const { address } = cabinet
+  const { address } = practice
   return (
     <SiteFooter
       brand={
@@ -174,7 +174,7 @@ function Footer() {
               {address.postalCode} {address.city}
               <br />
               <a href="tel:+33772508017" className="hover:text-foreground">
-                {cabinet.phone}
+                {practice.phone}
               </a>
             </address>
           ),
@@ -189,7 +189,7 @@ function Footer() {
           ),
         },
       ]}
-      note={`© ${new Date().getFullYear()} ${cabinet.name} · Bouger, récupérer, performer`}
+      note={`© ${new Date().getFullYear()} ${practice.name} · Bouger, récupérer, performer`}
       links={[...legalLinks]}
     />
   )

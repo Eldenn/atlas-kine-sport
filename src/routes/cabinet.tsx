@@ -17,11 +17,11 @@ export const Route = createFileRoute('/cabinet')({
       description:
         'Une rééducation active : vous travaillez avec le kiné, sur un plateau technique conçu comme une salle d’entraînement.',
     }),
-  component: Cabinet,
+  component: PracticePage,
 })
 
 // The scene's markers (% of the picture) and the legend they key to, left to right.
-const plateau = [
+const floorZones = [
   {
     x: 14,
     y: 30,
@@ -52,10 +52,10 @@ const container = 'mx-auto box-content max-w-[1120px] px-5 md:px-7'
 /** The frame of a photo, as in Coreloom's MediaSection. */
 const photoFrame = 'overflow-hidden bg-inset'
 
-function Cabinet() {
+function PracticePage() {
   return (
     <>
-      {/* Unlike the other pages: a centred opening over the whole plateau, drawn as one wide scene
+      {/* Unlike the other pages: a centred opening over the whole training floor, drawn as one wide scene
           with its legend, instead of an intro and media sections. */}
       <header className={`${container} pt-20 pb-10 text-center md:pt-28 md:pb-14`}>
         <p className="atlas-eyebrow m-0 text-primary-text">Le cabinet</p>
@@ -68,20 +68,20 @@ function Cabinet() {
         </p>
       </header>
 
-      <section aria-labelledby="plateau-titre" className="gold-scene pb-16 md:pb-24">
+      <section aria-labelledby="floor-title" className="gold-scene pb-16 md:pb-24">
         <div className={container}>
           <GoldFigure
-            avif="/images/cabinet/cabinet-640.avif 640w, /images/cabinet/cabinet-1168.avif 1168w"
-            webp="/images/cabinet/cabinet-640.webp 640w, /images/cabinet/cabinet-1168.webp 1168w"
-            src="/images/cabinet/cabinet-1168.webp"
-            lines="/images/cabinet/cabinet-lines.webp"
+            avif="/images/practice/practice-640.avif 640w, /images/practice/practice-1168.avif 1168w"
+            webp="/images/practice/practice-640.webp 640w, /images/practice/practice-1168.webp 1168w"
+            src="/images/practice/practice-1168.webp"
+            lines="/images/practice/practice-lines.webp"
             width={1168}
             height={722}
             sizes="(min-width: 1176px) 1120px, calc(100vw - 40px)"
             alt="Le plateau technique : une patiente en fente avant, guidée par le kinésithérapeute, entre la zone de charges et la table de soins. Au mur, le médaillon d’Atlas portant le monde."
             rest={{ x: 89, y: 23 }}
           >
-            {plateau.map((zone, i) => (
+            {floorZones.map((zone, i) => (
               <span
                 key={zone.title}
                 aria-hidden
@@ -96,7 +96,7 @@ function Cabinet() {
 
           <div className="mt-12 grid gap-10 border-t border-border-subtle pt-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,2fr)] lg:gap-16">
             <div>
-              <h2 id="plateau-titre" className="m-0 font-display text-[32px] leading-tight">
+              <h2 id="floor-title" className="m-0 font-display text-[32px] leading-tight">
                 Conçu comme une salle d’entraînement
               </h2>
               <p className="mt-4 mb-0 leading-relaxed text-fg-secondary">
@@ -105,7 +105,7 @@ function Cabinet() {
               </p>
             </div>
             <ol className="m-0 grid list-none content-start gap-x-10 gap-y-8 p-0 sm:grid-cols-2">
-              {plateau.map((zone, i) => (
+              {floorZones.map((zone, i) => (
                 <li
                   key={zone.title}
                   data-marker={i + 1}
@@ -122,9 +122,12 @@ function Cabinet() {
               ))}
             </ol>
           </div>
-          {photos.plateauVue && (
+          {photos.trainingFloorWide && (
             <div className={`${photoFrame} mt-12 aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]`}>
-              <PhotoSlot photo={photos.plateauVue} sizes="(min-width: 1176px) 1120px, 100vw" />
+              <PhotoSlot
+                photo={photos.trainingFloorWide}
+                sizes="(min-width: 1176px) 1120px, 100vw"
+              />
             </div>
           )}
         </div>
@@ -132,23 +135,23 @@ function Cabinet() {
 
       <div className="atlas-divide">
         <section
-          aria-labelledby="nom-titre"
+          aria-labelledby="name-title"
           className={cn(
             container,
             'grid gap-10 py-16 md:py-24',
-            photos.embleme &&
+            photos.emblem &&
               'md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:items-center md:gap-16',
           )}
         >
-          {photos.embleme && (
+          {photos.emblem && (
             <div className={`${photoFrame} mx-auto aspect-[4/5] w-full max-w-[460px]`}>
-              <PhotoSlot photo={photos.embleme} sizes="(min-width: 768px) 460px, 100vw" />
+              <PhotoSlot photo={photos.emblem} sizes="(min-width: 768px) 460px, 100vw" />
             </div>
           )}
           <div>
             <p className="atlas-eyebrow m-0 text-primary-text">Pourquoi Atlas</p>
             <h2
-              id="nom-titre"
+              id="name-title"
               className="mt-3 mb-0 max-w-[20ch] font-display text-[clamp(30px,4vw,44px)] leading-tight"
             >
               Le titan et la première vertèbre

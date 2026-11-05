@@ -1,5 +1,5 @@
 // Every fact about the practice in one place: pages, footer, legal notice and structured data read
-// from here. Sources: societe.com (company), the practitioners' Doctolib pages (RPPS, fees,
+// from here. Sources: company.com (company), the practitioners' Doctolib pages (RPPS, fees,
 // payment, areas of practice), the current site (address, phone, hours).
 
 export const SITE_URL = 'https://atlas-kine-sport.fr'
@@ -10,7 +10,7 @@ const weekday = [
   { open: '14:00', close: '19:00' },
 ]
 
-export const cabinet = {
+export const practice = {
   name: 'Atlas Kiné Sport',
   tagline: 'Bouger. Récupérer. Performer.',
   description:
@@ -41,7 +41,7 @@ export const cabinet = {
 } as const
 
 /** The company that publishes the site: a SCM pools the means, each physio practises on their own. */
-export const societe = {
+export const company = {
   name: 'ATLAS KINE SPORT',
   form: 'Société civile de moyens (SCM)',
   capital: '1 000 €',
@@ -51,7 +51,7 @@ export const societe = {
   managers: ['Delman Ahmed Mustafa', 'Moeine Khalifeh'],
 } as const
 
-export const hebergeur = {
+export const host = {
   // TODO(Matthieu): check the entity on the Hostinger invoice (Cyprus or Luxembourg for the EU).
   name: 'Hostinger International Ltd',
   address: '61 Lordou Vironos str., 6023 Larnaca, Chypre',

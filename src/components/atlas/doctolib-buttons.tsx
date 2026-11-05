@@ -2,7 +2,7 @@
 import { ArrowUpRightIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { practitioners } from '@/content/cabinet'
+import { practitioners } from '@/content/practice'
 
 export function DoctolibButtons({ variant = 'default' }: { variant?: 'default' | 'outline' }) {
   return (

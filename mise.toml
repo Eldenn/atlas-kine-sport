@@ -1,42 +1,42 @@
-# Outils et tâches du projet : `mise install` installe Node et pnpm aux versions ci-dessous,
-# `mise run <tâche>` (ou `mise <tâche>`) lance les commandes. https://mise.jdx.dev
-# Node 22 est aussi la version choisie dans hPanel (Hostinger) ; pnpm suit "packageManager".
+# The project's tools and tasks: `mise install` installs Node and pnpm at the versions below,
+# `mise run <task>` (or `mise <task>`) runs the commands. https://mise.jdx.dev
+# Node 22 is also the version selected in hPanel (Hostinger); pnpm follows "packageManager".
 
 [tools]
 node = "22"
 pnpm = "12.13.0"
 
 [tasks.install]
-description = "Installer les dépendances (lockfile figé)"
+description = "Install dependencies (frozen lockfile)"
 run = "pnpm install --frozen-lockfile"
 
 [tasks.dev]
-description = "Serveur de développement sur http://localhost:3000"
+description = "Development server on http://localhost:3000"
 depends = ["install"]
 run = "pnpm dev"
 
 [tasks.build]
-description = "Build de production : pré-rendu des pages + serveur Nitro dans .output/"
+description = "Production build: prerendered pages + Nitro server in .output/"
 depends = ["install"]
 run = "pnpm build"
 
 [tasks.start]
-description = "Lancer le build de production (comme Hostinger)"
+description = "Run the production build (as Hostinger does)"
 depends = ["build"]
 run = "node .output/server/index.mjs"
 
 [tasks.typecheck]
-description = "Vérifier les types"
+description = "Check types"
 run = "pnpm typecheck"
 
 [tasks.format]
-description = "Formater le code"
+description = "Format the code"
 run = "pnpm format"
 
 [tasks.check]
-description = "Tout vérifier avant de pousser : format, types, build"
+description = "Check everything before pushing: format, types, build"
 run = ["pnpm format:check", "pnpm typecheck", "pnpm build"]
 
 [tasks."coreloom:sync"]
-description = "Mettre à jour les composants Coreloom depuis un clone local : mise run coreloom:sync ../coreloom-ui"
+description = "Update the Coreloom components from a local clone: mise run coreloom:sync ../coreloom-ui"
 run = "node scripts/sync-coreloom.mjs"

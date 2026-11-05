@@ -20,7 +20,7 @@ import * as React from 'react'
 
 import { AtlasFigure } from '@/components/atlas/atlas-figure'
 import { Button } from '@/components/ui/button'
-import { cabinet } from '@/content/cabinet'
+import { practice } from '@/content/practice'
 import { AppLink } from '@/lib/link'
 
 const beats = [
@@ -156,7 +156,7 @@ export function HomeStage() {
   return (
     <section
       ref={ref}
-      aria-labelledby="accueil-titre"
+      aria-labelledby="home-title"
       data-live={live || undefined}
       className="atlas-stage"
     >
@@ -171,7 +171,7 @@ export function HomeStage() {
         </div>
 
         <div className="atlas-stage__text">
-          <h1 id="accueil-titre" className="sr-only">
+          <h1 id="home-title" className="sr-only">
             Atlas Kiné Sport, kinésithérapie du sport à Chasseneuil-du-Poitou
           </h1>
           <div className="atlas-stage__beats">
@@ -191,7 +191,7 @@ export function HomeStage() {
                 Découvrir le cabinet
               </AppLink>
             </div>
-            <p className="atlas-stage__facts">{cabinet.facts.join(' · ')}</p>
+            <p className="atlas-stage__facts">{practice.facts.join(' · ')}</p>
           </div>
         </div>
       </div>
