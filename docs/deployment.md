@@ -2,35 +2,43 @@
 
 The site runs as two Node.js apps on the Hostinger "Unlimited Web Hosting" plan (5 Node.js websites included), both built from this repository:
 
-| App        | Domain                          | Deploys from               | `VITE_SITE_ENV` | Indexed |
-| ---------- | ------------------------------- | -------------------------- | --------------- | ------- |
-| Staging    | `staging.atlas-kine-sport.fr`   | `main`, on every merge     | `staging`       | No      |
-| Production | `atlas-kine-sport.fr` (+ `www`) | `production`, on promotion | _(unset)_       | Yes     |
+| App        | Domain                          | Deploys from             | `VITE_SITE_ENV` | Indexed |
+| ---------- | ------------------------------- | ------------------------ | --------------- | ------- |
+| Staging    | `staging.atlas-kine-sport.fr`   | `main`, on every merge   | `staging`       | No      |
+| Production | `atlas-kine-sport.fr` (+ `www`) | `production`, on release | _(unset)_       | Yes     |
 
 ## Flow
 
-> **Production deployment is switched off for now.** The _Promote to production_ workflow is skipped until the repository variable `PRODUCTION_DEPLOY_ENABLED` is set to `true` (Settings → Secrets and variables → Actions → Variables). Until then only staging deploys.
+Releases are managed with [Changesets](https://github.com/changesets/changesets).
+
+> **Production deployment is switched off for now.** Releases are still prepared and tagged, but `production` does not move until the repository variable `PRODUCTION_DEPLOY_ENABLED` is set to `true` (Settings → Secrets and variables → Actions → Variables). Until then only staging deploys.
 
 ```
-feat/… ──PR, squash──▶ main ──auto-deploy──▶ staging
-                         │
-                         └── "Promote to production" (Actions) ──▶ production ──auto-deploy──▶ live site
+feat/… + changeset ──PR, squash──▶ main ──Hostinger──▶ staging
+                                     │
+                                     └─ Release workflow ──▶ PR "chore(release): vX.Y.Z" (chore/release)
+                                                                  │ squash-merge
+                                                                  ▼
+                                         tag vX.Y.Z + GitHub release ──▶ production ──Hostinger──▶ live site
 ```
 
-1. Work on a `type/topic` branch, open a PR, run `mise run check`, squash-merge into `main` (see `AGENTS.md`).
-2. Hostinger rebuilds the staging app. Check the change there (every page, the contact form, mobile).
-3. GitHub → Actions → **Promote to production** → _Run workflow_ with the defaults. The workflow fast-forwards `production` to `main`; Hostinger rebuilds the production app.
-4. Check the live site.
+1. On a `type/topic` branch, describe the change for the changelog: `mise run changeset` (or `pnpm changeset`), pick `patch` (fix, text), `minor` (new page or section) or `major` (redesign), write one line in English. Commit the generated `.changeset/*.md` with the rest. A change with nothing to release (docs, CI) needs no changeset.
+2. Open the PR, run `mise run check`, squash-merge into `main` (see `AGENTS.md`). Hostinger rebuilds staging.
+3. The **Release** workflow opens or updates the release PR `chore(release): vX.Y.Z` on `chore/release`: it bumps `package.json` and writes `CHANGELOG.md` from every changeset merged since the last release. Several feature PRs pile up in the same release PR.
+4. Check staging. When it is right, squash-merge the release PR. The workflow then tags `vX.Y.Z`, publishes a GitHub release and moves `production` to that commit; Hostinger rebuilds the production app.
+5. Check the live site.
 
-Nothing is ever committed to `production` by hand: it only moves through the workflow, and only to commits that are on `main`.
+Nothing is ever committed to `production` by hand: it only moves through the workflows, and only to commits that are on `main`.
+
+Repository setting needed once: Settings → Actions → General → Workflow permissions → tick **Allow GitHub Actions to create and approve pull requests** (the workflow opens the release PR).
 
 ## Rollback
 
-Hostinger keeps only the live build, so a rollback is a new deployment of an older commit:
+Hostinger keeps only the live build, so a rollback is a new deployment of an older release:
 
-1. Find the last good commit on `main` (GitHub commits list, or the production app's **Deployments** page in hPanel, which shows the commit hash of each build).
-2. Actions → **Promote to production** → `ref` = that SHA, tick **rollback**.
-3. Fix the problem on `main` as usual; the next promotion moves `production` forward again.
+1. Pick the last good release under GitHub → Releases (or a commit hash from the production app's **Deployments** page in hPanel).
+2. Actions → **Roll back production** → `ref` = that tag (`v0.2.0`) or SHA → _Run workflow_.
+3. Fix the problem on `main` with a changeset as usual; the next release moves `production` forward again.
 
 A failed build never replaces the live version: Hostinger only switches to a build that succeeded.
 

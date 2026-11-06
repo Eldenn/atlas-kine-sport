@@ -1,0 +1,101 @@
+# Releases with Changesets. On every push to main:
+# - changesets waiting in .changeset/ → (re)build the release PR on `chore/release`: version bump
+#   in package.json + CHANGELOG.md. Nothing goes live.
+# - no changeset left and the version has no tag yet (the release PR was just merged) → tag
+#   v<version>, publish a GitHub release, and move `production` to this commit so Hostinger
+#   deploys it. The last step is off until the repository variable PRODUCTION_DEPLOY_ENABLED is "true".
+# Staging needs nothing here: Hostinger deploys every push to main.
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_BRANCH: chore/release
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: What this push is
+        id: state
+        run: |
+          version=$(node -p "require('./package.json').version")
+          pending=$(find .changeset -maxdepth 1 -name '*.md' ! -name README.md | wc -l)
+          if [ "$pending" -gt 0 ]; then
+            mode=prepare
+          elif git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+            mode=none
+          else
+            mode=release
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "Version $version, $pending changeset(s) waiting: $mode"
+
+      - name: Open or update the release PR
+        if: steps.state.outputs.mode == 'prepare'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$RELEASE_BRANCH"
+          pnpm changeset version
+          pnpm prettier --write CHANGELOG.md package.json
+          version=$(node -p "require('./package.json').version")
+          git add -A
+          git commit -m "chore(release): v$version"
+          git push --force origin "$RELEASE_BRANCH"
+
+          notes=$(awk -v v="$version" '$0 == "## " v {on=1; next} /^## / && on {exit} on' CHANGELOG.md)
+          body=$(printf 'Merging this PR releases **v%s**: tag, GitHub release and production deployment.\n\n%s\n' "$version" "$notes")
+          number=$(gh pr list --head "$RELEASE_BRANCH" --state open --json number --jq '.[0].number')
+          if [ -n "$number" ]; then
+            gh pr edit "$number" --title "chore(release): v$version" --body "$body"
+          else
+            gh pr create --base main --head "$RELEASE_BRANCH" --title "chore(release): v$version" --body "$body"
+          fi
+
+      - name: Tag and publish the release
+        if: steps.state.outputs.mode == 'release'
+        env:
+          VERSION: ${{ steps.state.outputs.version }}
+        run: |
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+          notes=$(awk -v v="$VERSION" '$0 == "## " v {on=1; next} /^## / && on {exit} on' CHANGELOG.md)
+          gh release create "v$VERSION" --title "v$VERSION" --notes "${notes:-Release v$VERSION}"
+
+      - name: Deploy to production
+        if: steps.state.outputs.mode == 'release'
+        env:
+          VERSION: ${{ steps.state.outputs.version }}
+          ENABLED: ${{ vars.PRODUCTION_DEPLOY_ENABLED }}
+        run: |
+          if [ "$ENABLED" != "true" ]; then
+            echo "::notice::v$VERSION tagged; production deployment is switched off (PRODUCTION_DEPLOY_ENABLED)."
+            exit 0
+          fi
+          git push --force origin "HEAD:refs/heads/production"
+          echo "v$VERSION is going live: production is now at $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"

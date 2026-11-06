@@ -1,0 +1,50 @@
+# Puts an older release back online: moves the `production` branch, which the production app on
+# Hostinger deploys from, to a release tag (v0.2.0) or a commit of `main`. Releases themselves go
+# out through release.yml. Off until the repository variable PRODUCTION_DEPLOY_ENABLED is "true".
+name: Roll back production
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Release tag (v0.2.0) or commit SHA to put back online
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    if: vars.PRODUCTION_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve the commit
+        id: target
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          sha=$(git rev-parse --verify "$REF^{commit}" 2>/dev/null || git rev-parse --verify "origin/$REF^{commit}")
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          git log -1 --format='Putting back online: %h %s' "$sha"
+
+      - name: Check the commit is on main
+        env:
+          SHA: ${{ steps.target.outputs.sha }}
+        run: |
+          git merge-base --is-ancestor "$SHA" origin/main \
+            || { echo "::error::$SHA is not on main: only reviewed code goes live."; exit 1; }
+
+      - name: Move production
+        env:
+          SHA: ${{ steps.target.outputs.sha }}
+        run: |
+          git push --force origin "$SHA:refs/heads/production"
+          echo "production is now at $(git rev-parse --short "$SHA")" >> "$GITHUB_STEP_SUMMARY"

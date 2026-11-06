@@ -47,7 +47,7 @@ Installed files are ours: review the diff before committing.
 
 ## Deploying on Hostinger
 
-Two Node.js apps on the "Unlimited Web Hosting" plan: **staging** (`staging.atlas-kine-sport.fr`, deploys every merge into `main`, never indexed) and **production** (`atlas-kine-sport.fr`, deploys the `production` branch, moved by the _Promote to production_ GitHub Action). Settings, environment variables, release and rollback: [`docs/deployment.md`](docs/deployment.md).
+Two Node.js apps on the "Unlimited Web Hosting" plan: **staging** (`staging.atlas-kine-sport.fr`, deploys every merge into `main`, never indexed) and **production** (`atlas-kine-sport.fr`, deploys the `production` branch, moved when a [Changesets](https://github.com/changesets/changesets) release PR is merged). Settings, environment variables, release and rollback: [`docs/deployment.md`](docs/deployment.md).
 
 Without the mail variables, `pnpm dev` prints the contact message in the terminal instead of sending it; in production, the form says sending is unavailable and points to the phone number.
 
