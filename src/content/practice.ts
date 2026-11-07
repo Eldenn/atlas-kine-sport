@@ -14,13 +14,33 @@ export const practice = {
   name: 'Atlas Kiné Sport',
   tagline: 'Bouger. Récupérer. Performer.',
   description:
-    'Cabinet de kinésithérapie du sport à Chasseneuil-du-Poitou : bilan, rééducation et reconditionnement progressif, pour les sportifs de tous niveaux.',
+    'Cabinet de kinésithérapie du sport à Chasseneuil-du-Poitou, près de Poitiers : bilan, rééducation et reconditionnement progressif, pour les sportifs de tous niveaux.',
   address: {
     street: '2 avenue de l’Europe',
     postalCode: '86360',
     city: 'Chasseneuil-du-Poitou',
   },
   phone: '07 72 50 80 17',
+  /** The same number for `tel:` links and structured data. */
+  phoneE164: '+33772508017',
+  /** Towns the practice serves, for search engines' local results. */
+  areaServed: [
+    'Chasseneuil-du-Poitou',
+    'Poitiers',
+    'Jaunay-Marigny',
+    'Saint-Georges-lès-Baillargeaux',
+    'Migné-Auxances',
+    'Buxerolles',
+  ],
+  // TODO(Matthieu): latitude and longitude of the entrance (right-click the pin in Google Maps),
+  // e.g. { latitude: 46.6, longitude: 0.36 }. Search engines then place the practice exactly.
+  geo: null as { latitude: number; longitude: number } | null,
+  /**
+   * The practice's own pages elsewhere, so search engines and AI assistants know they describe the
+   * same place: Google Business Profile, Pages Jaunes, Instagram…
+   * TODO(Matthieu): add the Google Business Profile link once the listing is verified.
+   */
+  profiles: [] as string[],
   /** The week in one line, where a day-by-day table would repeat itself. */
   hoursText: 'Du lundi au vendredi, 8 h 30 – 13 h et 14 h – 19 h. Fermé le week-end.',
   /** Facts that reassure, under the home page's actions. */
