@@ -1,9 +1,10 @@
-# Releases with Changesets. On every push to main:
-# - changesets waiting in .changeset/ → (re)build the release PR on `chore/release`: version bump
-#   in package.json + CHANGELOG.md. Nothing goes live.
-# - no changeset left and the version has no tag yet (the release PR was just merged) → tag
-#   v<version>, publish a GitHub release, and move `production` to this commit so Hostinger
-#   deploys it. The last step is off until the repository variable PRODUCTION_DEPLOY_ENABLED is "true".
+# Releases with Changesets, with nothing to run by hand. On every push to main:
+# - the push is the merged release PR ("chore(release): v…") → tag v<version>, publish a GitHub
+#   release, and move `production` to this commit so Hostinger deploys it. That last step is off
+#   until the repository variable PRODUCTION_DEPLOY_ENABLED is "true".
+# - otherwise, if feat / fix / perf commits landed since the last release → one changeset per commit
+#   (scripts/release/changesets-from-commits.mjs, from the squash-merged PR title), then
+#   (re)build the release PR on `chore/release`: version bump + CHANGELOG.md. Nothing goes live.
 # Staging needs nothing here: Hostinger deploys every push to main.
 name: Release
 
@@ -43,17 +44,17 @@ jobs:
         id: state
         run: |
           version=$(node -p "require('./package.json').version")
-          pending=$(find .changeset -maxdepth 1 -name '*.md' ! -name README.md | wc -l)
-          if [ "$pending" -gt 0 ]; then
-            mode=prepare
-          elif git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
-            mode=none
-          else
+          subject=$(git log -1 --format=%s)
+          if [[ "$subject" == "chore(release): v"* ]] && ! git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
             mode=release
+          elif [ "$(node scripts/release/changesets-from-commits.mjs)" -gt 0 ]; then
+            mode=prepare
+          else
+            mode=none
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
-          echo "Version $version, $pending changeset(s) waiting: $mode"
+          echo "Version $version: $mode"
 
       - name: Open or update the release PR
         if: steps.state.outputs.mode == 'prepare'
