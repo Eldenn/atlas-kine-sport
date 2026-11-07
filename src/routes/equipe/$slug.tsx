@@ -10,7 +10,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { Button } from '@/components/ui/button'
-import { practitioners } from '@/content/practice'
+import { practitioners, type Training } from '@/content/practice'
 import { AppLink } from '@/lib/link'
 import { seo } from '@/lib/seo'
 
@@ -99,6 +99,50 @@ function PractitionerPage() {
           </Button>
         </div>
       </section>
+      {p.trainings.length > 0 && <Trainings trainings={p.trainings} />}
     </>
+  )
+}
+
+/** Continuing education, grouped by year: the year in Marcellus on the left, the courses on the
+ *  right. Same rules as the "Domaines d’intervention" list, so the page reads as one document. */
+function Trainings({ trainings }: { trainings: Training[] }) {
+  const years = [...new Set(trainings.map((t) => t.year))].sort((a, b) => b - a)
+  return (
+    <section
+      aria-labelledby="formations"
+      className="atlas-divide mx-auto box-content grid max-w-[1120px] grid-cols-[minmax(0,1fr)] gap-x-12 gap-y-8 px-5 py-12 md:grid-cols-[240px_minmax(0,1fr)] md:px-7 md:pb-20 lg:grid-cols-[280px_minmax(0,1fr)]"
+    >
+      <div>
+        <h2 id="formations" className="m-0 font-display text-[26px]">
+          Formations
+        </h2>
+        <p className="mt-4 mb-0 max-w-[30ch] text-[15px] leading-relaxed text-fg-secondary">
+          Formation continue, de la plus récente à la plus ancienne.
+        </p>
+      </div>
+      <div>
+        {years.map((year) => (
+          <div
+            key={year}
+            className="grid grid-cols-[56px_minmax(0,1fr)] gap-x-5 border-b border-border-subtle py-5 first:pt-0 sm:grid-cols-[88px_minmax(0,1fr)] sm:gap-x-8"
+          >
+            <h3 className="m-0 font-display text-[20px] leading-[1.35] font-normal text-primary-text tabular-nums sm:text-[24px] sm:leading-[1.1]">
+              {year}
+            </h3>
+            <ul className="m-0 grid list-none gap-4 p-0">
+              {trainings
+                .filter((t) => t.year === year)
+                .map((t) => (
+                  <li key={t.title}>
+                    <p className="m-0 text-[16px] leading-snug">{t.title}</p>
+                    <p className="text-fg-muted mt-1 mb-0 text-[14px] leading-snug">{t.by}</p>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
