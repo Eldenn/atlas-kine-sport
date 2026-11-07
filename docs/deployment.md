@@ -72,17 +72,19 @@ On the server (once): Coolify installed, and Docker logged in to GHCR so it can 
 
 Then two resources in the same project, one per environment: **+ New → Private repository (GitHub App or deploy key) → Eldenn/atlas-kine-sport**, branch `main`.
 
-| Setting                      | Staging                                    | Production                                                              |
-| ---------------------------- | ------------------------------------------ | ----------------------------------------------------------------------- |
-| Build pack                   | Docker Compose                             | Docker Compose                                                          |
-| Base directory               | `/`                                        | `/`                                                                     |
-| Docker Compose location      | `/infra/compose.yaml`                      | `/infra/compose.yaml`                                                   |
-| Domain of the `web` service  | `https://staging.atlas-kine-sport.fr:3000` | `https://atlas-kine-sport.fr:3000,https://www.atlas-kine-sport.fr:3000` |
-| Automatic deployment on push | off (GitHub Actions triggers it)           | off                                                                     |
-| `IMAGE_TAG`                  | `staging`                                  | `production`                                                            |
-| `HOSTINGER_MAIL_API_TOKEN`   | Mail API token                             | Mail API token                                                          |
-| `HOSTINGER_MAILBOX_ID`       | sending mailbox ID                         | sending mailbox ID                                                      |
-| `CONTACT_TO`                 | the developer's address                    | the practice's address(es)                                              |
+| Setting                             | Staging                                    | Production                                                              |
+| ----------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------- |
+| Build pack                          | Docker Compose                             | Docker Compose                                                          |
+| Base directory                      | `/`                                        | `/`                                                                     |
+| Docker Compose location             | `/infra/compose.yaml`                      | `/infra/compose.yaml`                                                   |
+| Domain of the `web` service         | `https://staging.atlas-kine-sport.fr:3000` | `https://atlas-kine-sport.fr:3000,https://www.atlas-kine-sport.fr:3000` |
+| Advanced → Deployment → Auto deploy | Manual deployments only                    | Manual deployments only                                                 |
+| `IMAGE_TAG`                         | `staging`                                  | `production`                                                            |
+| `HOSTINGER_MAIL_API_TOKEN`          | Mail API token                             | Mail API token                                                          |
+| `HOSTINGER_MAILBOX_ID`              | sending mailbox ID                         | sending mailbox ID                                                      |
+| `CONTACT_TO`                        | the developer's address                    | the practice's address(es)                                              |
+
+With the Coolify GitHub App, auto deploy defaults to _Deploy on push_ ("Managed by your Git App"): switch it to _Manual deployments only_, otherwise Coolify redeploys the old image before GitHub Actions has pushed the new one. The authenticated Deploy webhook stays available under Webhooks.
 
 The `:3000` suffix tells Coolify's proxy which container port to route to; it is not part of the public URL. Coolify issues the Let's Encrypt certificates once DNS points to the server. In production, redirect `www` to the bare domain (Coolify → resource → Configuration → Redirect).
 
