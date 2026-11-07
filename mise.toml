@@ -1,6 +1,6 @@
 # The project's tools and tasks: `mise install` installs Node and pnpm at the versions below,
 # `mise run <task>` (or `mise <task>`) runs the commands. https://mise.jdx.dev
-# Node 22 is also the version selected in hPanel (Hostinger); pnpm follows "packageManager".
+# Node 22 is also the version in infra/Dockerfile; pnpm follows "packageManager".
 
 [tools]
 node = "22"
@@ -21,7 +21,7 @@ depends = ["install"]
 run = "pnpm build"
 
 [tasks.start]
-description = "Run the production build (as Hostinger does)"
+description = "Run the production build (the server the Docker image runs)"
 depends = ["build"]
 run = "node .output/server/index.mjs"
 
@@ -40,3 +40,15 @@ run = ["pnpm format:check", "pnpm typecheck", "pnpm build"]
 [tasks."coreloom:sync"]
 description = "Update the Coreloom components from a local clone: mise run coreloom:sync ../coreloom-ui"
 run = "node scripts/sync-coreloom.mjs"
+
+[tasks."infra:up"]
+description = "Run the production image locally with Docker Compose on http://localhost:3000"
+run = """
+env_file=""
+if [ -f .env ]; then env_file="--env-file .env"; fi
+docker compose $env_file -f infra/compose.yaml -f infra/compose.local.yaml up --build
+"""
+
+[tasks."infra:down"]
+description = "Stop the local Docker Compose stack"
+run = "docker compose -f infra/compose.yaml -f infra/compose.local.yaml down"

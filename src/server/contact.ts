@@ -10,6 +10,7 @@ import {
   type ContactRequest,
   type ContactResult,
 } from '@/lib/contact-schema'
+import { isStaging } from '@/lib/site-env'
 
 const API_BASE = 'https://api.mail.hostinger.com'
 const MIN_FILL_MS = 3000
@@ -38,7 +39,8 @@ const oneLine = (value: string) => value.replace(/[\r\n\t]+/g, ' ').trim()
 
 function composeEmail(data: ContactRequest) {
   const topic = contactTopics[data.topic]
-  const subject = oneLine(`Site · ${topic} · ${data.name}`)
+  // A test sent from the staging app must not be mistaken for a patient's message.
+  const subject = oneLine(`${isStaging ? '[TEST] ' : ''}Site · ${topic} · ${data.name}`)
   const text = [
     'Nouveau message envoyé depuis le formulaire du site.',
     '',

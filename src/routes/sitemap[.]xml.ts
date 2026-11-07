@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { practitioners, SITE_URL } from '@/content/practice'
 
-// The sitemap search engines read (announced in public/robots.txt). Served by the Node server:
+// The sitemap search engines read (announced in robots.txt). Served by the Node server:
 // Nitro only serves the public files it knew about when it built, and TanStack's own sitemap is
 // written after that.
 const paths = [

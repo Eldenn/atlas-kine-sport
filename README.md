@@ -9,17 +9,18 @@ Website of Atlas, a sports physiotherapy practice in Chasseneuil-du-Poitou, Fran
 
 ## Development
 
-Tools are pinned by [mise](https://mise.jdx.dev) in `mise.toml`: Node 22 (the version selected on Hostinger) and pnpm 12.13.
+Tools are pinned by [mise](https://mise.jdx.dev) in `mise.toml`: Node 22 (the version in the Docker image, `infra/Dockerfile`) and pnpm 12.13.
 
 ```bash
 mise install             # Node and pnpm at the right versions
 mise run dev             # http://localhost:3000 (installs dependencies first)
 mise run check           # before pushing: format, types, build
-mise run start           # production build, served as on Hostinger
+mise run start           # production build, served as in production
+mise run infra:up        # the real Docker image, as deployed
 mise tasks               # every task
 ```
 
-`pnpm install` only installs versions published at least 14 days ago (`pnpm-workspace.yaml`). Hostinger does not use mise: it reads `package.json` and `pnpm-lock.yaml`.
+`pnpm install` only installs versions published at least 14 days ago (`pnpm-workspace.yaml`). The Docker image does not use mise: it reads `package.json` and `pnpm-lock.yaml`.
 
 ## Where things are
 
@@ -45,28 +46,11 @@ mise run coreloom:sync ../coreloom-ui                      # or from a local clo
 
 Installed files are ours: review the diff before committing.
 
-## Deploying on Hostinger
+## Deploying
 
-"Unlimited Web Hosting" plan, Node.js application connected to this GitHub repository (every push to the selected branch redeploys).
+Docker images built by GitHub Actions, deployed by [Coolify](https://coolify.io) on our own server; the stack lives in `infra/`. **Staging** (`staging.atlas-kine-sport.fr`, never indexed) follows every merge into `main`; **production** (`atlas-kine-sport.fr`) is released by merging the `chore(release): vX.Y.Z` PR that the Release workflow keeps up to date from the PR titles. Infra, secrets, Coolify and DNS settings, rollback: [`docs/deployment.md`](docs/deployment.md).
 
-| hPanel setting   | Value              |
-| ---------------- | ------------------ |
-| Application type | Nitro              |
-| Node version     | 22                 |
-| Package manager  | pnpm               |
-| Build script     | `build`            |
-| Output directory | `.output`          |
-| Entry file       | `server/index.mjs` |
-
-Environment variables, set in hPanel (never in the code, never prefixed with `VITE_`):
-
-| Variable                   | Value                                                                                  |
-| -------------------------- | -------------------------------------------------------------------------------------- |
-| `HOSTINGER_MAIL_API_TOKEN` | Mail API token (_Emails → Agentic Mail → API access_)                                  |
-| `HOSTINGER_MAILBOX_ID`     | ID of the sending mailbox (returned by `GET https://api.mail.hostinger.com/api/v1/me`) |
-| `CONTACT_TO`               | Address(es) that receive the contact form's messages, separated by commas              |
-
-Without these variables, `pnpm dev` prints the message in the terminal instead of sending it; in production, the form says sending is unavailable and points to the phone number.
+Without the mail variables, `pnpm dev` prints the contact message in the terminal instead of sending it; in production, the form says sending is unavailable and points to the phone number.
 
 ## Content rules
 
