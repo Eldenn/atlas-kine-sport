@@ -47,10 +47,14 @@ jobs:
           subject=$(git log -1 --format=%s)
           if [[ "$subject" == "chore(release): v"* ]] && ! git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
             mode=release
-          elif [ "$(node scripts/release/changesets-from-commits.mjs)" -gt 0 ]; then
-            mode=prepare
           else
-            mode=none
+            node scripts/release/changesets-from-commits.mjs
+            # Generated changesets plus any hand-written one.
+            if [ "$(find .changeset -maxdepth 1 -name '*.md' ! -name README.md | wc -l)" -gt 0 ]; then
+              mode=prepare
+            else
+              mode=none
+            fi
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "mode=$mode" >> "$GITHUB_OUTPUT"

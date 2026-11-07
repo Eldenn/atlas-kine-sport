@@ -40,7 +40,3 @@ run = ["pnpm format:check", "pnpm typecheck", "pnpm build"]
 [tasks."coreloom:sync"]
 description = "Update the Coreloom components from a local clone: mise run coreloom:sync ../coreloom-ui"
 run = "node scripts/sync-coreloom.mjs"
-
-[tasks.changeset]
-description = "Describe this branch's change for the next release (patch, minor or major)"
-run = "pnpm changeset"

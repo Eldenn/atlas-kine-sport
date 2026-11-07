@@ -10,7 +10,7 @@ Rules for working on this repository (people and coding agents). The README cove
 - **Style**: semantic tokens (`bg-background`, `text-fg-secondary`, `text-primary-text`), never a hard-coded colour outside `src/styles/`. Headings in `font-display` (Marcellus, a single weight), eyebrows with `.atlas-eyebrow`. A light band: `data-theme="light" data-surface="bone" data-accent="atlas"` + `bg-background`.
 - **Accessibility**: WCAG 2.1 AA. External links with `target="_blank"` announced as "(nouvel onglet)"; an image that conveys something has an `alt`.
 - **Tools**: Node and pnpm come from `mise.toml` (`mise install`); changing a version means changing `mise.toml`, `packageManager` and Hostinger's Node setting together.
-- **Releases**: every PR that changes the site adds a changeset (`mise run changeset`, one line in English); merging the release PR is what deploys production. See `docs/deployment.md`.
+- **Releases**: automatic, from the squash-merged PR titles: `feat` → minor, `fix`/`perf` → patch, `!` → major, other types are not released. The PR title is therefore the changelog line. Merging the release PR is what deploys production. See `docs/deployment.md`.
 - **Before pushing**: `mise run check` (format, types, build; prerendering fails if a page crashes).
 
 ## Git: commits, branches and PRs

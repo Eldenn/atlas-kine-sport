@@ -6,7 +6,8 @@
 import { execFileSync } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
 
-const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim()
+const git = (...args) =>
+  execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
 
 /** The last release tag, or (before the first one) the commit before Changesets was set up. */
 function baseRef() {
@@ -44,7 +45,8 @@ for (const entry of log.split('\x1e')) {
   if (!sha) continue
   const bump = bumpFor(subject, body)
   if (!bump) continue
-  const summary = SUBJECT.exec(subject).groups.description
+  const description = SUBJECT.exec(subject).groups.description
+  const summary = description[0].toUpperCase() + description.slice(1)
   writeFileSync(
     `.changeset/commit-${sha.slice(0, 7)}.md`,
     `---\n'${name}': ${bump}\n---\n\n${summary}\n`,

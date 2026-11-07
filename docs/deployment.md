@@ -14,7 +14,7 @@ Releases are managed with [Changesets](https://github.com/changesets/changesets)
 > **Production deployment is switched off for now.** Releases are still prepared and tagged, but `production` does not move until the repository variable `PRODUCTION_DEPLOY_ENABLED` is set to `true` (Settings → Secrets and variables → Actions → Variables). Until then only staging deploys.
 
 ```
-feat/… + changeset ──PR, squash──▶ main ──Hostinger──▶ staging
+feat/… ──PR, squash──▶ main ──Hostinger──▶ staging
                                      │
                                      └─ Release workflow ──▶ PR "chore(release): vX.Y.Z" (chore/release)
                                                                   │ squash-merge
@@ -22,11 +22,12 @@ feat/… + changeset ──PR, squash──▶ main ──Hostinger──▶ sta
                                          tag vX.Y.Z + GitHub release ──▶ production ──Hostinger──▶ live site
 ```
 
-1. On a `type/topic` branch, describe the change for the changelog: `mise run changeset` (or `pnpm changeset`), pick `patch` (fix, text), `minor` (new page or section) or `major` (redesign), write one line in English. Commit the generated `.changeset/*.md` with the rest. A change with nothing to release (docs, CI) needs no changeset.
-2. Open the PR, run `mise run check`, squash-merge into `main` (see `AGENTS.md`). Hostinger rebuilds staging.
-3. The **Release** workflow opens or updates the release PR `chore(release): vX.Y.Z` on `chore/release`: it bumps `package.json` and writes `CHANGELOG.md` from every changeset merged since the last release. Several feature PRs pile up in the same release PR.
-4. Check staging. When it is right, squash-merge the release PR. The workflow then tags `vX.Y.Z`, publishes a GitHub release and moves `production` to that commit; Hostinger rebuilds the production app.
-5. Check the live site.
+1. Open a PR from a `type/topic` branch with a conventional title, run `mise run check`, squash-merge into `main` (see `AGENTS.md`). Hostinger rebuilds staging. Nothing to run for the release: the PR title is the changelog line.
+2. The **Release** workflow turns every releasable commit merged since the last release into a changeset (`scripts/release/changesets-from-commits.mjs`): `feat` → minor, `fix` / `perf` → patch, `!` after the type or a `BREAKING CHANGE:` footer → major; `docs`, `ci`, `chore`, `build`, `refactor`, `style`, `test` are not released. It then opens or updates the release PR `chore(release): vX.Y.Z` on `chore/release`, which bumps `package.json` and writes `CHANGELOG.md`. Several PRs pile up in the same release PR.
+3. Check staging. When it is right, squash-merge the release PR (keep its title). The workflow then tags `vX.Y.Z`, publishes a GitHub release and moves `production` to that commit; Hostinger rebuilds the production app.
+4. Check the live site.
+
+A hand-written changeset (`pnpm changeset`) is still picked up, for a release note the PR title cannot carry.
 
 Nothing is ever committed to `production` by hand: it only moves through the workflows, and only to commits that are on `main`.
 
@@ -38,7 +39,7 @@ Hostinger keeps only the live build, so a rollback is a new deployment of an old
 
 1. Pick the last good release under GitHub → Releases (or a commit hash from the production app's **Deployments** page in hPanel).
 2. Actions → **Roll back production** → `ref` = that tag (`v0.2.0`) or SHA → _Run workflow_.
-3. Fix the problem on `main` with a changeset as usual; the next release moves `production` forward again.
+3. Fix the problem on `main` with a `fix:` PR as usual; the next release moves `production` forward again.
 
 A failed build never replaces the live version: Hostinger only switches to a build that succeeded.
 
