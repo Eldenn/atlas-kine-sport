@@ -58,6 +58,14 @@ export const host = {
   website: 'https://www.hostinger.fr',
 } as const
 
+/** A continuing-education course, as the practitioner reported it. */
+export interface Training {
+  year: number
+  title: string
+  /** Trainers or organisation. */
+  by: string
+}
+
 export interface Practitioner {
   slug: string
   name: string
@@ -77,6 +85,8 @@ export interface Practitioner {
   doctolib: string
   /** Portrait in public/images, 4:5. */
   photo: string
+  /** Most recent first; the page groups them by year. */
+  trainings: Training[]
 }
 
 export const practitioners: Practitioner[] = [
@@ -100,6 +110,10 @@ export const practitioners: Practitioner[] = [
       'Rééducation fonctionnelle',
     ],
     bio: 'Une kinésithérapie active, fondée sur l’exercice thérapeutique. Ensemble, on fixe vos objectifs : prévenir les blessures, renforcer votre condition physique, récupérer plus vite. Sportif confirmé, amateur ou non pratiquant, le suivi s’adapte à vous et à votre discipline.',
+    trainings: [
+      { year: 2026, title: 'Lésion du mollet', by: 'Physiolearning' },
+      { year: 2026, title: 'Formation épaule', by: 'Training Thérapie Rennes' },
+    ],
     doctolib:
       'https://www.doctolib.fr/masseur-kinesitherapeute/chasseneuil-du-poitou/delman-ahmed-mustafa/booking/new-patient',
   },
@@ -124,6 +138,48 @@ export const practitioners: Practitioner[] = [
       'Troubles musculo-squelettiques',
     ],
     bio: 'Kinésithérapeute du sport, il accompagne les sportifs ainsi que les personnes qui vivent avec des douleurs persistantes ou chroniques. Il se forme en continu pour appuyer sa pratique sur les connaissances les plus récentes.',
+    trainings: [
+      { year: 2026, title: 'Lésion des ischio-jambiers', by: 'Bryan Littré' },
+      {
+        year: 2025,
+        title: 'Masterclass neurologique',
+        by: 'Bryan Littré, Laurent Fabre, Anais Rot',
+      },
+      { year: 2025, title: 'L’épaule du sportif', by: 'Clémence Bienaimé, Nicolas Foucher' },
+      { year: 2025, title: 'Gérer la douleur', by: 'Anthony Halimi' },
+      {
+        year: 2024,
+        title: 'Évaluation, diagnostic et rééducation de la hanche',
+        by: 'Michael Reiman',
+      },
+      {
+        year: 2024,
+        title: 'Troubles vasculaires en musculo-squelettique : trier pour savoir quand traiter',
+        by: 'Bryan Littré, Olivia Ferrand',
+      },
+      {
+        year: 2024,
+        title: 'Troubles neurologiques en musculo-squelettique : trier, évaluer et traiter',
+        by: 'Bryan Littré',
+      },
+      {
+        year: 2024,
+        title: 'Lésions myo-collagéniques du mollet et rupture du tendon d’Achille',
+        by: 'Damien Rech',
+      },
+      { year: 2024, title: 'Kinésithérapeute du sport', by: 'SFMKS' },
+      {
+        year: 2023,
+        title: 'Lombalgie chronique : remettre de l’ordre dans la complexité',
+        by: 'Joshua Lavalee',
+      },
+      { year: 2023, title: 'L’épaule EBPratique', by: 'Germain Delos, Azziz Youssef' },
+      {
+        year: 2021,
+        title: 'Épaule : utiliser les données de la science pour optimiser nos résultats',
+        by: 'Jo Gibson, Agence EBP',
+      },
+    ],
     doctolib:
       'https://www.doctolib.fr/masseur-kinesitherapeute/chasseneuil-du-poitou/moeine-khalifeh/booking/new-patient',
   },
