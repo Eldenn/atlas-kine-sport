@@ -1,5 +1,5 @@
 /**
- * Which Hostinger app this build is for, from `VITE_SITE_ENV` (set in hPanel, read at build time
+ * Which environment this build is for, from `VITE_SITE_ENV` (a Docker build argument, read at build time
  * because every page is prerendered). Only `staging` changes anything: pages carry `noindex`,
  * robots.txt disallows everything and contact emails are flagged. A missing value means production,
  * so forgetting it on the live site can never hide it from search engines.

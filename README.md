@@ -9,17 +9,18 @@ Website of Atlas, a sports physiotherapy practice in Chasseneuil-du-Poitou, Fran
 
 ## Development
 
-Tools are pinned by [mise](https://mise.jdx.dev) in `mise.toml`: Node 22 (the version selected on Hostinger) and pnpm 12.13.
+Tools are pinned by [mise](https://mise.jdx.dev) in `mise.toml`: Node 22 (the version in the Docker image, `infra/Dockerfile`) and pnpm 12.13.
 
 ```bash
 mise install             # Node and pnpm at the right versions
 mise run dev             # http://localhost:3000 (installs dependencies first)
 mise run check           # before pushing: format, types, build
-mise run start           # production build, served as on Hostinger
+mise run start           # production build, served as in production
+mise run infra:up        # the real Docker image, as deployed
 mise tasks               # every task
 ```
 
-`pnpm install` only installs versions published at least 14 days ago (`pnpm-workspace.yaml`). Hostinger does not use mise: it reads `package.json` and `pnpm-lock.yaml`.
+`pnpm install` only installs versions published at least 14 days ago (`pnpm-workspace.yaml`). The Docker image does not use mise: it reads `package.json` and `pnpm-lock.yaml`.
 
 ## Where things are
 
@@ -45,9 +46,9 @@ mise run coreloom:sync ../coreloom-ui                      # or from a local clo
 
 Installed files are ours: review the diff before committing.
 
-## Deploying on Hostinger
+## Deploying
 
-Two Node.js apps on the "Unlimited Web Hosting" plan: **staging** (`staging.atlas-kine-sport.fr`, deploys every merge into `main`, never indexed) and **production** (`atlas-kine-sport.fr`, deploys the `production` branch, moved when a [Changesets](https://github.com/changesets/changesets) release PR is merged). Settings, environment variables, release and rollback: [`docs/deployment.md`](docs/deployment.md).
+Docker images built by GitHub Actions, deployed by [Coolify](https://coolify.io) on our own server; the stack lives in `infra/`. **Staging** (`staging.atlas-kine-sport.fr`, never indexed) follows every merge into `main`; **production** (`atlas-kine-sport.fr`) is released by merging the `chore(release): vX.Y.Z` PR that the Release workflow keeps up to date from the PR titles. Infra, secrets, Coolify and DNS settings, rollback: [`docs/deployment.md`](docs/deployment.md).
 
 Without the mail variables, `pnpm dev` prints the contact message in the terminal instead of sending it; in production, the form says sending is unavailable and points to the phone number.
 

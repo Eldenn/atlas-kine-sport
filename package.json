@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Website of the Atlas Kiné Sport physiotherapy practice (Chasseneuil-du-Poitou): TanStack Start + Coreloom UI, deployed on Hostinger.",
+  "description": "Website of the Atlas Kiné Sport physiotherapy practice (Chasseneuil-du-Poitou): TanStack Start + Coreloom UI, self-hosted with Docker and Coolify.",
   "engines": {
     "node": ">=22"
   },

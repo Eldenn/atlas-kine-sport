@@ -1,91 +1,104 @@
 # Deployment
 
-The site runs as two Node.js apps on the Hostinger "Unlimited Web Hosting" plan (5 Node.js websites included), both built from this repository:
+The site runs in Docker on Matthieu's own server, managed by [Coolify](https://coolify.io). GitHub Actions builds the images and asks Coolify to deploy them; the stack is described once in `infra/` and shared by every environment.
 
-| App        | Domain                          | Deploys from             | `VITE_SITE_ENV` | Indexed |
-| ---------- | ------------------------------- | ------------------------ | --------------- | ------- |
-| Staging    | `staging.atlas-kine-sport.fr`   | `main`, on every merge   | `staging`       | No      |
-| Production | `atlas-kine-sport.fr` (+ `www`) | `production`, on release | _(unset)_       | Yes     |
+| Environment | Domain                          | Image (GHCR)                                 | Deployed when            | `VITE_SITE_ENV` | Indexed |
+| ----------- | ------------------------------- | -------------------------------------------- | ------------------------ | --------------- | ------- |
+| Local       | `localhost:3000`                | built from the working copy                  | `mise run infra:up`      | _(unset)_       | —       |
+| Staging     | `staging.atlas-kine-sport.fr`   | `ghcr.io/eldenn/atlas-kine-sport:staging`    | every push to `main`     | `staging`       | No      |
+| Production  | `atlas-kine-sport.fr` (+ `www`) | `ghcr.io/eldenn/atlas-kine-sport:production` | the release PR is merged | _(unset)_       | Yes     |
 
-## Flow
+## `infra/`
 
-Releases are managed with [Changesets](https://github.com/changesets/changesets).
+| File                      | Role                                                                                                                                               |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Dockerfile`              | Two stages: pnpm install + prerendered build, then a `node:22-alpine` image with only `.output` (≈250 MB), non-root, healthcheck on `/robots.txt`. |
+| `Dockerfile.dockerignore` | What stays out of the build context (the context is the repository root).                                                                          |
+| `compose.yaml`            | The stack used by staging and production: the `web` service, the image `:${IMAGE_TAG}`, mail variables, healthcheck.                               |
+| `compose.local.yaml`      | Local override: builds the image from the working copy and publishes port 3000.                                                                    |
 
-> **Production deployment is switched off for now.** Releases are still prepared and tagged, but `production` does not move until the repository variable `PRODUCTION_DEPLOY_ENABLED` is set to `true` (Settings → Secrets and variables → Actions → Variables). Until then only staging deploys.
+`VITE_SITE_ENV` is a build argument, not a runtime variable: pages are prerendered, so staging and production are two images built from the same commit. `staging` adds `noindex, nofollow` to every page, a disallow-all `robots.txt`, a "Préproduction" badge and a `[TEST]` prefix on contact emails. Unset means production, so forgetting it can only expose staging, never hide the live site.
+
+## Local
+
+```bash
+mise run infra:up                       # production image on http://localhost:3000 (uses .env if present)
+VITE_SITE_ENV=staging mise run infra:up # staging look
+mise run infra:down
+```
+
+`mise run dev` stays the everyday development server; `infra:up` is for checking the real image.
+
+## Release flow
+
+> **Production deployment is switched off for now.** Releases are still prepared, tagged and built, but `:production` does not move and Coolify is not called until the repository variable `PRODUCTION_DEPLOY_ENABLED` is `true`.
 
 ```
-feat/… ──PR, squash──▶ main ──Hostinger──▶ staging
-                                     │
-                                     └─ Release workflow ──▶ PR "chore(release): vX.Y.Z" (chore/release)
-                                                                  │ squash-merge
-                                                                  ▼
-                                         tag vX.Y.Z + GitHub release ──▶ production ──Hostinger──▶ live site
+feat/… ──PR (CI)──squash──▶ main ──Deploy staging──▶ :staging ──Coolify──▶ staging
+                              │
+                              └─ Release ──▶ PR "chore(release): vX.Y.Z" ──squash──▶ main
+                                                                              │
+                                   tag + GitHub release + image :vX.Y.Z ◀─────┘
+                                                 │
+                                                 └─▶ :production ──Coolify──▶ live site
 ```
 
-1. Open a PR from a `type/topic` branch with a conventional title, run `mise run check`, squash-merge into `main` (see `AGENTS.md`). Hostinger rebuilds staging. Nothing to run for the release: the PR title is the changelog line.
-2. The **Release** workflow turns every releasable commit merged since the last release into a changeset (`scripts/release/changesets-from-commits.mjs`): `feat` → minor, `fix` / `perf` → patch, `!` after the type or a `BREAKING CHANGE:` footer → major; `docs`, `ci`, `chore`, `build`, `refactor`, `style`, `test` are not released. It then opens or updates the release PR `chore(release): vX.Y.Z` on `chore/release`, which bumps `package.json` and writes `CHANGELOG.md`. Several PRs pile up in the same release PR.
-3. Check staging. When it is right, squash-merge the release PR (keep its title). The workflow then tags `vX.Y.Z`, publishes a GitHub release and moves `production` to that commit; Hostinger rebuilds the production app.
-4. Check the live site.
-
-A hand-written changeset (`pnpm changeset`) is still picked up, for a release note the PR title cannot carry.
-
-Nothing is ever committed to `production` by hand: it only moves through the workflows, and only to commits that are on `main`.
-
-Repository setting needed once: Settings → Actions → General → Workflow permissions → tick **Allow GitHub Actions to create and approve pull requests** (the workflow opens the release PR).
+1. Open a PR from a `type/topic` branch with a conventional title. **CI** checks format, types, the build and the Docker image. Squash-merge into `main`.
+2. **Deploy staging** builds `:staging` (and `:staging-<sha>`), pushes it to GHCR and calls the staging deploy webhook.
+3. **Release** turns every releasable commit since the last release into a changeset (`scripts/release/changesets-from-commits.mjs`): `feat` → minor, `fix` / `perf` → patch, `!` or a `BREAKING CHANGE:` footer → major; `docs`, `ci`, `chore`, `build`, `refactor`, `style`, `test` are not released. It opens or updates the release PR `chore(release): vX.Y.Z` (version in `package.json`, `CHANGELOG.md`). A hand-written changeset (`pnpm changeset`) is picked up too.
+4. Check staging, then squash-merge the release PR (keep its title). **Release** tags `vX.Y.Z`, publishes a GitHub release, builds `:vX.Y.Z`, points `:production` at it and calls the production deploy webhook.
 
 ## Rollback
 
-Hostinger keeps only the live build, so a rollback is a new deployment of an older release:
+Every release keeps its image (`:v0.2.0`, `:v0.3.0`…). Actions → **Roll back production** → `version` = the release to put back → _Run workflow_: `:production` points at that image again and Coolify redeploys, without rebuilding. Then fix the problem on `main` with a `fix:` PR; the next release moves production forward.
 
-1. Pick the last good release under GitHub → Releases (or a commit hash from the production app's **Deployments** page in hPanel).
-2. Actions → **Roll back production** → `ref` = that tag (`v0.2.0`) or SHA → _Run workflow_.
-3. Fix the problem on `main` with a `fix:` PR as usual; the next release moves `production` forward again.
+Coolify only switches containers once the new one is healthy, so a broken image does not replace a working one.
 
-A failed build never replaces the live version: Hostinger only switches to a build that succeeded.
+## GitHub configuration
 
-## Hostinger settings (both apps)
+| Where (Settings → …)                        | Name                         | Value                                                                     |
+| ------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------- |
+| Secrets and variables → Actions → Secrets   | `COOLIFY_TOKEN`              | Coolify API token with the deploy permission (Keys & Tokens → API tokens) |
+| Secrets and variables → Actions → Secrets   | `COOLIFY_STAGING_WEBHOOK`    | Staging resource → Webhooks → Deploy webhook URL                          |
+| Secrets and variables → Actions → Secrets   | `COOLIFY_PRODUCTION_WEBHOOK` | Production resource → Webhooks → Deploy webhook URL                       |
+| Secrets and variables → Actions → Variables | `PRODUCTION_DEPLOY_ENABLED`  | `true` once production is ready                                           |
+| Actions → General → Workflow permissions    | —                            | Allow GitHub Actions to create and approve pull requests                  |
 
-| hPanel setting   | Value                                        |
-| ---------------- | -------------------------------------------- |
-| Application type | Nitro                                        |
-| Node version     | 22 (keep in sync with `mise.toml`)           |
-| Root directory   | `/`                                          |
-| Package manager  | pnpm                                         |
-| Build script     | `build`                                      |
-| Output directory | `.output`                                    |
-| Entry file       | `server/index.mjs`                           |
-| Branch           | `main` (staging) / `production` (production) |
+Images go to GHCR with the workflow's own `GITHUB_TOKEN`: no secret needed for that.
 
-## Environment variables
+## Coolify configuration
 
-Set per app in hPanel → the website → **Environment variables**. They are available to both the build and the running server; saving them redeploys the app.
+On the server (once): Coolify installed, and Docker logged in to GHCR so it can pull the private images: create a GitHub token with `read:packages`, then on the server `echo "$TOKEN" | docker login ghcr.io --username Eldenn --password-stdin`.
 
-| Variable                   | Staging                       | Production                 |
-| -------------------------- | ----------------------------- | -------------------------- |
-| `VITE_SITE_ENV`            | `staging`                     | leave unset                |
-| `HOSTINGER_MAIL_API_TOKEN` | Mail API token (same as prod) | Mail API token             |
-| `HOSTINGER_MAILBOX_ID`     | sending mailbox ID (same)     | sending mailbox ID         |
-| `CONTACT_TO`               | the developer's address only  | the practice's address(es) |
+Then two resources in the same project, one per environment: **+ New → Private repository (GitHub App or deploy key) → Eldenn/atlas-kine-sport**, branch `main`.
 
-`VITE_SITE_ENV=staging` is read at build time (pages are prerendered) and does three things: a `noindex, nofollow` meta on every page, a `robots.txt` that disallows everything, and a `[TEST]` prefix on contact emails. It also shows a small "Préproduction" badge. Unset means production, so forgetting it can only expose staging, never hide the live site.
+| Setting                      | Staging                                    | Production                                                              |
+| ---------------------------- | ------------------------------------------ | ----------------------------------------------------------------------- |
+| Build pack                   | Docker Compose                             | Docker Compose                                                          |
+| Base directory               | `/`                                        | `/`                                                                     |
+| Docker Compose location      | `/infra/compose.yaml`                      | `/infra/compose.yaml`                                                   |
+| Domain of the `web` service  | `https://staging.atlas-kine-sport.fr:3000` | `https://atlas-kine-sport.fr:3000,https://www.atlas-kine-sport.fr:3000` |
+| Automatic deployment on push | off (GitHub Actions triggers it)           | off                                                                     |
+| `IMAGE_TAG`                  | `staging`                                  | `production`                                                            |
+| `HOSTINGER_MAIL_API_TOKEN`   | Mail API token                             | Mail API token                                                          |
+| `HOSTINGER_MAILBOX_ID`       | sending mailbox ID                         | sending mailbox ID                                                      |
+| `CONTACT_TO`                 | the developer's address                    | the practice's address(es)                                              |
 
-`VITE_SITE_ENV` is the only variable allowed a `VITE_` prefix, because it is not a secret: anything prefixed `VITE_` can end up in the browser bundle.
+The `:3000` suffix tells Coolify's proxy which container port to route to; it is not part of the public URL. Coolify issues the Let's Encrypt certificates once DNS points to the server. In production, redirect `www` to the bare domain (Coolify → resource → Configuration → Redirect).
 
-## Staging protection
+## DNS
 
-- **Always on**: `noindex` and `robots.txt` (above). Canonical URLs point to `https://atlas-kine-sport.fr`, so even a leaked staging link credits the live site.
-- **Password (optional)**: hPanel → staging website → Advanced → **Password Protect Directories** on `public_html`. Hostinger rewrites `public_html/.htaccess` on each deployment, so check after a deploy that the password prompt still appears (private window). If it does not, rely on `noindex` and keep the staging URL private.
+At the registrar of `atlas-kine-sport.fr` (Hostinger today):
 
-## Domains and SSL
+| Type   | Name       | Value                            |
+| ------ | ---------- | -------------------------------- |
+| `A`    | `@`        | the server's IPv4                |
+| `A`    | `www`      | the server's IPv4                |
+| `A`    | `staging`  | the server's IPv4                |
+| `AAAA` | same three | the server's IPv6, if it has one |
 
-- Production: the `atlas-kine-sport.fr` website in hPanel, with `www` redirecting to the bare domain. `domain.tld` and `www.domain.tld` each run a Node process, which counts toward the plan's process limit.
-- Staging: a subdomain website (`staging`), created as its own website, not a subfolder.
-- SSL: hPanel → Security → SSL, free certificate on each website (production, `www`, staging). Force HTTPS on all of them.
-- DNS: if the domain's nameservers are Hostinger's, records are created automatically. Otherwise add an `A` record for `staging` (and `@`/`www`) pointing to the IP shown in hPanel.
+Leave the `MX`, SPF, DKIM and DMARC records alone: mail stays with Hostinger and the contact form keeps using the Hostinger Mail API. Lower the TTL to 300 a day before switching `@` and `www`, so the cut-over is quick and easy to undo.
 
-## Limits to keep in mind
+## Legal
 
-- Apps stop after a period without traffic and restart on the next request. Pages are prerendered, so a cold start costs only the server start, not any rendering.
-- One deployment at a time per app; install and build are each limited to 15 minutes.
-- No inbound WebSockets, no background workers, 120-second request timeout.
-- Build logs (last 10) under the website's **Deployments**; server output under **Runtime logs**.
+The legal notice (`/mentions-legales`) must name the new host: name, address and phone of the provider running the server (`host` in `src/content/practice.ts`). Update it before production goes live.

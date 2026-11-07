@@ -1,0 +1,15 @@
+# Local run of the production setup, built from the working copy:
+#   docker compose -f infra/compose.yaml -f infra/compose.local.yaml up --build   (or: mise run infra:up)
+# http://localhost:3000. `mise run infra:up` also passes .env from the repository root (mail variables).
+# VITE_SITE_ENV=staging mise run infra:up previews the staging build (noindex, badge).
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+      args:
+        VITE_SITE_ENV: ${VITE_SITE_ENV:-}
+    image: atlas-kine-sport:local
+    pull_policy: build
+    ports:
+      - '3000:3000'

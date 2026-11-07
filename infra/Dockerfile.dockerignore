@@ -1,0 +1,14 @@
+# Read by BuildKit for infra/Dockerfile (the build context is the repository root).
+.git
+.github
+node_modules
+.output
+.nitro
+.tanstack
+.vinxi
+dist
+.env
+.env.*
+*.log
+infra
+docs

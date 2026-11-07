@@ -1,50 +1,54 @@
-# Puts an older release back online: moves the `production` branch, which the production app on
-# Hostinger deploys from, to a release tag (v0.2.0) or a commit of `main`. Releases themselves go
-# out through release.yml. Off until the repository variable PRODUCTION_DEPLOY_ENABLED is "true".
+# Puts an older release back online: points the :production image at an already-built release
+# (v0.2.0) and asks Coolify to redeploy production. Nothing is rebuilt.
+# Off until the repository variable PRODUCTION_DEPLOY_ENABLED is "true".
 name: Roll back production
 
 on:
   workflow_dispatch:
     inputs:
-      ref:
-        description: Release tag (v0.2.0) or commit SHA to put back online
+      version:
+        description: Release to put back online (for example v0.2.0)
         required: true
 
 permissions:
-  contents: write
+  contents: read
+  packages: write
 
 concurrency:
   group: production
   cancel-in-progress: false
 
+env:
+  IMAGE: ghcr.io/eldenn/atlas-kine-sport
+
 jobs:
   rollback:
     if: vars.PRODUCTION_DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://atlas-kine-sport.fr
     steps:
-      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
         with:
-          fetch-depth: 0
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Resolve the commit
-        id: target
+      - name: Point :production at the release
         env:
-          REF: ${{ inputs.ref }}
+          VERSION: ${{ inputs.version }}
         run: |
-          sha=$(git rev-parse --verify "$REF^{commit}" 2>/dev/null || git rev-parse --verify "origin/$REF^{commit}")
-          echo "sha=$sha" >> "$GITHUB_OUTPUT"
-          git log -1 --format='Putting back online: %h %s' "$sha"
+          [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Expected a release like v0.2.0"; exit 1; }
+          docker buildx imagetools create --tag "$IMAGE:production" "$IMAGE:$VERSION"
+          echo "Production image is now $VERSION" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Check the commit is on main
+      - name: Deploy on Coolify
         env:
-          SHA: ${{ steps.target.outputs.sha }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_WEBHOOK: ${{ secrets.COOLIFY_PRODUCTION_WEBHOOK }}
         run: |
-          git merge-base --is-ancestor "$SHA" origin/main \
-            || { echo "::error::$SHA is not on main: only reviewed code goes live."; exit 1; }
-
-      - name: Move production
-        env:
-          SHA: ${{ steps.target.outputs.sha }}
-        run: |
-          git push --force origin "$SHA:refs/heads/production"
-          echo "production is now at $(git rev-parse --short "$SHA")" >> "$GITHUB_STEP_SUMMARY"
+          curl --fail --silent --show-error --request POST "$COOLIFY_WEBHOOK" \
+            --header "Authorization: Bearer $COOLIFY_TOKEN"

@@ -10,10 +10,10 @@ export default defineConfig({
     tailwindcss(),
     tanstackStart({
       // Every page is rendered to HTML at build time, starting from "/" and following its links:
-      // search engines get full pages, and the first visit after Hostinger idles the app is fast.
+      // search engines get full pages and the server has almost nothing to render.
       prerender: { enabled: true, crawlLinks: true, failOnError: true },
     }),
-    // Builds .output/server/index.mjs, the Node server Hostinger runs ("Nitro" preset).
+    // Builds .output/server/index.mjs, the Node server the Docker image runs (infra/Dockerfile).
     nitro(),
     react(),
   ],

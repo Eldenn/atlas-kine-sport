@@ -1,11 +1,12 @@
 # Releases with Changesets, with nothing to run by hand. On every push to main:
 # - the push is the merged release PR ("chore(release): v…") → tag v<version>, publish a GitHub
-#   release, and move `production` to this commit so Hostinger deploys it. That last step is off
-#   until the repository variable PRODUCTION_DEPLOY_ENABLED is "true".
+#   release, build the production image (ghcr.io/eldenn/atlas-kine-sport:v<version>), then point
+#   :production at it and ask Coolify to redeploy production. Those last two steps are off until the
+#   repository variable PRODUCTION_DEPLOY_ENABLED is "true".
 # - otherwise, if feat / fix / perf commits landed since the last release → one changeset per commit
 #   (scripts/release/changesets-from-commits.mjs, from the squash-merged PR title), then
 #   (re)build the release PR on `chore/release`: version bump + CHANGELOG.md. Nothing goes live.
-# Staging needs nothing here: Hostinger deploys every push to main.
+# Staging is handled by deploy-staging.yml. Secrets: COOLIFY_TOKEN, COOLIFY_PRODUCTION_WEBHOOK.
 name: Release
 
 on:
@@ -15,6 +16,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  packages: write
 
 concurrency:
   group: production
@@ -26,6 +28,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       RELEASE_BRANCH: chore/release
+      IMAGE: ghcr.io/eldenn/atlas-kine-sport
     steps:
       - uses: actions/checkout@v4
         with:
@@ -92,15 +95,41 @@ jobs:
           notes=$(awk -v v="$VERSION" '$0 == "## " v {on=1; next} /^## / && on {exit} on' CHANGELOG.md)
           gh release create "v$VERSION" --title "v$VERSION" --notes "${notes:-Release v$VERSION}"
 
+      - uses: docker/setup-buildx-action@v3
+        if: steps.state.outputs.mode == 'release'
+
+      - uses: docker/login-action@v3
+        if: steps.state.outputs.mode == 'release'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build the production image
+        if: steps.state.outputs.mode == 'release'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ env.IMAGE }}:v${{ steps.state.outputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Deploy to production
         if: steps.state.outputs.mode == 'release'
         env:
           VERSION: ${{ steps.state.outputs.version }}
           ENABLED: ${{ vars.PRODUCTION_DEPLOY_ENABLED }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_WEBHOOK: ${{ secrets.COOLIFY_PRODUCTION_WEBHOOK }}
         run: |
           if [ "$ENABLED" != "true" ]; then
-            echo "::notice::v$VERSION tagged; production deployment is switched off (PRODUCTION_DEPLOY_ENABLED)."
+            echo "::notice::v$VERSION tagged and built; production deployment is switched off (PRODUCTION_DEPLOY_ENABLED)."
             exit 0
           fi
-          git push --force origin "HEAD:refs/heads/production"
-          echo "v$VERSION is going live: production is now at $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
+          docker buildx imagetools create --tag "$IMAGE:production" "$IMAGE:v$VERSION"
+          curl --fail --silent --show-error --request POST "$COOLIFY_WEBHOOK" \
+            --header "Authorization: Bearer $COOLIFY_TOKEN"
+          echo "v$VERSION is going live" >> "$GITHUB_STEP_SUMMARY"

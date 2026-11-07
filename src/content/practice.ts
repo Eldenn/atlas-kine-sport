@@ -52,7 +52,8 @@ export const company = {
 } as const
 
 export const host = {
-  // TODO(Matthieu): check the entity on the Hostinger invoice (Cyprus or Luxembourg for the EU).
+  // TODO(Matthieu): the site moves to our own server (Coolify): replace with that server's provider
+  // (name, address, phone, as the LCEN requires) before production goes live. Hostinger keeps the mail.
   name: 'Hostinger International Ltd',
   address: '61 Lordou Vironos str., 6023 Larnaca, Chypre',
   website: 'https://www.hostinger.fr',
