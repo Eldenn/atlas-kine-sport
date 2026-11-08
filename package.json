@@ -1,6 +1,6 @@
 {
   "name": "atlas-kine-sport",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Website of the Atlas Kiné Sport physiotherapy practice (Chasseneuil-du-Poitou): TanStack Start + Coreloom UI, self-hosted with Docker and Coolify.",
