@@ -14,7 +14,9 @@ export default defineConfig({
       prerender: { enabled: true, crawlLinks: true, failOnError: true },
     }),
     // Builds .output/server/index.mjs, the Node server the Docker image runs (infra/Dockerfile).
-    nitro(),
+    // Pages, scripts and styles are also written gzip- and brotli-compressed, and the server sends the
+    // smallest one the browser accepts: about a third of the bytes, with no work per request.
+    nitro({ compressPublicAssets: { gzip: true, brotli: true } }),
     react(),
   ],
 })

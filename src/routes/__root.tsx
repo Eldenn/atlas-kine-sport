@@ -11,10 +11,11 @@ import { SiteHeader } from '@/components/site-header'
 import { Button } from '@/components/ui/button'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { practice, legalLinks, nav, practitioners, SITE_URL } from '@/content/practice'
+import { practice, legalLinks, nav, practitioners } from '@/content/practice'
 import { CoreloomI18nProvider } from '@/lib/i18n'
 import { AppLink, CoreloomLinkProvider } from '@/lib/link'
 import { isStaging } from '@/lib/site-env'
+import { jsonLdScript, personNode, practiceNode, websiteNode } from '@/lib/structured-data'
 import montserratWoff2 from '@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2?url'
 import marcellusWoff2 from '@fontsource/marcellus/files/marcellus-latin-400-normal.woff2?url'
 import appCss from '@/styles/globals.css?url'
@@ -51,47 +52,15 @@ export const Route = createRootRoute({
     ],
     scripts: [
       { children: introScript },
-      { type: 'application/ld+json', children: JSON.stringify(structuredData) },
+      // The practice, its website and its practitioners, on every page: each page adds its own
+      // breadcrumb and details, pointing back to these by `@id`.
+      jsonLdScript([practiceNode, websiteNode, ...practitioners.map(personNode)]),
     ],
   }),
   shellComponent: RootDocument,
   component: Layout,
   notFoundComponent: NotFound,
 })
-
-// schema.org description of the practice, read by search engines for the local results.
-const structuredData = {
-  '@context': 'https://schema.org',
-  '@type': 'Physiotherapy',
-  name: practice.name,
-  description: practice.description,
-  url: SITE_URL,
-  image: `${SITE_URL}/og-image.jpg`,
-  logo: `${SITE_URL}/images/emblem-bone.png`,
-  hasMap: practice.directionsHref,
-  medicalSpecialty: 'PhysicalTherapy',
-  telephone: '+33772508017',
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: practice.address.street,
-    postalCode: practice.address.postalCode,
-    addressLocality: practice.address.city,
-    addressCountry: 'FR',
-  },
-  openingHoursSpecification: [
-    {
-      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-      opens: '08:30',
-      closes: '13:00',
-    },
-    {
-      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-      opens: '14:00',
-      closes: '19:00',
-    },
-  ],
-  employee: practitioners.map((p) => ({ '@type': 'Person', name: p.name, jobTitle: p.profession })),
-}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -181,7 +150,7 @@ function Footer() {
               <br />
               {address.postalCode} {address.city}
               <br />
-              <a href="tel:+33772508017" className="hover:text-foreground">
+              <a href={`tel:${practice.phoneE164}`} className="hover:text-foreground">
                 {practice.phone}
               </a>
             </address>

@@ -13,9 +13,10 @@ export const Route = createFileRoute('/cabinet')({
   head: () =>
     seo({
       path: '/cabinet',
-      title: 'Le cabinet',
+      title: 'Le cabinet de kinésithérapie du sport à Chasseneuil-du-Poitou',
+      name: 'Le cabinet',
       description:
-        'Une rééducation active : vous travaillez avec le kiné, sur un plateau technique conçu comme une salle d’entraînement.',
+        'Une rééducation active, près de Poitiers : vous travaillez avec le kiné, sur un plateau technique conçu comme une salle d’entraînement.',
     }),
   component: PracticePage,
 })

@@ -16,6 +16,7 @@ import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DelmanAhmedMustafaRouteImport } from './routes/delman-ahmed-mustafa'
 import { Route as InfosPratiquesRouteImport } from './routes/infos-pratiques'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as MoeineKhalifehRouteImport } from './routes/moeine-khalifeh'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
@@ -58,6 +59,11 @@ const DelmanAhmedMustafaRoute = DelmanAhmedMustafaRouteImport.update({
 const InfosPratiquesRoute = InfosPratiquesRouteImport.update({
   id: '/infos-pratiques',
   path: '/infos-pratiques',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/delman-ahmed-mustafa': typeof DelmanAhmedMustafaRoute
   '/infos-pratiques': typeof InfosPratiquesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/moeine-khalifeh': typeof MoeineKhalifehRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/delman-ahmed-mustafa': typeof DelmanAhmedMustafaRoute
   '/infos-pratiques': typeof InfosPratiquesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/moeine-khalifeh': typeof MoeineKhalifehRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/delman-ahmed-mustafa': typeof DelmanAhmedMustafaRoute
   '/infos-pratiques': typeof InfosPratiquesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/moeine-khalifeh': typeof MoeineKhalifehRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/delman-ahmed-mustafa'
     | '/infos-pratiques'
+    | '/llms.txt'
     | '/mentions-legales'
     | '/moeine-khalifeh'
     | '/robots.txt'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/delman-ahmed-mustafa'
     | '/infos-pratiques'
+    | '/llms.txt'
     | '/mentions-legales'
     | '/moeine-khalifeh'
     | '/robots.txt'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/delman-ahmed-mustafa'
     | '/infos-pratiques'
+    | '/llms.txt'
     | '/mentions-legales'
     | '/moeine-khalifeh'
     | '/robots.txt'
@@ -215,6 +227,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DelmanAhmedMustafaRoute: typeof DelmanAhmedMustafaRoute
   InfosPratiquesRoute: typeof InfosPratiquesRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   MoeineKhalifehRoute: typeof MoeineKhalifehRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
@@ -274,6 +287,13 @@ declare module '@tanstack/react-router' {
       path: '/infos-pratiques'
       fullPath: '/infos-pratiques'
       preLoaderRoute: typeof InfosPratiquesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mentions-legales': {
@@ -343,6 +363,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DelmanAhmedMustafaRoute: DelmanAhmedMustafaRoute,
   InfosPratiquesRoute: InfosPratiquesRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
   MoeineKhalifehRoute: MoeineKhalifehRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,

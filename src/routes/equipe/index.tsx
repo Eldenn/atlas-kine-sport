@@ -9,8 +9,10 @@ export const Route = createFileRoute('/equipe/')({
   head: () =>
     seo({
       path: '/equipe',
-      title: 'L’équipe',
-      description: 'Delman Ahmed Mustafa et Moeine Khalifeh, masseurs-kinésithérapeutes du sport.',
+      title: 'Les kinésithérapeutes du sport du cabinet',
+      name: 'L’équipe',
+      description:
+        'Delman Ahmed Mustafa et Moeine Khalifeh, masseurs-kinésithérapeutes du sport conventionnés à Chasseneuil-du-Poitou : domaines d’intervention, formations, rendez-vous.',
     }),
   component: TeamPage,
 })

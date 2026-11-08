@@ -10,9 +10,10 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { Button } from '@/components/ui/button'
-import { practitioners, type Training } from '@/content/practice'
+import { practitioners, SITE_URL, type Training } from '@/content/practice'
 import { AppLink } from '@/lib/link'
 import { seo } from '@/lib/seo'
+import { personId } from '@/lib/structured-data'
 
 export const Route = createFileRoute('/equipe/$slug')({
   loader: ({ params }) => {
@@ -24,7 +25,20 @@ export const Route = createFileRoute('/equipe/$slug')({
     loaderData
       ? seo({
           path: `/equipe/${loaderData.slug}`,
-          title: `${loaderData.name}, masseur-kinésithérapeute`,
+          title: `${loaderData.name}, kinésithérapeute du sport à Chasseneuil-du-Poitou`,
+          name: loaderData.name,
+          trail: [
+            { name: 'L’équipe', path: '/equipe' },
+            { name: loaderData.name, path: `/equipe/${loaderData.slug}` },
+          ],
+          // A profile page about the practitioner described once in the root's structured data.
+          schema: [
+            {
+              '@type': 'ProfilePage',
+              url: `${SITE_URL}/equipe/${loaderData.slug}`,
+              mainEntity: { '@id': personId(loaderData) },
+            },
+          ],
           // Kept under ~160 characters: the first areas only, the page lists them all.
           description: `${loaderData.name}, kinésithérapeute du sport à Chasseneuil-du-Poitou : ${loaderData.areas.slice(1, 4).join(', ').toLowerCase()}. Rendez-vous sur Doctolib.`,
         })

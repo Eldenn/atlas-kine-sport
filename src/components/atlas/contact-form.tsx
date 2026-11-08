@@ -152,7 +152,7 @@ export function ContactForm() {
               {status !== 'invalid' && (
                 <>
                   ou appelez le cabinet au{' '}
-                  <a href="tel:+33772508017" className="underline">
+                  <a href={`tel:${practice.phoneE164}`} className="underline">
                     {practice.phone}
                   </a>
                   .

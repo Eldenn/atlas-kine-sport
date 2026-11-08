@@ -11,7 +11,8 @@ export const Route = createFileRoute('/contact')({
   head: () =>
     seo({
       path: '/contact',
-      title: 'Prendre rendez-vous',
+      title: 'Prendre rendez-vous avec un kiné du sport',
+      name: 'Contact',
       description:
         'Prenez rendez-vous avec Delman Ahmed Mustafa ou Moeine Khalifeh sur Doctolib, ou contactez le cabinet Atlas Kiné Sport.',
     }),

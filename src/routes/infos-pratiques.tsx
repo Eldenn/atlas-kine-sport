@@ -20,9 +20,10 @@ export const Route = createFileRoute('/infos-pratiques')({
   head: () =>
     seo({
       path: '/infos-pratiques',
-      title: 'Infos pratiques et tarifs',
+      title: 'Horaires, accès et tarifs du cabinet',
+      name: 'Infos pratiques',
       description:
-        'Horaires, accès, conventionnement, moyens de paiement et tarifs des prestations non remboursées du cabinet Atlas Kiné Sport.',
+        'Horaires, accès, conventionnement, tiers payant, moyens de paiement et tarifs des prestations non remboursées du cabinet Atlas Kiné Sport, à Chasseneuil-du-Poitou.',
     }),
   component: PracticalInfoPage,
 })

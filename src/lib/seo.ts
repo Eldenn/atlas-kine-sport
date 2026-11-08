@@ -1,4 +1,5 @@
 import { SITE_URL } from '@/content/practice'
+import { breadcrumbNode, jsonLdScript } from '@/lib/structured-data'
 
 /** The image shown when a page is shared (messaging apps, social networks): 1200 × 630. */
 const OG_IMAGE = {
@@ -8,15 +9,28 @@ const OG_IMAGE = {
   alt: 'Atlas Kiné Sport, kinésithérapie du sport à Chasseneuil-du-Poitou',
 }
 
-/** Title, description, canonical URL and Open Graph tags for a page's `head`. */
+/**
+ * Title, description, canonical URL, Open Graph tags and structured data for a page's `head`.
+ * Every page but the home page gets a breadcrumb; by default it is "Accueil › <name>".
+ */
 export function seo({
   path,
   title,
   description,
+  name,
+  trail,
+  schema = [],
 }: {
   path: string
+  /** The `<title>`, without the site name (added after it, except on the home page). */
   title: string
   description: string
+  /** The page's short name in the breadcrumb, as in the menu. Defaults to `title`. */
+  name?: string
+  /** The breadcrumb from the home page, when the page is deeper than one level. */
+  trail?: { name: string; path: string }[]
+  /** More schema.org nodes about the page (FAQ, profile…). */
+  schema?: Record<string, unknown>[]
 }) {
   const fullTitle = path === '/' ? title : `${title} · Atlas Kiné Sport`
   const url = SITE_URL + path
@@ -36,5 +50,14 @@ export function seo({
       { name: 'twitter:card', content: 'summary_large_image' },
     ],
     links: [{ rel: 'canonical', href: url }],
+    scripts:
+      path === '/' && schema.length === 0
+        ? []
+        : [
+            jsonLdScript([
+              ...(path === '/' ? [] : [breadcrumbNode(trail ?? [{ name: name ?? title, path }])]),
+              ...schema,
+            ]),
+          ],
   }
 }
