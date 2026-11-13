@@ -175,10 +175,14 @@ function OpeningHours({
       ? t.closed
       : // One range per span: on a narrow screen they wrap between ranges, never inside one.
         valid.map((r, i) => (
-          <span key={r.open} className="whitespace-nowrap">
-            {formatClockTime(locale, r.open)} – {formatClockTime(locale, r.close)}
-            {i < valid.length - 1 && ', '}
-          </span>
+          // The space sits outside the span: inside it, nowrap would forbid the break too.
+          <React.Fragment key={r.open}>
+            <span className="whitespace-nowrap">
+              {formatClockTime(locale, r.open)} – {formatClockTime(locale, r.close)}
+              {i < valid.length - 1 && ','}
+            </span>
+            {i < valid.length - 1 && ' '}
+          </React.Fragment>
         ))
   }
   const status = now && showStatus ? openingStatus(hours, now, exceptions) : undefined

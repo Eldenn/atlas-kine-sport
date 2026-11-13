@@ -117,6 +117,25 @@ header nav a {
 [data-slot='field-description'] {
   font-size: 13px;
 }
+/* Touch screens: buttons and standalone links are at least 44px, the size a finger needs. */
+@media (pointer: coarse) {
+  .atlas-link,
+  [data-slot='button'],
+  header :is(a, button),
+  nav a,
+  footer a,
+  a.inline-flex,
+  a[href^='tel:'] {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  nav a,
+  footer a,
+  a[href^='tel:'] {
+    display: inline-flex;
+    align-items: center;
+  }
+}
 
 /* The intro screen (components/atlas/intro.tsx): the logo traces itself in about 1.9 s, holds,
    then the screen fades out and lets clicks through. Hidden for the rest of the visit
