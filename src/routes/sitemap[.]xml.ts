@@ -9,6 +9,7 @@ const paths = [
   '/',
   '/cabinet',
   '/soins',
+  '/preparation-physique',
   '/equipe',
   ...practitioners.map((p) => `/equipe/${p.slug}`),
   '/infos-pratiques',

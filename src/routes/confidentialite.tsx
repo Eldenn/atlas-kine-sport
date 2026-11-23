@@ -19,12 +19,12 @@ function PrivacyPage() {
   return (
     <LegalLayout
       title="Politique de confidentialité"
-      updated="2026-11-03"
+      updated="2026-11-23"
       intro={
         <p>
-          Ce site sert à présenter le cabinet et à vous orienter vers la prise de rendez-vous. Il
-          collecte le moins de données possible et ne contient aucun traceur publicitaire ni outil
-          de mesure d’audience.
+          Ce site sert à présenter le cabinet, à vous orienter vers la prise de rendez-vous et à
+          recevoir vos demandes. Il collecte le moins de données possible et ne contient aucun
+          traceur publicitaire ni outil de mesure d’audience.
         </p>
       }
       sections={[
@@ -65,6 +65,41 @@ function PrivacyPage() {
               <p>
                 N’envoyez pas d’informations médicales par ce formulaire : elles seront échangées en
                 consultation, dans le cadre du secret professionnel.
+              </p>
+            </>
+          ),
+        },
+        {
+          id: 'preparation-physique',
+          title: 'Demande de préparation physique',
+          content: (
+            <>
+              <p>
+                <strong>Données</strong> : nom, adresse e-mail, téléphone si vous le donnez, avec ou
+                sans bilan de départ, formule envisagée, sport et niveau si vous les indiquez, et
+                votre objectif.
+                <br />
+                <strong>Finalité</strong> : répondre à votre demande et organiser le début de la
+                préparation physique.
+                <br />
+                <strong>Base légale</strong> : les mesures précontractuelles prises à votre demande.
+                <br />
+                <strong>Durée</strong> : sans suite, 12 mois après notre dernier échange, puis
+                suppression. Si un suivi commence, le temps du suivi, puis 3 ans après sa fin.
+                <br />
+                <strong>Destinataires</strong> : les kinésithérapeutes du cabinet, et {host.name}{' '}
+                qui héberge le site et la messagerie.
+              </p>
+              <p>
+                Le formulaire ne demande aucune information de santé : votre état de santé est
+                abordé au bilan, en consultation. Si vous en indiquez malgré tout (une blessure, un
+                antécédent), elles ne sont lues que par les kinésithérapeutes du cabinet, tenus au
+                secret professionnel, et servent uniquement à adapter votre prise en charge. Vous
+                pouvez en demander l’effacement à tout moment.
+              </p>
+              <p>
+                La même protection contre les envois automatiques que pour le formulaire de contact
+                s’applique : adresse IP et heure d’envoi gardées en mémoire 15 minutes au plus.
               </p>
             </>
           ),

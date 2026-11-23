@@ -32,7 +32,16 @@ ${practitioners
 
 ${[
   page('/cabinet', 'Le cabinet', 'la démarche (rééducation active) et le plateau technique.'),
-  page('/soins', 'Soins', 'du bilan au retour au sport, et questions fréquentes.'),
+  page(
+    '/soins',
+    'Soins',
+    'kinésithérapie (traitement actif et passif), préparation physique, récupération, et questions fréquentes.',
+  ),
+  page(
+    '/preparation-physique',
+    'Préparation physique',
+    'pourquoi elle n’est pas remboursée, prestations, bilan de départ et formulaire de demande.',
+  ),
   page('/equipe', 'L’équipe', 'les praticiens, leurs domaines d’intervention et formations.'),
   page(
     '/infos-pratiques',

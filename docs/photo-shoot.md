@@ -15,11 +15,10 @@ WebP (and AVIF) into `public/images/photos/` and fill in the entry.
 
 ## Slots on the site
 
-| Slot                | Page                                       | Format                               | What we see                                                         |
-| ------------------- | ------------------------------------------ | ------------------------------------ | ------------------------------------------------------------------- |
-| `trainingFloor`     | Home, "Une rééducation active"             | 4:3 landscape                        | The sprint track at floor level, the load area blurred behind.      |
-| `trainingFloorWide` | Le cabinet, under the training floor scene | 21:9 (cropped 16:9 and 4:3 on phone) | The whole training floor seen from the entrance, wall lamps on.     |
-| `emblem`            | Le cabinet, "Pourquoi Atlas"               | 4:5 portrait                         | The lit logo on the walnut slats, a plant at the edge of the frame. |
+| Slot                | Page                                       | Format                               | What we see                                                     |
+| ------------------- | ------------------------------------------ | ------------------------------------ | --------------------------------------------------------------- |
+| `trainingFloor`     | Home, "Une rééducation active"             | 4:3 landscape                        | The sprint track at floor level, the load area blurred behind.  |
+| `trainingFloorWide` | Le cabinet, under the training floor scene | 21:9 (cropped 16:9 and 4:3 on phone) | The whole training floor seen from the entrance, wall lamps on. |
 
 ## Portraits
 

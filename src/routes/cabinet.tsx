@@ -6,7 +6,6 @@ import { GoldFigure } from '@/components/atlas/gold-figure'
 import { BookingBand } from '@/components/atlas/booking-band'
 import { PhotoSlot } from '@/components/atlas/photo-slot'
 import { photos } from '@/content/photos'
-import { cn } from '@/lib/utils'
 import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/cabinet')({
@@ -133,52 +132,6 @@ function PracticePage() {
           )}
         </div>
       </section>
-
-      <div className="atlas-divide">
-        <section
-          aria-labelledby="name-title"
-          className={cn(
-            container,
-            'grid gap-10 py-16 md:py-24',
-            photos.emblem &&
-              'md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:items-center md:gap-16',
-          )}
-        >
-          {photos.emblem && (
-            <div className={`${photoFrame} mx-auto aspect-[4/5] w-full max-w-[460px]`}>
-              <PhotoSlot photo={photos.emblem} sizes="(min-width: 768px) 460px, 100vw" />
-            </div>
-          )}
-          <div>
-            <p className="atlas-eyebrow m-0 text-primary-text">Pourquoi Atlas</p>
-            <h2
-              id="name-title"
-              className="mt-3 mb-0 max-w-[20ch] font-display text-[clamp(30px,4vw,44px)] leading-tight"
-            >
-              Le titan et la première vertèbre
-            </h2>
-            <div className="mt-8 grid gap-8 sm:grid-cols-2 sm:gap-10">
-              <div className="border-t border-border-subtle pt-5">
-                <h3 className="m-0 font-display text-[22px]">En mythologie</h3>
-                <p className="mt-3 mb-0 leading-relaxed text-fg-secondary">
-                  Atlas porte le monde sur ses épaules : la force, l’endurance, la stabilité.
-                </p>
-              </div>
-              <div className="border-t border-border-subtle pt-5">
-                <h3 className="m-0 font-display text-[22px]">En anatomie</h3>
-                <p className="mt-3 mb-0 leading-relaxed text-fg-secondary">
-                  L’atlas, la première vertèbre cervicale (C1), soutient la tête et lui donne sa
-                  mobilité.
-                </p>
-              </div>
-            </div>
-            <p className="mt-8 mb-0 max-w-[62ch] text-[18px] leading-[1.7]">
-              Le nom dit ce que nous faisons : soutenir la reconstruction du corps, jusqu’à ce qu’il
-              retrouve force et mouvement.
-            </p>
-          </div>
-        </section>
-      </div>
 
       <BookingBand title="Commencer par un bilan">
         <p className="m-0">
