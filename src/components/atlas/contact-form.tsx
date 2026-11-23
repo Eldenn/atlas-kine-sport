@@ -1,84 +1,35 @@
-// The contact form. Checks each field when the visitor leaves it, then live once it has been
-// flagged, so an error clears as soon as it's fixed. The server checks everything again and sends.
+// The contact form. The server checks everything again and sends (src/server/contact.ts).
 import { useForm } from '@tanstack/react-form'
 import { useServerFn } from '@tanstack/react-start'
 import * as React from 'react'
-import type { z } from 'zod'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
 import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+  ChoiceField,
+  Honeypot,
+  rules,
+  SendError,
+  TextAreaField,
+  TextField,
+  useOpenedAt,
+} from '@/components/atlas/form-parts'
+import { Button } from '@/components/ui/button'
+import { FieldGroup } from '@/components/ui/field'
 import { Spinner } from '@/components/ui/spinner'
-import { Textarea } from '@/components/ui/textarea'
-import { practice } from '@/content/practice'
-import { contactSchema, contactTopics, type ContactResult } from '@/lib/contact-schema'
+import { contactSchema, contactTopics } from '@/lib/contact-schema'
+import type { FailReason, FormResult } from '@/lib/form-common'
 import { AppLink } from '@/lib/link'
 import { sendContactMessage } from '@/server/contact'
 
-type FailReason = Exclude<ContactResult, { ok: true }>['reason']
-
-const failMessages: Record<FailReason, string> = {
-  invalid: 'Certains champs ne sont pas valides. Vérifiez-les puis renvoyez le message.',
-  'rate-limited':
-    'Plusieurs messages sont partis d’ici en peu de temps. Réessayez dans un quart d’heure,',
-  unavailable: 'L’envoi de messages est momentanément indisponible. Réessayez plus tard,',
-  failed: 'Votre message n’a pas pu partir. Réessayez dans un instant,',
-}
-
-/** The first problem with a value, as a sentence, or nothing. */
-function firstError(schema: z.ZodType, value: unknown) {
-  const result = schema.safeParse(value)
-  return result.success ? undefined : result.error.issues[0]?.message
-}
-
-/**
- * One validator, run on change but silent until the field has been left once (or the form
- * submitted): no error while someone is still typing, and an error clears as soon as it's fixed.
- * All errors live under the same cause, so fixing a field always clears its message.
- */
-function rules(schema: z.ZodType) {
-  return {
-    onChange: ({
-      value,
-      fieldApi,
-    }: {
-      value: unknown
-      fieldApi: { state: { meta: { isBlurred: boolean } } }
-    }) => (fieldApi.state.meta.isBlurred ? firstError(schema, value) : undefined),
-  }
-}
-
-/** Leaving a field marks it, then checks it. */
-function leave(field: { handleBlur: () => void; validate: (cause: 'change') => unknown }) {
-  field.handleBlur()
-  void field.validate('change')
-}
-
 const FIELDS = ['name', 'email', 'phone', 'topic', 'message'] as const
-
-const MESSAGE_MAX = 3000
+const ID = 'contact'
 
 export function ContactForm() {
   const send = useServerFn(sendContactMessage)
   const [status, setStatus] = React.useState<'idle' | 'sent' | FailReason>('idle')
-  const openedAt = React.useRef(0)
+  const openedAt = useOpenedAt()
   const formRef = React.useRef<HTMLFormElement>(null)
   const sentRef = React.useRef<HTMLHeadingElement>(null)
   const errorRef = React.useRef<HTMLDivElement>(null)
-
-  // Set in the browser: the page is prerendered, so a value from render time would be stale.
-  React.useEffect(() => {
-    openedAt.current = Date.now()
-  }, [])
 
   const form = useForm({
     defaultValues: { name: '', email: '', phone: '', topic: '', message: '', website: '' },
@@ -89,7 +40,7 @@ export function ContactForm() {
     },
     onSubmit: async ({ value }) => {
       setStatus('idle')
-      let result: ContactResult
+      let result: FormResult
       try {
         result = await send({
           data: {
@@ -144,32 +95,19 @@ export function ContactForm() {
       }}
     >
       <FieldGroup>
-        {status !== 'idle' && (
-          <Alert variant="destructive" ref={errorRef} tabIndex={-1} className="outline-none">
-            <AlertTitle>Le message n’est pas parti</AlertTitle>
-            <AlertDescription>
-              {failMessages[status]}{' '}
-              {status !== 'invalid' && (
-                <>
-                  ou appelez le cabinet au{' '}
-                  <a href={`tel:${practice.phoneE164}`} className="underline">
-                    {practice.phone}
-                  </a>
-                  .
-                </>
-              )}
-            </AlertDescription>
-          </Alert>
-        )}
+        {status !== 'idle' && <SendError reason={status} ref={errorRef} />}
 
         <div className="grid gap-7 md:grid-cols-2 md:gap-5">
           <form.Field name="name" validators={rules(contactSchema.shape.name)}>
-            {(field) => <TextField field={field} label="Nom et prénom" autoComplete="name" />}
+            {(field) => (
+              <TextField field={field} idPrefix={ID} label="Nom et prénom" autoComplete="name" />
+            )}
           </form.Field>
           <form.Field name="email" validators={rules(contactSchema.shape.email)}>
             {(field) => (
               <TextField
                 field={field}
+                idPrefix={ID}
                 label="Adresse e-mail"
                 type="email"
                 autoComplete="email"
@@ -183,6 +121,7 @@ export function ContactForm() {
           {(field) => (
             <TextField
               field={field}
+              idPrefix={ID}
               label="Téléphone"
               optional
               type="tel"
@@ -195,93 +134,25 @@ export function ContactForm() {
         </form.Field>
 
         <form.Field name="topic" validators={rules(contactSchema.shape.topic)}>
-          {(field) => {
-            const error = field.state.meta.errors[0] as string | undefined
-            return (
-              <FieldSet
-                aria-invalid={error ? true : undefined}
-                aria-describedby={error ? 'topic-error' : undefined}
-              >
-                <FieldLegend>Sujet</FieldLegend>
-                <div className="grid gap-2.5 sm:grid-cols-2">
-                  {Object.entries(contactTopics).map(([value, label]) => (
-                    <label
-                      key={value}
-                      className="flex cursor-pointer items-start gap-3 rounded-md border border-input bg-inset px-3.5 py-3 text-[14px] transition-colors has-checked:border-primary has-focus-visible:ring-[3px] has-focus-visible:ring-ring"
-                    >
-                      <input
-                        type="radio"
-                        name={field.name}
-                        value={value}
-                        checked={field.state.value === value}
-                        onChange={() => field.handleChange(value)}
-                        onBlur={() => leave(field)}
-                        aria-invalid={error ? true : undefined}
-                        className="mt-0.5 size-4 shrink-0 accent-primary outline-none"
-                      />
-                      {label}
-                    </label>
-                  ))}
-                </div>
-                <FieldError id="topic-error" className="text-[13px]">
-                  {error}
-                </FieldError>
-              </FieldSet>
-            )
-          }}
+          {(field) => (
+            <ChoiceField field={field} idPrefix={ID} legend="Sujet" options={contactTopics} />
+          )}
         </form.Field>
 
         <form.Field name="message" validators={rules(contactSchema.shape.message)}>
-          {(field) => {
-            const error = field.state.meta.errors[0] as string | undefined
-            const length = field.state.value.length
-            return (
-              <Field data-invalid={error ? true : undefined}>
-                <FieldLabel htmlFor="contact-message">Message</FieldLabel>
-                <Textarea
-                  id="contact-message"
-                  name={field.name}
-                  rows={6}
-                  maxLength={MESSAGE_MAX}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  onBlur={() => leave(field)}
-                  aria-invalid={error ? true : undefined}
-                  aria-describedby={`contact-message-help${error ? ' contact-message-error' : ''}`}
-                  className="min-h-[160px]"
-                />
-                <FieldDescription id="contact-message-help" className="flex justify-between gap-4">
-                  <span>
-                    Pas de détails médicaux ici : on en parle en séance, sous le secret
-                    professionnel.
-                  </span>
-                  <span aria-hidden className="shrink-0 tabular-nums">
-                    {length} / {MESSAGE_MAX}
-                  </span>
-                </FieldDescription>
-                <FieldError id="contact-message-error" className="text-[13px]">
-                  {error}
-                </FieldError>
-              </Field>
-            )
-          }}
+          {(field) => (
+            <TextAreaField
+              field={field}
+              idPrefix={ID}
+              label="Message"
+              maxLength={3000}
+              help="Pas de détails médicaux ici : on en parle en séance, sous le secret professionnel."
+            />
+          )}
         </form.Field>
 
-        {/* Hidden from people and assistive tech; a bot that fills every field fills this one. */}
         <form.Field name="website">
-          {(field) => (
-            <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
-              <label htmlFor="contact-website">Ne pas remplir</label>
-              <input
-                id="contact-website"
-                name={field.name}
-                tabIndex={-1}
-                autoComplete="off"
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-              />
-            </div>
-          )}
+          {(field) => <Honeypot field={field} idPrefix={ID} />}
         </form.Field>
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -302,55 +173,5 @@ export function ContactForm() {
         </div>
       </FieldGroup>
     </form>
-  )
-}
-
-interface TextFieldApi {
-  name: string
-  state: { value: string; meta: { errors: unknown[] } }
-  handleChange: (value: string) => void
-  handleBlur: () => void
-  validate: (cause: 'change') => unknown
-}
-
-function TextField({
-  field,
-  label,
-  optional,
-  description,
-  className,
-  ...inputProps
-}: {
-  field: TextFieldApi
-  label: string
-  optional?: boolean
-  description?: string
-  className?: string
-} & Pick<React.ComponentProps<'input'>, 'type' | 'autoComplete' | 'inputMode'>) {
-  const id = `contact-${field.name}`
-  const error = field.state.meta.errors[0] as string | undefined
-  const describedBy = [description && `${id}-help`, error && `${id}-error`].filter(Boolean)
-  return (
-    <Field data-invalid={error ? true : undefined} className={className}>
-      <FieldLabel htmlFor={id}>
-        {label}
-        {optional && <span className="font-normal text-muted-foreground">(facultatif)</span>}
-      </FieldLabel>
-      <Input
-        id={id}
-        name={field.name}
-        value={field.state.value}
-        onChange={(e) => field.handleChange(e.target.value)}
-        onBlur={() => leave(field)}
-        required={!optional}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy.length ? describedBy.join(' ') : undefined}
-        {...inputProps}
-      />
-      {description && <FieldDescription id={`${id}-help`}>{description}</FieldDescription>}
-      <FieldError id={`${id}-error`} className="text-[13px]">
-        {error}
-      </FieldError>
-    </Field>
   )
 }

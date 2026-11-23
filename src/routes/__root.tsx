@@ -136,7 +136,8 @@ function Footer() {
         <div className="space-y-4">
           <Brand />
           <p className="m-0 max-w-[34ch] text-[14px] leading-relaxed text-fg-secondary">
-            Kinésithérapie du sport à Chasseneuil-du-Poitou. Bilan, soins et reconditionnement.
+            Kinésithérapie du sport à Chasseneuil-du-Poitou. Rééducation, préparation physique et
+            récupération.
           </p>
         </div>
       }

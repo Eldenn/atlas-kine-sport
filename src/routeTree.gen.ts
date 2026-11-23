@@ -19,6 +19,7 @@ import { Route as InfosPratiquesRouteImport } from './routes/infos-pratiques'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as MoeineKhalifehRouteImport } from './routes/moeine-khalifeh'
+import { Route as PreparationPhysiqueRouteImport } from './routes/preparation-physique'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -76,6 +77,11 @@ const MoeineKhalifehRoute = MoeineKhalifehRouteImport.update({
   path: '/moeine-khalifeh',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PreparationPhysiqueRoute = PreparationPhysiqueRouteImport.update({
+  id: '/preparation-physique',
+  path: '/preparation-physique',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
   id: '/robots.txt',
   path: '/robots.txt',
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/llms.txt': typeof LlmsDottxtRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/moeine-khalifeh': typeof MoeineKhalifehRoute
+  '/preparation-physique': typeof PreparationPhysiqueRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/llms.txt': typeof LlmsDottxtRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/moeine-khalifeh': typeof MoeineKhalifehRoute
+  '/preparation-physique': typeof PreparationPhysiqueRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/llms.txt': typeof LlmsDottxtRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/moeine-khalifeh': typeof MoeineKhalifehRoute
+  '/preparation-physique': typeof PreparationPhysiqueRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/mentions-legales'
     | '/moeine-khalifeh'
+    | '/preparation-physique'
     | '/robots.txt'
     | '/services'
     | '/sitemap.xml'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/mentions-legales'
     | '/moeine-khalifeh'
+    | '/preparation-physique'
     | '/robots.txt'
     | '/services'
     | '/sitemap.xml'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/mentions-legales'
     | '/moeine-khalifeh'
+    | '/preparation-physique'
     | '/robots.txt'
     | '/services'
     | '/sitemap.xml'
@@ -230,6 +242,7 @@ export interface RootRouteChildren {
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   MoeineKhalifehRoute: typeof MoeineKhalifehRoute
+  PreparationPhysiqueRoute: typeof PreparationPhysiqueRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -310,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MoeineKhalifehRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/preparation-physique': {
+      id: '/preparation-physique'
+      path: '/preparation-physique'
+      fullPath: '/preparation-physique'
+      preLoaderRoute: typeof PreparationPhysiqueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/robots.txt': {
       id: '/robots.txt'
       path: '/robots.txt'
@@ -366,6 +386,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsDottxtRoute: LlmsDottxtRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
   MoeineKhalifehRoute: MoeineKhalifehRoute,
+  PreparationPhysiqueRoute: PreparationPhysiqueRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

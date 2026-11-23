@@ -209,6 +209,7 @@ export const practitioners: Practitioner[] = [
 export const nav = [
   { label: 'Le cabinet', href: '/cabinet' },
   { label: 'Soins', href: '/soins' },
+  { label: 'Prépa physique', href: '/preparation-physique' },
   { label: 'L’équipe', href: '/equipe' },
   { label: 'Infos pratiques', href: '/infos-pratiques' },
   { label: 'Contact', href: '/contact' },

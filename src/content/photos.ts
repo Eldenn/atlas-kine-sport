@@ -16,6 +16,4 @@ export const photos = {
   trainingFloor: null as Photo | null,
   /** Practice page: the whole training floor seen from the entrance, wide 21:9. */
   trainingFloorWide: null as Photo | null,
-  /** Practice page, "Pourquoi Atlas" section: the lit emblem on the walnut slats, portrait 4:5. */
-  emblem: null as Photo | null,
 }

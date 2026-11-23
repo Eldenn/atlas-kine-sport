@@ -4,6 +4,7 @@ import type * as React from 'react'
 
 import { BookingBand } from '@/components/atlas/booking-band'
 import { PageIntro } from '@/components/atlas/page-intro'
+import { anchorOffset, PageNav } from '@/components/atlas/page-nav'
 import { ContactDetails, OpeningHours } from '@/components/contact-section'
 import {
   Accordion,
@@ -37,8 +38,6 @@ const sections = [
 
 // box-content, like PageIntro: the text lines up with the page title.
 const container = 'mx-auto box-content max-w-[1120px] px-5 md:px-7'
-// Room for the sticky site header (64 px) and the page's own nav under it.
-const anchorOffset = 'scroll-mt-20 md:scroll-mt-32'
 
 const feesBySlug: Record<string, Fee[]> = {
   'delman-ahmed-mustafa': delmanFees,
@@ -65,28 +64,6 @@ function SectionHeading({
         </div>
       )}
     </div>
-  )
-}
-
-function PageNav() {
-  return (
-    <nav
-      aria-label="Sur cette page"
-      className="border-y border-border-subtle bg-background/85 backdrop-blur-md md:sticky md:top-16 md:z-10"
-    >
-      <ul className={`${container} m-0 flex list-none flex-wrap gap-x-6 gap-y-2 py-3.5`}>
-        {sections.map((s) => (
-          <li key={s.id}>
-            <a
-              href={`#${s.id}`}
-              className="inline-flex items-baseline gap-2 rounded-xs text-[14px] text-fg-secondary underline-offset-4 outline-none hover:text-foreground hover:underline focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              {s.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
   )
 }
 
@@ -336,7 +313,7 @@ function PracticalInfoPage() {
           remboursé et ce qui ne l’est pas.
         </p>
       </PageIntro>
-      <PageNav />
+      <PageNav sections={sections} />
       <GettingHere />
       <CoverageAndPayment />
       <FirstSession />
